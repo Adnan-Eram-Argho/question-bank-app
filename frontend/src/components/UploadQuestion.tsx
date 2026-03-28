@@ -56,8 +56,8 @@ const UploadQuestion = () => {
                 setMessage('Only JPG and PNG files are allowed.');
                 return;
             }
-            if (selectedFiles.length > 10) {
-                setMessage('You can upload a maximum of 10 images at once.');
+            if (selectedFiles.length > 2) {
+                setMessage('You can upload a maximum of 2 images at once.');
                 return;
             }
             setFiles(selectedFiles);
@@ -161,7 +161,7 @@ const UploadQuestion = () => {
                                             <span className="text-gray-400 dark:text-gray-500 line-clamp-2 max-w-xs">{files.map(f => f.name).join(', ')}</span>
                                         </div>
                                     ) : (
-                                        "PNG, JPG format up to 5MB (Max 10 files)"
+                                        "PNG, JPG format up to 5MB (Max 2 files)"
                                     )}
                                 </div>
                             </div>

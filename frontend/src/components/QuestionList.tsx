@@ -17,74 +17,59 @@ interface Question {
 const QuestionCard = ({ q }: { q: Question }) => {
     // Collect all images, fallback to single image_url if image_urls is missing or empty
     const images = q.image_urls && q.image_urls.length > 0 ? q.image_urls : (q.image_url ? [q.image_url] : []);
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    const nextImage = (e: React.MouseEvent) => {
-        e.preventDefault();
-        setCurrentIndex((prev) => (prev + 1) % images.length);
-    };
-
-    const prevImage = (e: React.MouseEvent) => {
-        e.preventDefault();
-        setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-    };
 
     return (
         <div className="group bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
             
             {/* Image Container */}
-            <div className="relative h-56 w-full bg-gray-100 dark:bg-gray-900 overflow-hidden border-b border-gray-100 dark:border-gray-800 group/img">
-                {images.length > 0 && (
-                    <img
-                        src={images[currentIndex]}
-                        alt={`${q.course_name} page ${currentIndex + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
-                        loading="lazy"
-                    />
+            <div className="relative h-56 w-full bg-gray-100 dark:bg-gray-900 overflow-hidden border-b border-gray-100 dark:border-gray-800 flex">
+                {images.length === 1 && (
+                    <a href={images[0]} target="_blank" rel="noreferrer" className="w-full h-full block relative group/full">
+                        <img
+                            src={images[0]}
+                            alt={`${q.course_name} page 1`}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/full:scale-105"
+                            loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/full:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/full:opacity-100 translate-y-2 group-hover/full:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Full Image">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                            </svg>
+                        </div>
+                    </a>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                {/* Image Navigator Badges */}
-                {images.length > 1 && (
-                    <div className="absolute top-3 right-3 bg-gray-900/70 backdrop-blur-md text-white px-2.5 py-1 text-xs font-semibold rounded-full shadow-sm z-10 flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        {currentIndex + 1} / {images.length}
-                    </div>
-                )}
-                
-                {/* Navigation Arrows */}
                 {images.length > 1 && (
                     <>
-                        <button 
-                            onClick={prevImage}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-1.5 rounded-full text-gray-800 dark:text-white opacity-0 group-hover/img:opacity-100 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 shadow-md transition-all duration-300 z-10"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                        </button>
-                        <button 
-                            onClick={nextImage}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-1.5 rounded-full text-gray-800 dark:text-white opacity-0 group-hover/img:opacity-100 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 shadow-md transition-all duration-300 z-10"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                        </button>
+                        <a href={images[0]} target="_blank" rel="noreferrer" className="w-1/2 h-full block relative border-r border-white/20 dark:border-gray-800 group/half flex-shrink-0">
+                            <img
+                                src={images[0]}
+                                alt={`${q.course_name} page 1`}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-105"
+                                loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/half:opacity-100 translate-y-2 group-hover/half:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Page 1">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                            </div>
+                        </a>
+                        <a href={images[1]} target="_blank" rel="noreferrer" className="w-1/2 h-full block relative group/half flex-shrink-0">
+                            <img
+                                src={images[1]}
+                                alt={`${q.course_name} page 2`}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-105"
+                                loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/half:opacity-100 translate-y-2 group-hover/half:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Page 2">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                            </div>
+                        </a>
                     </>
-                )}
-
-                {/* View Full Button */}
-                {images.length > 0 && (
-                    <a 
-                        href={images[currentIndex]} 
-                        target="_blank" 
-                        rel="noreferrer" 
-                        className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10"
-                        title="View Full Image"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                        </svg>
-                    </a>
                 )}
             </div>
 
