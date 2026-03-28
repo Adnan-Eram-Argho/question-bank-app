@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="24" fill="#1e3c2f" />
+  <!-- Stylized leaf background -->
+  <path d="M30 70 Q15 45 40 30 T80 20 Q80 45 60 65 T30 70 Z" fill="#468b6c" />
+  <!-- Elegant 'Q' Typography -->
+  <text x="48%" y="58%" dominant-baseline="middle" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="800" font-size="56" fill="#fdf8f0">Q</text>
+  <!-- Amber Accent Dot -->
+  <circle cx="68" cy="74" r="8" fill="#e38229" />
+</svg>

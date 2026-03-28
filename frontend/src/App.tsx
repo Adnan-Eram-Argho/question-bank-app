@@ -1,0 +1,70 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Layout from './components/Layout';
+import Login from './components/Login';
+import AdminDashboard from './components/AdminDashboard';
+import UploadQuestion from './components/UploadQuestion';
+import QuestionList from './components/QuestionList';
+import Developer from './components/Developer';
+import Contributors from './components/Contributors';
+import Profile from './components/Profile';
+
+const ProtectedRoute = ({ children, allowedRoles }: { children: JSX.Element, allowedRoles: string[] }) => {
+  const { user, role, loading } = useAuth();
+
+  if (loading) return <div className="text-center p-10">Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (!allowedRoles.includes(role || '')) return <Navigate to="/" replace />;
+
+  return children;
+};
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<QuestionList />} />
+              <Route path="/login" element={<Login />} />
+
+              {/* Protected Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/upload"
+                element={
+                  <ProtectedRoute allowedRoles={['admin', 'collector']}>
+                    <UploadQuestion />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute allowedRoles={['admin', 'collector']}>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Public Info Routes */}
+              <Route path="/developer" element={<Developer />} />
+              <Route path="/contributors" element={<Contributors />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;
