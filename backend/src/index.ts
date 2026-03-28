@@ -98,9 +98,10 @@ app.post('/api/admin/create-user', async (req: Request, res: Response): Promise<
  * POST /api/upload
  * Handles question uploads, including proxying the image to Cloudinary and storing records in Supabase.
  */
-app.post('/api/upload', upload.single('image'), async (req: Request, res: Response): Promise<void> => {
+app.post('/api/upload', upload.array('images', 10), async (req: Request, res: Response): Promise<void> => {
   try {
-    if (!req.file) {
+    const files = req.files as Express.Multer.File[];
+    if (!files || files.length === 0) {
       res.status(400).json({ error: 'Missing required image payload' });
       return;
     }
@@ -120,14 +121,20 @@ app.post('/api/upload', upload.single('image'), async (req: Request, res: Respon
       });
     };
 
-    const result = await streamUpload(req.file.buffer);
-    const imageUrl = result.secure_url;
+    // Upload all files to Cloudinary in parallel
+    const uploadPromises = files.map((file) => streamUpload(file.buffer));
+    const results = await Promise.all(uploadPromises);
+    const imageUrls = results.map((result) => result.secure_url);
+
+    // Provide the first image as the primary image_url for backward compatibility in some views
+    const imageUrl = imageUrls.length > 0 ? imageUrls[0] : null;
 
     const { data, error } = await supabase
       .from('questions')
       .insert([
         {
           image_url: imageUrl,
+          image_urls: imageUrls,
           level,
           semester,
           course_name,
@@ -225,13 +232,19 @@ app.delete('/api/admin/questions/:id', async (req: Request, res: Response): Prom
   try {
     const { data: question, error: fetchError } = await supabase
       .from('questions')
-      .select('image_url')
+      .select('image_url, image_urls')
       .eq('id', id)
       .single();
 
     if (fetchError) throw fetchError;
 
-    if (question?.image_url) {
+    if (question?.image_urls && question.image_urls.length > 0) {
+      // Delete all images in the array
+      const deletePromises = question.image_urls.map((url: string) => 
+        deleteImageFromCloudinary(url, 'question_bank')
+      );
+      await Promise.all(deletePromises);
+    } else if (question?.image_url) {
       await deleteImageFromCloudinary(question.image_url, 'question_bank');
     }
 

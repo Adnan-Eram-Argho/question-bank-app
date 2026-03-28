@@ -5,6 +5,7 @@ import { courseData } from '../data';
 interface Question {
     id: number;
     image_url: string;
+    image_urls?: string[];
     level: string;
     semester: string;
     course_name: string;
@@ -12,6 +13,120 @@ interface Question {
     uploaded_by: string;
     created_at: string;
 }
+
+const QuestionCard = ({ q }: { q: Question }) => {
+    // Collect all images, fallback to single image_url if image_urls is missing or empty
+    const images = q.image_urls && q.image_urls.length > 0 ? q.image_urls : (q.image_url ? [q.image_url] : []);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const nextImage = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const prevImage = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    return (
+        <div className="group bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+            
+            {/* Image Container */}
+            <div className="relative h-56 w-full bg-gray-100 dark:bg-gray-900 overflow-hidden border-b border-gray-100 dark:border-gray-800 group/img">
+                {images.length > 0 && (
+                    <img
+                        src={images[currentIndex]}
+                        alt={`${q.course_name} page ${currentIndex + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                        loading="lazy"
+                    />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Image Navigator Badges */}
+                {images.length > 1 && (
+                    <div className="absolute top-3 right-3 bg-gray-900/70 backdrop-blur-md text-white px-2.5 py-1 text-xs font-semibold rounded-full shadow-sm z-10 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {currentIndex + 1} / {images.length}
+                    </div>
+                )}
+                
+                {/* Navigation Arrows */}
+                {images.length > 1 && (
+                    <>
+                        <button 
+                            onClick={prevImage}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-1.5 rounded-full text-gray-800 dark:text-white opacity-0 group-hover/img:opacity-100 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 shadow-md transition-all duration-300 z-10"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button 
+                            onClick={nextImage}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-1.5 rounded-full text-gray-800 dark:text-white opacity-0 group-hover/img:opacity-100 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 shadow-md transition-all duration-300 z-10"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                    </>
+                )}
+
+                {/* View Full Button */}
+                {images.length > 0 && (
+                    <a 
+                        href={images[currentIndex]} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10"
+                        title="View Full Image"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                        </svg>
+                    </a>
+                )}
+            </div>
+
+            {/* Content Container */}
+            <div className="p-5 flex flex-col flex-grow">
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-3 line-clamp-2 leading-tight">
+                    {q.course_name}
+                </h3>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4 mt-auto">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
+                        {q.level}
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50">
+                        {q.semester}
+                    </span>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${
+                        q.question_type === 'Theory' 
+                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-100 dark:border-purple-800/50' 
+                            : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-100 dark:border-amber-800/50'
+                    }`}>
+                        {q.question_type}
+                    </span>
+                </div>
+
+                {/* Footer Info */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span className="truncate max-w-[120px]">{q.uploaded_by || 'Unknown'}</span>
+                    </div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500">
+                        {new Date(q.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const QuestionList = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -222,69 +337,7 @@ const QuestionList = () => {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                         {questions.map((q) => (
-                            <div key={q.id} className="group bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                                
-                                {/* Image Container */}
-                                <div className="relative h-56 w-full bg-gray-100 dark:bg-gray-900 overflow-hidden border-b border-gray-100 dark:border-gray-800">
-                                    <img
-                                        src={q.image_url}
-                                        alt={q.course_name}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                        loading="lazy"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    
-                                    {/* Action button overlay (optional, e.g. View Full) */}
-                                    <a 
-                                        href={q.image_url} 
-                                        target="_blank" 
-                                        rel="noreferrer" 
-                                        className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500"
-                                        title="View Full Image"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                        </svg>
-                                    </a>
-                                </div>
-
-                                {/* Content Container */}
-                                <div className="p-5 flex flex-col flex-grow">
-                                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-3 line-clamp-2 leading-tight">
-                                        {q.course_name}
-                                    </h3>
-
-                                    {/* Tags */}
-                                    <div className="flex flex-wrap gap-2 mb-4 mt-auto">
-                                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
-                                            {q.level}
-                                        </span>
-                                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50">
-                                            {q.semester}
-                                        </span>
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${
-                                            q.question_type === 'Theory' 
-                                                ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-100 dark:border-purple-800/50' 
-                                                : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-100 dark:border-amber-800/50'
-                                        }`}>
-                                            {q.question_type}
-                                        </span>
-                                    </div>
-
-                                    {/* Footer Info */}
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
-                                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                            <span className="truncate max-w-[120px]">{q.uploaded_by || 'Unknown'}</span>
-                                        </div>
-                                        <div className="text-xs text-gray-400 dark:text-gray-500">
-                                            {new Date(q.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <QuestionCard key={q.id} q={q} />
                         ))}
                     </div>
                 )}

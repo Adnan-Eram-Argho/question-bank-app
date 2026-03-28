@@ -13,6 +13,7 @@ export interface UserProfile {
 export interface Question {
     id: number;
     image_url: string;
+    image_urls?: string[];
     level: string;
     semester: string;
     course_name: string;
@@ -351,8 +352,16 @@ const AdminDashboard: React.FC = () => {
                         {questions.map(q => (
                             <div key={q.id} className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden relative group hover:shadow-lg transition-all duration-300 flex flex-col">
                                 <div className="relative h-40 bg-gray-100 dark:bg-gray-900">
-                                    <img src={q.image_url} alt="Q" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <img src={q.image_url || (q.image_urls && q.image_urls[0]) || ''} alt="Q" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                    {q.image_urls && q.image_urls.length > 1 && (
+                                        <div className="absolute top-2 right-2 bg-gray-900/70 backdrop-blur-md text-white px-2 py-1 text-[10px] font-bold rounded shadow-sm z-10 flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            {q.image_urls.length} Pages
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
                                         <button
                                             onClick={() => handleDeleteQuestion(q.id)}
                                             className="bg-red-600 hover:bg-red-700 text-white p-2.5 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-300"

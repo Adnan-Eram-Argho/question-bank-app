@@ -6,7 +6,7 @@ const UploadQuestion = () => {
     const { user } = useAuth();
 
     // Form State
-    const [file, setFile] = useState<File | null>(null);
+    const [files, setFiles] = useState<File[]>([]);
     const [level, setLevel] = useState('');
     const [semester, setSemester] = useState('');
     const [courseName, setCourseName] = useState('');
@@ -48,21 +48,26 @@ const UploadQuestion = () => {
     }, [level, semester]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const selectedFile = e.target.files[0];
+        if (e.target.files) {
+            const selectedFiles = Array.from(e.target.files);
             // Validation: Check type
-            if (!['image/jpeg', 'image/png'].includes(selectedFile.type)) {
+            const invalidFiles = selectedFiles.filter(f => !['image/jpeg', 'image/png'].includes(f.type));
+            if (invalidFiles.length > 0) {
                 setMessage('Only JPG and PNG files are allowed.');
                 return;
             }
-            setFile(selectedFile);
+            if (selectedFiles.length > 10) {
+                setMessage('You can upload a maximum of 10 images at once.');
+                return;
+            }
+            setFiles(selectedFiles);
             setMessage('');
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!file || !level || !semester || !courseName || !questionType) {
+        if (files.length === 0 || !level || !semester || !courseName || !questionType) {
             setMessage('Please fill in all fields.');
             return;
         }
@@ -72,7 +77,7 @@ const UploadQuestion = () => {
 
         // Prepare FormData for Multer
         const formData = new FormData();
-        formData.append('image', file);
+        files.forEach(f => formData.append('images', f));
         formData.append('level', level);
         formData.append('semester', semester);
         formData.append('course_name', courseName);
@@ -93,7 +98,7 @@ const UploadQuestion = () => {
 
             setMessage('Question uploaded successfully!');
             // Reset form
-            setFile(null);
+            setFiles([]);
             setLevel('');
             setSemester('');
             setCourseName('');
@@ -140,6 +145,7 @@ const UploadQuestion = () => {
                                             id="file-upload"
                                             name="file-upload"
                                             type="file"
+                                            multiple
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             className="sr-only"
@@ -148,13 +154,16 @@ const UploadQuestion = () => {
                                     </label>
                                     <p className="pl-1 hidden sm:block">or drag and drop</p>
                                 </div>
-                                <p className="text-xs text-gray-500 dark:text-gray-500">
-                                    {file ? (
-                                        <span className="text-primary-600 dark:text-primary-400 font-medium">Selected: {file.name}</span>
+                                <div className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                                    {files.length > 0 ? (
+                                        <div className="flex flex-col gap-1 items-center">
+                                            <span className="text-primary-600 dark:text-primary-400 font-medium">Selected {files.length} file(s)</span>
+                                            <span className="text-gray-400 dark:text-gray-500 line-clamp-2 max-w-xs">{files.map(f => f.name).join(', ')}</span>
+                                        </div>
                                     ) : (
-                                        "PNG, JPG format up to 5MB"
+                                        "PNG, JPG format up to 5MB (Max 10 files)"
                                     )}
-                                </p>
+                                </div>
                             </div>
                         </div>
                     </div>
