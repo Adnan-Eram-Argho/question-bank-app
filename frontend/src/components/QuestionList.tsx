@@ -161,9 +161,12 @@ const QuestionList = () => {
 
     // 3. Fetch Questions whenever filters change
     useEffect(() => {
-        // When a Level is chosen but Semester hasn't been picked yet,
-        // skip the fetch — the user is still making their selection.
-        if (filterLevel && !filterSemester && !filterCourse && !filterType) return;
+        // Skip only when the user is mid-selection:
+        // i.e., some of Level/Semester/Course are filled but not all three yet.
+        // An empty state (nothing selected) still fetches the default 10.
+        const allThreeSet = filterLevel && filterSemester && filterCourse;
+        const partialLSCSelection = (filterLevel || filterSemester || filterCourse) && !allThreeSet;
+        if (partialLSCSelection && !filterType) return;
         fetchQuestions();
     }, [filterLevel, filterSemester, filterCourse, filterType]);
 
