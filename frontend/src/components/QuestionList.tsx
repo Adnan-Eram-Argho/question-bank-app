@@ -161,8 +161,15 @@ const QuestionList = () => {
 
     // 3. Fetch Questions whenever filters change
     useEffect(() => {
+        // When a Level is chosen but Semester hasn't been picked yet,
+        // skip the fetch — the user is still making their selection.
+        if (filterLevel && !filterSemester && !filterCourse && !filterType) return;
         fetchQuestions();
     }, [filterLevel, filterSemester, filterCourse, filterType]);
+
+    // Requires at minimum Level + Semester to be considered a real search.
+    // Selecting only Level is incomplete — we wait for Semester before fetching filtered results.
+    const isFiltered = !!(filterLevel && filterSemester) || !!(filterCourse || filterType);
 
     const fetchQuestions = async () => {
         setLoading(true);
@@ -173,6 +180,13 @@ const QuestionList = () => {
             if (filterSemester) query = query.eq('semester', filterSemester);
             if (filterCourse) query = query.eq('course_name', filterCourse);
             if (filterType) query = query.eq('question_type', filterType);
+
+            // Only lift the limit once the user has selected at least Level + Semester.
+            // Selecting Level alone is a preparatory step, not a real search.
+            const hasMinimumFilter = (filterLevel && filterSemester) || filterCourse || filterType;
+            if (!hasMinimumFilter) {
+                query = query.limit(10);
+            }
 
             const { data, error } = await query;
             if (error) throw error;
@@ -289,7 +303,11 @@ const QuestionList = () => {
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}
+                        {isFiltered ? (
+                            <>Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
+                        ) : (
+                            <>Showing <span className="text-gray-900 dark:text-white font-bold">latest {questions.length}</span> question{questions.length !== 1 && 's'} &mdash; use filters to search all</>  
+                        )}
                     </p>
                 </div>
 
@@ -305,7 +323,7 @@ const QuestionList = () => {
                         <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
                             Try adjusting your filters or check back later for new uploads.
                         </p>
-                        {(filterLevel || filterSemester || filterCourse || filterType) && (
+                        {isFiltered && (
                             <button 
                                 onClick={() => {
                                     setFilterLevel('');
@@ -320,11 +338,23 @@ const QuestionList = () => {
                         )}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                        {questions.map((q) => (
-                            <QuestionCard key={q.id} q={q} />
-                        ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                            {questions.map((q) => (
+                                <QuestionCard key={q.id} q={q} />
+                            ))}
+                        </div>
+
+                        {/* Show-all CTA — only visible on the unfiltered default view */}
+                        {!isFiltered && (
+                            <div className="text-center pt-4">
+                                <p className="text-sm text-gray-400 dark:text-gray-500 mb-3">Looking for a specific question?</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Use the <span className="font-semibold text-gray-700 dark:text-gray-300">filters above</span> to search by level, semester, course, or type — results will load without any limit.
+                                </p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
