@@ -73,7 +73,7 @@ const AdminDashboard: React.FC = () => {
     }, [qLevel, qSemester, qCourse, activeTab]);
 
     const fetchUsers = async (): Promise<void> => {
-        const response = await fetch('http://localhost:5000/api/admin/users');
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
         const data = await response.json();
         setUsers(data);
     };
@@ -83,7 +83,7 @@ const AdminDashboard: React.FC = () => {
         setUserMessage('');
 
         try {
-            const response = await fetch('http://localhost:5000/api/admin/create-user', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/create-user`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -104,7 +104,7 @@ const AdminDashboard: React.FC = () => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users/${userId}`, {
                 method: 'DELETE',
             });
             const data = await response.json();
@@ -130,7 +130,7 @@ const AdminDashboard: React.FC = () => {
         if (!window.confirm('Delete this question? The image will also be removed from Cloudinary.')) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/admin/questions/${questionId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/questions/${questionId}`, {
                 method: 'DELETE',
             });
             const data = await response.json();

@@ -14,7 +14,7 @@ const Contributors = () => {
     useEffect(() => {
         const fetchContributors = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/admin/users');
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
                 const data = await response.json();
                 // Filter only collectors and admins (or just collectors if you prefer)
                 const active = data.filter((u: any) => u.role === 'collector' || u.role === 'admin');

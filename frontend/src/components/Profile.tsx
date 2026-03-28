@@ -26,7 +26,7 @@ const Profile = () => {
         const fetchProfile = async () => {
             if (!user) return;
             try {
-                const response = await fetch(`http://localhost:5000/api/admin/users`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
                 const users = await response.json();
                 const currentUser = users.find((u: any) => u.id === user.id);
 
@@ -69,7 +69,7 @@ const Profile = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/user/profile', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/user/profile`, {
                 method: 'POST',
                 body: data,
             });

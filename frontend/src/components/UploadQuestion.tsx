@@ -80,7 +80,7 @@ const UploadQuestion = () => {
         formData.append('uploaded_by', user?.email || 'Unknown');
 
         try {
-            const response = await fetch('http://localhost:5000/api/upload', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/upload`, {
                 method: 'POST',
                 body: formData,
             });
