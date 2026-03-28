@@ -74,9 +74,14 @@ const AdminDashboard: React.FC = () => {
     }, [qLevel, qSemester, qCourse, activeTab]);
 
     const fetchUsers = async (): Promise<void> => {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
-        const data = await response.json();
-        setUsers(data);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
+            if (!response.ok) throw new Error('Failed to fetch users');
+            const data = await response.json();
+            setUsers(data);
+        } catch (err) {
+            console.error('[AdminDashboard] Failed to load users:', err);
+        }
     };
 
     const handleCreateUser = async (e: React.FormEvent) => {
@@ -118,13 +123,18 @@ const AdminDashboard: React.FC = () => {
     };
 
     const fetchQuestions = async () => {
-        let query = supabase.from('questions').select('*').order('created_at', { ascending: false });
-        if (qLevel) query = query.eq('level', qLevel);
-        if (qSemester) query = query.eq('semester', qSemester);
-        if (qCourse) query = query.eq('course_name', qCourse);
+        try {
+            let query = supabase.from('questions').select('*').order('created_at', { ascending: false });
+            if (qLevel) query = query.eq('level', qLevel);
+            if (qSemester) query = query.eq('semester', qSemester);
+            if (qCourse) query = query.eq('course_name', qCourse);
 
-        const { data, error } = await query;
-        if (!error) setQuestions(data || []);
+            const { data, error } = await query;
+            if (error) throw error;
+            setQuestions(data || []);
+        } catch (err) {
+            console.error('[AdminDashboard] Failed to load questions:', err);
+        }
     };
 
     const handleDeleteQuestion = async (questionId: number) => {
