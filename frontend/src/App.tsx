@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -10,7 +11,7 @@ import Developer from './components/Developer';
 import Contributors from './components/Contributors';
 import Profile from './components/Profile';
 
-const ProtectedRoute = ({ children, allowedRoles }: { children: JSX.Element, allowedRoles: string[] }) => {
+const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode, allowedRoles: string[] }) => {
   const { user, role, loading } = useAuth();
 
   if (loading) return <div className="text-center p-10">Loading...</div>;
