@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { courseData } from '../data'; // Import the data from Step 1
 
@@ -19,6 +19,8 @@ const UploadQuestion = () => {
     // Feedback State
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [isDragging, setIsDragging] = useState(false);
+    const dragCounterRef = useRef(0);
 
     // 1. Update Semesters when Level changes
     useEffect(() => {
@@ -47,22 +49,92 @@ const UploadQuestion = () => {
         }
     }, [level, semester]);
 
+    // Shared validation and file setter
+    const processFiles = useCallback((incoming: File[]) => {
+        const imageFiles = incoming.filter(f => ['image/jpeg', 'image/png'].includes(f.type));
+        const invalid = incoming.filter(f => !['image/jpeg', 'image/png'].includes(f.type));
+
+        if (invalid.length > 0) {
+            setMessage('Only JPG and PNG files are allowed.');
+            return;
+        }
+
+        setFiles(prev => {
+            const merged = [...prev, ...imageFiles];
+            if (merged.length > 2) {
+                setMessage('You can upload a maximum of 2 images at once.');
+                return prev;
+            }
+            setMessage('');
+            return merged;
+        });
+    }, []);
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const selectedFiles = Array.from(e.target.files);
-            // Validation: Check type
-            const invalidFiles = selectedFiles.filter(f => !['image/jpeg', 'image/png'].includes(f.type));
-            if (invalidFiles.length > 0) {
-                setMessage('Only JPG and PNG files are allowed.');
-                return;
-            }
-            if (selectedFiles.length > 2) {
-                setMessage('You can upload a maximum of 2 images at once.');
-                return;
-            }
-            setFiles(selectedFiles);
-            setMessage('');
+            processFiles(Array.from(e.target.files));
         }
+    };
+
+    // --- Drag & Drop handlers ---
+    const handleDragEnter = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounterRef.current += 1;
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+            setIsDragging(true);
+        }
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounterRef.current -= 1;
+        if (dragCounterRef.current === 0) {
+            setIsDragging(false);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+        dragCounterRef.current = 0;
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        if (droppedFiles.length > 0) {
+            processFiles(droppedFiles);
+        }
+    };
+
+    // --- Ctrl+V Paste handler ---
+    useEffect(() => {
+        const handlePaste = (e: ClipboardEvent) => {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+            const pastedFiles: File[] = [];
+            for (const item of Array.from(items)) {
+                if (item.kind === 'file') {
+                    const file = item.getAsFile();
+                    if (file) pastedFiles.push(file);
+                }
+            }
+            if (pastedFiles.length > 0) {
+                processFiles(pastedFiles);
+            }
+        };
+
+        document.addEventListener('paste', handlePaste);
+        return () => document.removeEventListener('paste', handlePaste);
+    }, [processFiles]);
+
+    const removeFile = (index: number) => {
+        setFiles(prev => prev.filter((_, i) => i !== index));
+        setMessage('');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -133,14 +205,32 @@ const UploadQuestion = () => {
                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
                             Question Image (JPG/PNG)
                         </label>
-                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-xl focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                            <div className="space-y-1 text-center flex flex-col items-center">
-                                <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-2" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <div className="flex text-sm text-gray-600 dark:text-gray-400">
+                        {/* Drop Zone */}
+                        <div
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                            className={`mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-dashed rounded-xl transition-all duration-200 ${
+                                isDragging
+                                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-400/30'
+                                    : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500'
+                            }`}
+                        >
+                            <div className="space-y-2 text-center flex flex-col items-center w-full">
+                                {isDragging ? (
+                                    <svg className="mx-auto h-12 w-12 text-primary-500 mb-2 animate-bounce" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                ) : (
+                                    <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-2" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                )}
+
+                                <div className="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
                                     <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1 focus-within:ring-primary-500 dark:focus-within:ring-offset-gray-900">
-                                        <span>Click to upload a file</span>
+                                        <span>Click to browse</span>
                                         <input
                                             id="file-upload"
                                             name="file-upload"
@@ -149,21 +239,53 @@ const UploadQuestion = () => {
                                             accept=".jpg,.jpeg,.png"
                                             onChange={handleFileChange}
                                             className="sr-only"
-                                            required
                                         />
                                     </label>
-                                    <p className="pl-1 hidden sm:block">or drag and drop</p>
+                                    <p className="pl-1">, drag & drop, or <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-mono">Ctrl+V</kbd> to paste</p>
                                 </div>
-                                <div className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                                    {files.length > 0 ? (
-                                        <div className="flex flex-col gap-1 items-center">
-                                            <span className="text-primary-600 dark:text-primary-400 font-medium">Selected {files.length} file(s)</span>
-                                            <span className="text-gray-400 dark:text-gray-500 line-clamp-2 max-w-xs">{files.map(f => f.name).join(', ')}</span>
-                                        </div>
-                                    ) : (
-                                        "PNG, JPG format up to 5MB (Max 2 files)"
-                                    )}
-                                </div>
+
+                                <p className="text-xs text-gray-500 dark:text-gray-500">
+                                    {isDragging ? 'Release to drop your images here' : 'PNG, JPG up to 5MB — max 2 files'}
+                                </p>
+
+                                {/* Thumbnail Previews */}
+                                {files.length > 0 && (
+                                    <div className="flex gap-3 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 w-full justify-center">
+                                        {files.map((file, index) => {
+                                            const url = URL.createObjectURL(file);
+                                            return (
+                                                <div key={index} className="relative group/thumb flex-shrink-0">
+                                                    <img
+                                                        src={url}
+                                                        alt={`Preview ${index + 1}`}
+                                                        className="h-20 w-20 object-cover rounded-lg border-2 border-primary-400 dark:border-primary-600 shadow-md"
+                                                        onLoad={() => URL.revokeObjectURL(url)}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeFile(index)}
+                                                        className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full h-5 w-5 flex items-center justify-center shadow-md opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-200 z-10"
+                                                        title="Remove image"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                        </svg>
+                                                    </button>
+                                                    <span className="absolute bottom-0 left-0 right-0 text-center text-[9px] text-white bg-black/50 rounded-b-lg py-0.5 px-1 truncate">
+                                                        Page {index + 1}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                        {files.length < 2 && (
+                                            <label htmlFor="file-upload" className="h-20 w-20 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 hover:border-primary-400 hover:text-primary-500 cursor-pointer transition-colors flex-shrink-0" title="Add another image">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </label>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
