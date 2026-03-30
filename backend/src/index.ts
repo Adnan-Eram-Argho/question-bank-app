@@ -405,7 +405,7 @@ app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> =
 
     const completion = await groq.chat.completions.create({
       // model: 'llama-3.1-8b-instant',
-      model: 'llama-3.2-11b-vision-preview',
+      model: 'llama-3.2-11b-vision-instruct',
       messages: messages as any,
       max_tokens: 1024,
     });
