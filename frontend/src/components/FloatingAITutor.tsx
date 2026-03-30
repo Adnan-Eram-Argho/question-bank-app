@@ -163,7 +163,6 @@ const FloatingAITutor = () => {
                         </div>
                         <div>
                             <p className="font-semibold text-sm leading-tight">SAU Agri-Econ Tutor</p>
-                            <p className="text-xs text-emerald-100 leading-tight">Powered by Gemini AI</p>
                         </div>
                     </div>
                     <button
