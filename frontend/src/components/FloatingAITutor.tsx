@@ -124,10 +124,11 @@ const FloatingAITutor = () => {
             };
             setMessages((prev) => [...prev, aiMessage]);
         } catch (err: any) {
+            const detail = err?.message || 'Unknown error';
             const errorMessage: Message = {
                 id: messageIdRef.current++,
                 role: 'model',
-                text: '⚠️ Sorry, I could not connect to the AI service. Please check your connection and try again.',
+                text: `⚠️ Could not reach the AI service. (${detail}) — Please try again in a moment.`,
             };
             setMessages((prev) => [...prev, errorMessage]);
         } finally {

@@ -5,7 +5,7 @@ import multer from 'multer';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import streamifier from 'streamifier';
 import { createClient } from '@supabase/supabase-js';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, type Part } from '@google/generative-ai';
 
 dotenv.config();
 
@@ -386,9 +386,9 @@ app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> =
     const chat = model.startChat({ history: history || [] });
 
     // Build message parts: images first (if any), then the user's text
-    const messageParts: (string | { inlineData: { data: string; mimeType: string } })[] = [
+    const messageParts: Part[] = [
       ...imageParts,
-      message,
+      { text: message },
     ];
 
     const result = await chat.sendMessage(messageParts);
