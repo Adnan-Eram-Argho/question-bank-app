@@ -6,11 +6,6 @@ interface Message {
     text: string;
 }
 
-interface HistoryEntry {
-    role: 'user' | 'model';
-    parts: { text: string }[];
-}
-
 const API_URL = import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com';
 
 // Sparkle / brain icon for the floating button
@@ -78,13 +73,13 @@ const FloatingAITutor = () => {
         }
     }, [isOpen]);
 
-    // Build Gemini-compatible history from current messages (exclude welcome)
-    const buildHistory = (): HistoryEntry[] => {
+    // Build Groq-compatible history (OpenAI format: role + text)
+    const buildHistory = (): { role: 'user' | 'assistant'; text: string }[] => {
         return messages
-            .filter((m) => m.id !== 0) // skip the static welcome
+            .filter((m) => m.id !== 0) // skip static welcome message
             .map((m) => ({
-                role: m.role,
-                parts: [{ text: m.text }],
+                role: m.role === 'model' ? 'assistant' : 'user' as 'user' | 'assistant',
+                text: m.text,
             }));
     };
 
