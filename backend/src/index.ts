@@ -5,6 +5,7 @@ import multer from 'multer';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import streamifier from 'streamifier';
 import { createClient } from '@supabase/supabase-js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY!,
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
+
+// Gemini AI client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -317,6 +321,83 @@ app.post('/api/user/profile', upload.single('avatar'), async (req: Request, res:
   } catch (error: any) {
     console.error('[API Error] Profile Sync:', error.message);
     res.status(500).json({ error: error.message || 'Operation halted during profile sync' });
+  }
+});
+
+/**
+ * POST /api/chat-tutor
+ * Domain-specific AI Tutor powered by Google Gemini 1.5 Flash.
+ * Accepts: message (string), history (array), images (optional Cloudinary URL array).
+ * Enforces strict Agricultural Economics domain guardrails.
+ */
+const GEMINI_SYSTEM_INSTRUCTION = `
+You are a specialized AI Tutor built exclusively for the Agricultural Economics Question Bank at Sher-e-Bangla Agricultural University (SAU), Bangladesh.
+
+CRITICAL RULES — you must follow all of these without exception:
+
+RULE 1 — IDENTITY (HIGHEST PRIORITY):
+If the user asks "Who made you?", "Who created you?", "Who developed this?", "Who built you?", or any similar question about your creator, developer, or the application's author, you MUST reply with EXACTLY this phrase: "Md. Adnan Eram Argho made me." Do not add anything else about the creator.
+
+RULE 2 — DOMAIN RESTRICTION:
+You are STRICTLY limited to helping with Agricultural Economics and related subjects taught at SAU. Your knowledge domain includes: Principles of Economics, Micro Economics, Macro Economics, Agricultural Marketing, Farm Management, Agricultural Finance, Production Economics, Econometrics, Mathematical Economics, Environmental Economics, Agricultural Policy and Planning, Agricultural Development Economics, Supply Chain Management, Financial Management, Organizational Behavior, Bangladesh Studies, Human Resource Management, and any other subject within the SAU Agricultural Economics curriculum.
+You may also analyze and explain exam question papers if images are provided.
+
+RULE 3 — REJECTION:
+If the user asks about ANYTHING outside Agricultural Economics (including general knowledge, entertainment, movies, weather, coding, mathematics unrelated to economics, physics, chemistry, sports, politics, etc.), you MUST respond with EXACTLY: "I am here to help you only with Agricultural Economics and your exam questions." Do not attempt to answer off-topic questions under any circumstances.
+
+Always be helpful, clear, and educational when answering questions that fall within your allowed domain. If images of question papers are provided, analyze them carefully to help the student understand the questions and concepts.
+`;
+
+app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> => {
+  const { message, history, images } = req.body as {
+    message: string;
+    history: { role: 'user' | 'model'; parts: { text: string }[] }[];
+    images?: string[];
+  };
+
+  if (!message || typeof message !== 'string') {
+    res.status(400).json({ error: 'A valid message string is required.' });
+    return;
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      systemInstruction: GEMINI_SYSTEM_INSTRUCTION,
+    });
+
+    // Convert Cloudinary image URLs to base64 inline data
+    const imageParts: { inlineData: { data: string; mimeType: string } }[] = [];
+    if (images && Array.isArray(images) && images.length > 0) {
+      for (const url of images) {
+        try {
+          const imgResponse = await fetch(url);
+          const arrayBuffer = await imgResponse.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString('base64');
+          const contentType = imgResponse.headers.get('content-type') || 'image/jpeg';
+          imageParts.push({ inlineData: { data: base64, mimeType: contentType } });
+        } catch (imgErr) {
+          console.warn(`[Gemini] Could not fetch image: ${url}`, imgErr);
+        }
+      }
+    }
+
+    // Start chat session with prior conversation history
+    const chat = model.startChat({ history: history || [] });
+
+    // Build message parts: images first (if any), then the user's text
+    const messageParts: (string | { inlineData: { data: string; mimeType: string } })[] = [
+      ...imageParts,
+      message,
+    ];
+
+    const result = await chat.sendMessage(messageParts);
+    const responseText = result.response.text();
+
+    res.status(200).json({ reply: responseText });
+  } catch (error: any) {
+    console.error('[API Error] Chat Tutor:', error.message);
+    res.status(500).json({ error: error.message || 'AI service temporarily unavailable.' });
   }
 });
 

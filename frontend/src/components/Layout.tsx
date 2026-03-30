@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import FloatingAITutor from './FloatingAITutor';
 
 interface LayoutProps {
     children: ReactNode;
@@ -191,6 +192,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </p>
                 </div>
             </footer>
+            <FloatingAITutor />
         </div>
     );
 };
