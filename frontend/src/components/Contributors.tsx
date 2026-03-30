@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { supabase } from '../lib/supabaseClient';
 
 interface Contributor {
     email: string;
@@ -8,6 +9,17 @@ interface Contributor {
     avatar_url: string | null;
 }
 
+// Skeleton card shown while loading
+const SkeletonCard = () => (
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border dark:border-gray-700 text-center animate-pulse">
+        <div className="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto mb-2" />
+        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto mb-4" />
+        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-1" />
+        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mx-auto" />
+    </div>
+);
+
 const Contributors = () => {
     const [contributors, setContributors] = useState<Contributor[]>([]);
     const [loading, setLoading] = useState(true);
@@ -15,11 +27,15 @@ const Contributors = () => {
     useEffect(() => {
         const fetchContributors = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
-                const data = await response.json();
-                // Filter only collectors and admins (or just collectors if you prefer)
-                const active = data.filter((u: any) => u.role === 'collector' || u.role === 'admin');
-                setContributors(active);
+                // Fetch directly from Supabase — avoids Render cold-start delay
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('email, full_name, bio, avatar_url, role')
+                    .in('role', ['collector', 'admin'])
+                    .order('full_name', { ascending: true });
+
+                if (error) throw error;
+                setContributors(data || []);
             } catch (error) {
                 console.error('Error fetching contributors:', error);
             } finally {
@@ -28,8 +44,6 @@ const Contributors = () => {
         };
         fetchContributors();
     }, []);
-
-    if (loading) return <div className="text-center p-10">Loading...</div>;
 
     return (
         <div className="max-w-5xl mx-auto p-6 mt-10">
@@ -46,7 +60,14 @@ const Contributors = () => {
                 These users have dedicated their time to collect and upload questions for the faculty.
             </p>
 
-            {contributors.length === 0 ? (
+            {loading ? (
+                // Show 3 skeleton cards while data loads
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <SkeletonCard />
+                    <SkeletonCard />
+                    <SkeletonCard />
+                </div>
+            ) : contributors.length === 0 ? (
                 <p className="text-center text-gray-500">No contributors found yet.</p>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -70,6 +91,7 @@ const Contributors = () => {
                     ))}
                 </div>
             )}
+
             <div className="text-center mt-8">
                 <a href="/" className="text-secondary-600 hover:underline">← Back to Home</a>
             </div>
