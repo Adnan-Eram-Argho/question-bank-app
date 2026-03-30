@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 interface Contributor {
     email: string;
@@ -32,6 +33,12 @@ const Contributors = () => {
 
     return (
         <div className="max-w-5xl mx-auto p-6 mt-10">
+            <Helmet>
+                <title>Contributors | SAU Agricultural Economics Question Bank</title>
+                <meta name="description" content="Meet the dedicated contributors who collect and upload past exam questions for the Agricultural Economics faculty of Sher-e-Bangla Agricultural University (SAU)." />
+                <meta property="og:title" content="Contributors | SAU Agricultural Economics Question Bank" />
+                <meta property="og:description" content="Meet the dedicated contributors who collect and upload past exam questions for the SAU Agricultural Economics faculty." />
+            </Helmet>
             <h1 className="text-3xl font-bold text-center text-secondary-800 dark:text-secondary-200 mb-8">
                 Our Valued Contributors
             </h1>

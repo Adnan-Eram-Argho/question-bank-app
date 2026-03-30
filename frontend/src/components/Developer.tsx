@@ -1,6 +1,14 @@
+import { Helmet } from 'react-helmet-async';
+
 const Developer = () => {
   return (
     <div className="max-w-2xl mx-auto p-8 text-center mt-10">
+      <Helmet>
+        <title>Developer | SAU Agricultural Economics Question Bank</title>
+        <meta name="description" content="Learn about the developer behind the SAU Agricultural Economics Question Bank — a full-stack web application for Sher-e-Bangla Agricultural University." />
+        <meta property="og:title" content="Developer | SAU Agricultural Economics Question Bank" />
+        <meta property="og:description" content="Full-stack developer profile for the SAU Agri-Econ Question Bank application." />
+      </Helmet>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-10">
         <div className="mb-6">
           <div className="w-24 h-24 bg-primary-500 rounded-full mx-auto flex items-center justify-center text-white text-3xl font-bold">

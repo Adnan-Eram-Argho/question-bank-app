@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
 
@@ -27,7 +28,7 @@ const QuestionCard = ({ q }: { q: Question }) => {
                     <a href={images[0]} target="_blank" rel="noreferrer" className="w-full h-full block relative group/full">
                         <img
                             src={images[0]}
-                            alt={`${q.course_name} page 1`}
+                            alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover/full:scale-105"
                             loading="lazy"
                         />
@@ -44,7 +45,7 @@ const QuestionCard = ({ q }: { q: Question }) => {
                         <a href={images[0]} target="_blank" rel="noreferrer" className="w-1/2 h-full block relative border-r border-white/20 dark:border-gray-800 group/half flex-shrink-0">
                             <img
                                 src={images[0]}
-                                alt={`${q.course_name} page 1`}
+                                alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-105"
                                 loading="lazy"
                             />
@@ -58,7 +59,7 @@ const QuestionCard = ({ q }: { q: Question }) => {
                         <a href={images[1]} target="_blank" rel="noreferrer" className="w-1/2 h-full block relative group/half flex-shrink-0">
                             <img
                                 src={images[1]}
-                                alt={`${q.course_name} page 2`}
+                                alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 2) | SAU Agricultural Economics`}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-105"
                                 loading="lazy"
                             />
@@ -207,8 +208,49 @@ const QuestionList = () => {
         </div>
     );
 
+    // Build dynamic SEO title and description based on active filters
+    const buildPageTitle = (): string => {
+        const parts: string[] = [];
+        if (filterCourse) parts.push(filterCourse);
+        else if (filterLevel || filterSemester) parts.push('Question Repository');
+        if (filterLevel) parts.push(filterLevel);
+        if (filterSemester) parts.push(filterSemester);
+        if (filterType) parts.push(filterType);
+        if (parts.length === 0) return 'SAU Agricultural Economics Question Bank | Sher-e-Bangla Agricultural University';
+        return `${parts.join(' | ')} | SAU Agricultural Economics Question Bank`;
+    };
+
+    const buildMetaDescription = (): string => {
+        if (filterCourse && filterLevel && filterSemester) {
+            return `Download and view ${filterCourse} past exam question papers for ${filterLevel} ${filterSemester}${
+                filterType ? ` (${filterType})` : ''
+            } at Sher-e-Bangla Agricultural University (SAU) Agricultural Economics faculty.`;
+        }
+        if (filterLevel && filterSemester) {
+            return `Browse ${filterLevel} ${filterSemester}${
+                filterType ? ` ${filterType}` : ''
+            } past exam questions for the SAU Agricultural Economics faculty. Filter by course for more specific results.`;
+        }
+        if (filterType) {
+            return `Browse ${filterType} past exam questions for the Agricultural Economics faculty of Sher-e-Bangla Agricultural University (SAU).`;
+        }
+        return 'Browse past exam questions for the Agricultural Economics faculty of Sher-e-Bangla Agricultural University (SAU). Search by level, semester, course, and question type.';
+    };
+
     return (
         <div className="space-y-8 animate-fade-in">
+            <Helmet>
+                <title>{buildPageTitle()}</title>
+                <meta name="description" content={buildMetaDescription()} />
+                {/* Update canonical based on active filters */}
+                <link rel="canonical" href="https://sau-agri-econ.vercel.app/" />
+                {/* OG tags for social sharing */}
+                <meta property="og:title" content={buildPageTitle()} />
+                <meta property="og:description" content={buildMetaDescription()} />
+                <meta property="og:url" content="https://sau-agri-econ.vercel.app/" />
+                <meta property="og:type" content="website" />
+            </Helmet>
+
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2">
                 <div>
