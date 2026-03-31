@@ -16,13 +16,10 @@ interface Question {
 }
 
 const QuestionCard = ({ q }: { q: Question }) => {
-    // Collect all images, fallback to single image_url if image_urls is missing or empty
     const images = q.image_urls && q.image_urls.length > 0 ? q.image_urls : (q.image_url ? [q.image_url] : []);
 
     return (
         <div className="group bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-            
-            {/* Image Container */}
             <div className="relative h-56 w-full bg-gray-100 dark:bg-gray-900 overflow-hidden border-b border-gray-100 dark:border-gray-800 flex">
                 {images.length === 1 && (
                     <a href={images[0]} target="_blank" rel="noreferrer" className="w-full h-full block relative group/full">
@@ -74,13 +71,11 @@ const QuestionCard = ({ q }: { q: Question }) => {
                 )}
             </div>
 
-            {/* Content Container */}
             <div className="p-5 flex flex-col flex-grow">
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-3 line-clamp-2 leading-tight">
                     {q.course_name}
                 </h3>
 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4 mt-auto">
                     <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
                         {q.level}
@@ -97,7 +92,6 @@ const QuestionCard = ({ q }: { q: Question }) => {
                     </span>
                 </div>
 
-                {/* Footer Info */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,17 +112,14 @@ const QuestionList = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Filter States
     const [filterLevel, setFilterLevel] = useState('');
     const [filterSemester, setFilterSemester] = useState('');
     const [filterCourse, setFilterCourse] = useState('');
     const [filterType, setFilterType] = useState('');
 
-    // Dynamic Options for Dropdowns
     const [availableSemesters, setAvailableSemesters] = useState<string[]>([]);
     const [availableCourses, setAvailableCourses] = useState<string[]>([]);
 
-    // 1. Update Semesters & Reset Downstream when Level changes
     useEffect(() => {
         if (filterLevel && courseData[filterLevel as keyof typeof courseData]) {
             const semesters = Object.keys(courseData[filterLevel as keyof typeof courseData]);
@@ -136,17 +127,14 @@ const QuestionList = () => {
         } else {
             setAvailableSemesters([]);
         }
-        // Reset dependent fields
         setFilterSemester('');
         setFilterCourse('');
         setAvailableCourses([]);
     }, [filterLevel]);
 
-    // 2. Update Courses & Reset Downstream when Semester changes
     useEffect(() => {
         if (filterLevel && filterSemester) {
             const levelData = courseData[filterLevel as keyof typeof courseData];
-            // Safety check to ensure the path exists
             if (levelData && levelData[filterSemester as keyof typeof levelData]) {
                 const courses = levelData[filterSemester as keyof typeof levelData];
                 setAvailableCourses(courses);
@@ -156,23 +144,16 @@ const QuestionList = () => {
         } else {
             setAvailableCourses([]);
         }
-        // Reset course selection
         setFilterCourse('');
     }, [filterLevel, filterSemester]);
 
-    // 3. Fetch Questions whenever filters change
     useEffect(() => {
-        // Skip only when the user is mid-selection:
-        // i.e., some of Level/Semester/Course are filled but not all three yet.
-        // An empty state (nothing selected) still fetches the default 10.
         const allThreeSet = filterLevel && filterSemester && filterCourse;
         const partialLSCSelection = (filterLevel || filterSemester || filterCourse) && !allThreeSet;
         if (partialLSCSelection && !filterType) return;
         fetchQuestions();
     }, [filterLevel, filterSemester, filterCourse, filterType]);
 
-    // Requires at minimum Level + Semester to be considered a real search.
-    // Selecting only Level is incomplete — we wait for Semester before fetching filtered results.
     const isFiltered = !!(filterLevel && filterSemester) || !!(filterCourse || filterType);
 
     const fetchQuestions = async () => {
@@ -185,8 +166,6 @@ const QuestionList = () => {
             if (filterCourse) query = query.eq('course_name', filterCourse);
             if (filterType) query = query.eq('question_type', filterType);
 
-            // Only lift the limit once the user has selected at least Level + Semester.
-            // Selecting Level alone is a preparatory step, not a real search.
             const hasMinimumFilter = (filterLevel && filterSemester) || filterCourse || filterType;
             if (!hasMinimumFilter) {
                 query = query.limit(10);
@@ -208,7 +187,6 @@ const QuestionList = () => {
         </div>
     );
 
-    // Build dynamic SEO title and description based on active filters
     const buildPageTitle = (): string => {
         const parts: string[] = [];
         if (filterCourse) parts.push(filterCourse);
@@ -242,16 +220,13 @@ const QuestionList = () => {
             <Helmet>
                 <title>{buildPageTitle()}</title>
                 <meta name="description" content={buildMetaDescription()} />
-                {/* Update canonical based on active filters */}
                 <link rel="canonical" href="https://sau-agri-econ.vercel.app/" />
-                {/* OG tags for social sharing */}
                 <meta property="og:title" content={buildPageTitle()} />
                 <meta property="og:description" content={buildMetaDescription()} />
                 <meta property="og:url" content="https://sau-agri-econ.vercel.app/" />
                 <meta property="og:type" content="website" />
             </Helmet>
 
-            {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2">
                 <div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">Question Repository</h1>
@@ -259,11 +234,8 @@ const QuestionList = () => {
                 </div>
             </div>
 
-            {/* Filter Bar */}
             <div className="bg-white dark:bg-[#1E293B] p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                    
-                    {/* 1. Level */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Level</label>
                         <select
@@ -278,7 +250,6 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    {/* 2. Semester */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Semester</label>
                         <select
@@ -294,7 +265,6 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    {/* 3. Course Name */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Course</label>
                         <select
@@ -310,7 +280,6 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    {/* 4. Question Type */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Type</label>
                         <select
@@ -324,7 +293,6 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    {/* 5. Reset Button */}
                     <div className="flex flex-col justify-end">
                         <button
                             onClick={() => {
@@ -344,7 +312,6 @@ const QuestionList = () => {
                 </div>
             </div>
 
-            {/* Content Area */}
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -356,7 +323,6 @@ const QuestionList = () => {
                     </p>
                 </div>
 
-                {/* Question Grid */}
                 {questions.length === 0 ? (
                     <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
                         <div className="bg-gray-50 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -390,7 +356,6 @@ const QuestionList = () => {
                             ))}
                         </div>
 
-                        {/* Show-all CTA — only visible on the unfiltered default view */}
                         {!isFiltered && (
                             <div className="text-center pt-4">
                                 <p className="text-sm text-gray-400 dark:text-gray-500 mb-3">Looking for a specific question?</p>

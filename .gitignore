@@ -1,0 +1,7 @@
+# Root-level ignores — keep accidental installs and config out of git
+node_modules/
+package.json
+package-lock.json
+.env
+.env.local
+.env.*.local
