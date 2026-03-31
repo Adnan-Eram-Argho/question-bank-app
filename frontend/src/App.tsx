@@ -11,6 +11,9 @@ import Developer from './components/Developer';
 import Contributors from './components/Contributors';
 import Profile from './components/Profile';
 
+// ১. এই লাইনটি নতুন যোগ করা হয়েছে
+import { Analytics } from '@vercel/analytics/react'; 
+
 const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode, allowedRoles: string[] }) => {
   const { user, role, loading } = useAuth();
 
@@ -63,6 +66,10 @@ function App() {
             </Routes>
           </Layout>
         </Router>
+
+        
+        <Analytics /> 
+
       </AuthProvider>
     </ThemeProvider>
   );
