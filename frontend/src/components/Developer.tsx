@@ -10,8 +10,10 @@ const DEV = {
   avatarInitials: 'A',
 
   bio: `I'm a passionate full-stack developer and student at Sher-e-Bangla Agricultural University. 
-  I built this Question Bank platform to help students access past exam questions easily and academics 
-  to manage course resources in one place. I love turning real-world problems into clean, useful software.`,
+
+I have gained proficiency in different technologies.My learning journey has been largely self-directed. I have explored and learned some technologies from multiple online sources, allowing me to develop a comprehensive understanding and versatile skill set. This experience has not only honed my technical abilities but also cultivated a strong problem-solving mindset and an eagerness to embrace new challenges.
+
+I am passionate about programming and continuously learning new technologies to stay at the forefront of the ever-evolving tech landscape. I am excited to leverage my skills to contribute to innovative projects and collaborate with like-minded professionals in the field.`,
 
   github: 'https://github.com/Adnan-Eram-Argho',
   linkedin: 'https://www.linkedin.com/in/md-adnan-eram-argho/',
@@ -22,7 +24,7 @@ const DEV = {
     {
       degree: 'B.Sc. (Hons.) in Agricultural Economics',
       institution: 'Sher-e-Bangla Agricultural University',
-      year: '2022 – Present',
+      year: '2024 – Present',
     },
   ],
 
