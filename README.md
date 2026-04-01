@@ -10,6 +10,11 @@ A full-stack, comprehensive web application built for the Economics Faculty of a
 
 ---
 
+## 🚀 Live Demo
+[Visit the SAU Question Bank Here](https://question-bank-app-five.vercel.app)
+
+---
+
 ## 🌟 Features
 
 - **Public Repository Access**: Anyone can browse, search, and view past examination questions without needing an account.
@@ -19,6 +24,7 @@ A full-stack, comprehensive web application built for the Economics Faculty of a
 - **Admin Dashboard**: Secure panel to provision and manage contributor accounts (Admins only).
 - **Optimized Storage**: Image binaries are vaulted securely in **Cloudinary**, while fast, lightweight URLs are stored in **Supabase PostgreSQL** ensuring maximum performance.
 - **Dynamic Course Management**: Easily maintain and update course catalogs via a single configuration file without touching UI components.
+- **🤖 AI-Powered Tutor (Llama 3.2 Vision)**: Integrated a multimodal AI chatbot that scans question paper images using Groq API and answers student queries in real-time, explaining complex academic concepts natively.
 
 ## 🛠️ Tech Stack & Architecture
 
@@ -57,7 +63,9 @@ This application uses a robust, separated frontend-backend architecture.
 3. **Provisioning Users (Admin)**
    - An Admin submits an email/password via the Dashboard.
    - The Frontend hits `/api/admin/create-user`. The backend handles this by using Supabase's `auth.admin.createUser()` to securely bypass public signup restrictions and provisions the explicit database profile asynchronously.
-
+4.**🗄️ Database Structure (Supabase)**
+- **`users` table:** `id` (UUID), `email`, `role` (admin/collector), `created_at`
+- **`questions` table:** `id`, `level`, `semester`, `course_name`, `exam_type`, `image_urls` (Array), `uploader_id` (FK), `created_at`
 ---
 
 ## 💻 Installation & Local Development
@@ -81,7 +89,7 @@ You will need to set up `.env` files in both directories.
 PORT=5000
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_KEY=your_supabase_service_role_key
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_CLOUD_NAME=your_cloudinary_nam
 CLOUDINARY_API_KEY=your_cloudinary_key
 CLOUDINARY_API_SECRET=your_cloudinary_secret
 ```
@@ -125,5 +133,9 @@ You don't need to rebuild database relationships to add new semesters. The entir
 - **User**: General student body. No login required to perform complex queries and read data.
 
 ---
+## 🗺️ Future Roadmap
+- [ ] Implement user bookmarking for favorite questions.
+- [ ] Add an analytics dashboard to track the most searched courses.
+- [ ] Migrate from local `data.ts` course catalog to a dynamic Supabase table for easier updates.
 
 *Developed by Argho.*
