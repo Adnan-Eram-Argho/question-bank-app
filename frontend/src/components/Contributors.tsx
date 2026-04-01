@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com';
 
 interface Contributor {
   email: string;
@@ -27,13 +28,11 @@ const Contributors = () => {
   useEffect(() => {
     const fetchContributors = async () => {
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('email, full_name, bio, avatar_url, role')
-          .in('role', ['collector', 'admin'])
-          .order('full_name', { ascending: true });
-
-        if (error) throw error;
+        const response = await fetch(`${API_URL}/api/contributors`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch contributors');
+        }
+        const data = await response.json();
         setContributors(data || []);
       } catch (error) {
         console.error('Error fetching contributors:', error);

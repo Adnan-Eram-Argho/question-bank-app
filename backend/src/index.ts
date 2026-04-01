@@ -68,6 +68,27 @@ app.get('/', (req: Request, res: Response): void => {
 });
 
 /**
+ * GET /api/contributors
+ * Public route to fetch the list of contributors (collectors and admins).
+ * This uses the supabase service key to bypass Row Level Security.
+ */
+app.get('/api/contributors', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('email, full_name, bio, avatar_url, role')
+      .in('role', ['collector', 'admin'])
+      .order('full_name', { ascending: true });
+
+    if (error) throw error;
+    res.status(200).json(data);
+  } catch (error: any) {
+    console.error('[API Error] Fetch Contributors:', error.message);
+    res.status(500).json({ error: 'Failed to fetch contributors' });
+  }
+});
+
+/**
  * POST /api/admin/create-user
  * Admin route to safely create a new user in Supabase Auth and the public database schema.
  */

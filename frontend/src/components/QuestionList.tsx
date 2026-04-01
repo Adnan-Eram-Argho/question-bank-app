@@ -229,8 +229,10 @@ const QuestionList = () => {
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">Question Repository</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-2">Browse and find past exam questions</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent leading-tight">
+                        Sher-e-Bangla Agricultural University (SAU) Question Bank
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-2">Previous year exam papers for Agricultural Economics</p>
                 </div>
             </div>
 
