@@ -13,6 +13,7 @@ import Profile from './components/Profile';
 
 // ১. এই লাইনটি নতুন যোগ করা হয়েছে
 import { Analytics } from '@vercel/analytics/react'; 
+import { Toaster } from 'react-hot-toast';
 
 const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode, allowedRoles: string[] }) => {
   const { user, role, loading } = useAuth();
@@ -69,7 +70,29 @@ function App() {
 
         
         <Analytics /> 
-
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            style: {
+              background: '#333',
+              color: '#fff',
+              borderRadius: '8px',
+              padding: '12px 16px',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
       </AuthProvider>
     </ThemeProvider>
   );
