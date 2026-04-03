@@ -76,6 +76,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             Home
                         </Link>
 
+                        <button onClick={() => alert('Coming soon')} className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                            Blogs
+                        </button>
+                        <button onClick={() => alert('Coming soon')} className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                            Books
+                        </button>
+                        <button onClick={() => alert('Coming soon')} className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                            Notes
+                        </button>
+
                         {user ? (
                             <>
                                 {(role === 'admin' || role === 'collector') && (
@@ -133,6 +143,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <Link to="/" onClick={closeMobileMenu} className="block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Home
                             </Link>
+
+                            <button onClick={() => { alert('Coming soon'); closeMobileMenu(); }} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                                Blogs
+                            </button>
+                            <button onClick={() => { alert('Coming soon'); closeMobileMenu(); }} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                                Books
+                            </button>
+                            <button onClick={() => { alert('Coming soon'); closeMobileMenu(); }} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                                Notes
+                            </button>
 
                             {user ? (
                                 <>
