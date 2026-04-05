@@ -80,10 +80,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
                             Blogs
                         </a>
-                        <Link to="/study-materials" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <Link to="/study-materials?type=book" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
                             Books
                         </Link>
-                        <Link to="/study-materials" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <Link to="/study-materials?type=note" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
                             Notes
                         </Link>
 
@@ -148,10 +148,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Blogs
                             </a>
-                            <Link to="/study-materials" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/study-materials?type=book" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Books
                             </Link>
-                            <Link to="/study-materials" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/study-materials?type=note" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Notes
                             </Link>
 

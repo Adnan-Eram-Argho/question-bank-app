@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
@@ -99,13 +100,20 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
 };
 
 const StudyMaterials = () => {
+    const [searchParams] = useSearchParams();
     const [materials, setMaterials] = useState<StudyMaterial[]>([]);
     const [loading, setLoading] = useState(true);
 
     const [filterLevel, setFilterLevel] = useState('');
     const [filterSemester, setFilterSemester] = useState('');
     const [filterCourse, setFilterCourse] = useState('');
-    const [filterType, setFilterType] = useState('');
+    const [filterType, setFilterType] = useState(() => searchParams.get('type') || '');
+
+    // Sync filterType when URL query param changes (e.g. clicking Books vs Notes in nav)
+    useEffect(() => {
+        const typeFromUrl = searchParams.get('type') || '';
+        setFilterType(typeFromUrl);
+    }, [searchParams]);
 
     const [availableSemesters, setAvailableSemesters] = useState<string[]>([]);
     const [availableCourses, setAvailableCourses] = useState<string[]>([]);
