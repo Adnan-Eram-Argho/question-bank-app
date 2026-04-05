@@ -439,6 +439,40 @@ app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> =
   }
 });
 
+/**
+ * POST /api/upload-material
+ * Inserts a new study material (book or note) record into the `study_materials` table.
+ * Accepts JSON body: { title, type, level, semester, course_name, drive_link, uploader_id }
+ * No file processing — Google Drive links only.
+ */
+app.post('/api/upload-material', async (req: Request, res: Response): Promise<void> => {
+  const { title, type, level, semester, course_name, drive_link, uploader_id } = req.body;
+
+  if (!title || !type || !level || !semester || !course_name || !drive_link) {
+    res.status(400).json({ error: 'All fields (title, type, level, semester, course_name, drive_link) are required.' });
+    return;
+  }
+
+  if (!['book', 'note'].includes(type)) {
+    res.status(400).json({ error: 'Invalid type. Must be "book" or "note".' });
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('study_materials')
+      .insert([{ title, type, level, semester, course_name, drive_link, uploader_id: uploader_id || null }])
+      .select();
+
+    if (error) throw error;
+
+    res.status(201).json({ message: 'Study material uploaded successfully', data });
+  } catch (error: any) {
+    console.error('[API Error] Upload Material:', error.message);
+    res.status(500).json({ error: error.message || 'Failed to upload study material' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`[Server] Process initialized and listening on http://localhost:${PORT}`);
 });
