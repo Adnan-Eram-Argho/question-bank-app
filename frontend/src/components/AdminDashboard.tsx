@@ -189,8 +189,9 @@ const AdminDashboard: React.FC = () => {
     const handleDeleteMaterial = async (materialId: string, title: string) => {
         if (!window.confirm(`Delete "${title}"? This action cannot be undone.`)) return;
         try {
-            const { error } = await supabase.from('study_materials').delete().eq('id', materialId);
-            if (error) throw error;
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/materials/${materialId}`, { method: 'DELETE' });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to delete material');
             // Optimistic update — remove from local state immediately
             setMaterials(prev => prev.filter(m => m.id !== materialId));
         } catch (err: any) { alert(err.message || 'Failed to delete material'); }

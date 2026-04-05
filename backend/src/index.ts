@@ -473,6 +473,29 @@ app.post('/api/upload-material', async (req: Request, res: Response): Promise<vo
   }
 });
 
+/**
+ * DELETE /api/admin/materials/:id
+ * Removes a study material record from the `study_materials` table.
+ * Uses the service key to bypass Row Level Security.
+ */
+app.delete('/api/admin/materials/:id', async (req: Request, res: Response): Promise<void> => {
+  const id = req.params.id as string;
+
+  try {
+    const { error } = await supabase
+      .from('study_materials')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.status(200).json({ message: 'Study material permanently deleted' });
+  } catch (error: any) {
+    console.error('[API Error] Delete Material:', error.message);
+    res.status(500).json({ error: error.message || 'Failed to delete study material' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`[Server] Process initialized and listening on http://localhost:${PORT}`);
 });
