@@ -7,6 +7,7 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import UploadQuestion from './components/UploadQuestion';
 import QuestionList from './components/QuestionList';
+import StudyMaterials from './components/StudyMaterials';
 import Developer from './components/Developer';
 import Contributors from './components/Contributors';
 import Profile from './components/Profile';
@@ -62,6 +63,7 @@ function App() {
               />
 
               {/* Public Info Routes */}
+              <Route path="/study-materials" element={<StudyMaterials />} />
               <Route path="/developer" element={<Developer />} />
               <Route path="/contributors" element={<Contributors />} />
             </Routes>

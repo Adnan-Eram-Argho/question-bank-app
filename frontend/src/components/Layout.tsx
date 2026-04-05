@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import FloatingAITutor from './FloatingAITutor';
-import toast from 'react-hot-toast';
 
 interface LayoutProps {
     children: ReactNode;
@@ -32,43 +31,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         setIsMobileMenuOpen(false);
     };
 
-    const handleFeatureClick = (feature: string): void => {
-        toast.custom(
-            (t) => (
-                <div
-                    className={`${
-                        t.visible ? 'animate-enter' : 'animate-leave'
-                    } max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-xl border border-gray-200 dark:border-gray-700 pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-                >
-                    <div className="flex-1 w-0 p-4">
-                        <div className="flex items-start">
-                            <div className="flex-shrink-0 pt-0.5">
-                                <span className="text-2xl">🚀</span>
-                            </div>
-                            <div className="ml-3 flex-1">
-                                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    Feature In Development
-                                </p>
-                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    The <span className="font-semibold text-primary-600 dark:text-primary-400">{feature}</span> section is coming soon! Stay tuned.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex border-l border-gray-200 dark:border-gray-700">
-                        <button
-                            onClick={() => toast.dismiss(t.id)}
-                            className="w-full border border-transparent rounded-none rounded-r-xl p-4 flex items-center justify-center text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 focus:outline-none"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            ),
-            { duration: 4000 }
-        );
-        closeMobileMenu();
-    };
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100 font-sans selection:bg-primary-200 dark:selection:bg-primary-900/50 selection:text-primary-900 dark:selection:text-primary-100">
@@ -118,12 +80,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
                             Blogs
                         </a>
-                        <button onClick={() => handleFeatureClick('Books')} className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <Link to="/study-materials" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
                             Books
-                        </button>
-                        <button onClick={() => handleFeatureClick('Notes')} className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        </Link>
+                        <Link to="/study-materials" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
                             Notes
-                        </button>
+                        </Link>
 
                         {user ? (
                             <>
@@ -186,12 +148,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Blogs
                             </a>
-                            <button onClick={() => handleFeatureClick('Books')} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/study-materials" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Books
-                            </button>
-                            <button onClick={() => handleFeatureClick('Notes')} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            </Link>
+                            <Link to="/study-materials" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Notes
-                            </button>
+                            </Link>
 
                             {user ? (
                                 <>
