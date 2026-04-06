@@ -7,12 +7,14 @@ import { courseData } from '../data';
 interface StudyMaterial {
     id: string;
     title: string;
-    type: 'book' | 'note';
+    type: 'book' | 'note' | 'pdf';
     level: string;
     semester: string;
     course_name: string;
     drive_link: string;
     created_at: string;
+    uploader_id?: string;
+    users?: { full_name: string; email: string } | null;
 }
 
 const TYPE_CONFIG = {
@@ -38,6 +40,17 @@ const TYPE_CONFIG = {
         iconBg: 'bg-amber-100 dark:bg-amber-900/40',
         iconText: 'text-amber-600 dark:text-amber-400',
     },
+    pdf: {
+        label: 'Gen. PDF',
+        emoji: '📄',
+        badgeBg: 'bg-rose-50 dark:bg-rose-900/30',
+        badgeText: 'text-rose-700 dark:text-rose-300',
+        badgeBorder: 'border-rose-100 dark:border-rose-800/50',
+        btnBg: 'bg-rose-600 hover:bg-rose-700',
+        btnShadow: 'shadow-rose-500/30',
+        iconBg: 'bg-rose-100 dark:bg-rose-900/40',
+        iconText: 'text-rose-600 dark:text-rose-400',
+    },
 };
 
 const MaterialCard = ({ m }: { m: StudyMaterial }) => {
@@ -46,7 +59,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
     return (
         <div className="group bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
             {/* Top accent bar */}
-            <div className={`h-1.5 w-full ${m.type === 'book' ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-gradient-to-r from-amber-400 to-orange-500'}`} />
+            <div className={`h-1.5 w-full ${m.type === 'book' ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : m.type === 'note' ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-gradient-to-r from-rose-400 to-red-500'}`} />
 
             <div className="p-6 flex flex-col flex-grow gap-4">
                 {/* Icon + Title */}
@@ -72,22 +85,34 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                     <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
                         {m.level}
                     </span>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50">
-                        {m.semester}
-                    </span>
+                    {m.semester && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50">
+                            {m.semester}
+                        </span>
+                    )}
                 </div>
 
                 {/* Course name */}
-                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2 flex-grow">
-                    {m.course_name}
-                </p>
+                {m.course_name && (
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2 flex-grow">
+                        {m.course_name}
+                    </p>
+                )}
+                {!m.course_name && <div className="flex-grow"></div>}
+
+                <div className="flex items-center gap-2 pt-2 mt-auto text-xs text-gray-500 dark:text-gray-400 pb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span className="truncate font-medium">{m.users?.full_name || m.users?.email || 'Unknown Contributor'}</span>
+                </div>
 
                 {/* CTA Button */}
                 <a
                     href={m.drive_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`mt-auto w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-white text-sm font-semibold shadow-md ${cfg.btnBg} ${cfg.btnShadow} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300`}
+                    className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-white text-sm font-semibold shadow-md ${cfg.btnBg} ${cfg.btnShadow} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -167,7 +192,31 @@ const StudyMaterials = () => {
 
             const { data, error } = await query;
             if (error) throw error;
-            setMaterials(data || []);
+            
+            let fetchedMaterials = data || [];
+
+            if (fetchedMaterials.length > 0) {
+                const uploaderIds = Array.from(new Set(fetchedMaterials.map(m => m.uploader_id).filter(id => id)));
+                if (uploaderIds.length > 0) {
+                    const { data: usersData, error: usersError } = await supabase
+                        .from('users')
+                        .select('id, full_name, email')
+                        .in('id', uploaderIds);
+                        
+                    if (!usersError && usersData) {
+                        const userMap = usersData.reduce((acc: any, user: any) => {
+                            acc[user.id] = user;
+                            return acc;
+                        }, {});
+                        fetchedMaterials = fetchedMaterials.map(m => ({
+                            ...m,
+                            users: m.uploader_id ? userMap[m.uploader_id] : null
+                        }));
+                    }
+                }
+            }
+            
+            setMaterials(fetchedMaterials);
         } catch (err) {
             console.error('[StudyMaterials] Fetch error:', err);
         } finally {
@@ -186,12 +235,13 @@ const StudyMaterials = () => {
 
     const bookCount = materials.filter(m => m.type === 'book').length;
     const noteCount = materials.filter(m => m.type === 'note').length;
+    const pdfCount = materials.filter(m => m.type === 'pdf').length;
 
     return (
         <div className="space-y-8 animate-fade-in">
             <Helmet>
-                <title>Study Materials — Books & Notes | SAU Agricultural Economics</title>
-                <meta name="description" content="Browse curated books and notes for SAU Agricultural Economics courses. Filter by level, semester, and course to find the resources you need." />
+                <title>Study Materials — Books, Notes & PDFs | SAU Agricultural Economics</title>
+                <meta name="description" content="Browse curated books, notes, and general PDFs for SAU Agricultural Economics courses. Filter by level, semester, and course to find the resources you need." />
             </Helmet>
 
             {/* Header */}
@@ -213,6 +263,9 @@ const StudyMaterials = () => {
                         </div>
                         <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-xl text-sm font-semibold border border-amber-100 dark:border-amber-800/50">
                             📝 {noteCount} Note{noteCount !== 1 ? 's' : ''}
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 rounded-xl text-sm font-semibold border border-rose-100 dark:border-rose-800/50">
+                            📄 {pdfCount} PDF{pdfCount !== 1 ? 's' : ''}
                         </div>
                     </div>
                 )}
@@ -279,6 +332,7 @@ const StudyMaterials = () => {
                             <option value="">All Types</option>
                             <option value="book">📘 Books</option>
                             <option value="note">📝 Notes</option>
+                            <option value="pdf">📄 Gen. PDFs</option>
                         </select>
                     </div>
 

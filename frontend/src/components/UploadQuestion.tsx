@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { courseData } from '../data';
 
-type UploadTab = 'question' | 'book' | 'note';
+type UploadTab = 'question' | 'book' | 'note' | 'pdf';
 
 const TAB_CONFIG: { id: UploadTab; label: string; emoji: string }[] = [
-    { id: 'question', label: 'Upload Question', emoji: '📄' },
+    { id: 'question', label: 'Upload Question', emoji: '🖼️' },
     { id: 'book',     label: 'Upload Book',     emoji: '📘' },
     { id: 'note',     label: 'Upload Note',      emoji: '📝' },
+    { id: 'pdf',      label: 'General PDF',     emoji: '📄' },
 ];
 
 const UploadQuestion = () => {
@@ -152,12 +153,19 @@ const UploadQuestion = () => {
         }
     };
 
-    // ---- Submit: Book / Note ----
+    // ---- Submit: Material / PDF ----
     const handleMaterialSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!materialTitle || !driveLink || !level || !semester || !courseName) {
-            setMessage('Please fill in all fields including Level, Semester, and Course.'); return;
+        if (activeTab === 'pdf') {
+            if (!materialTitle || !driveLink || !level || !semester) {
+                setMessage('Please fill in Level, Semester, Title, and Drive Link.'); return;
+            }
+        } else {
+            if (!materialTitle || !driveLink || !level || !semester || !courseName) {
+                setMessage('Please fill in all fields including Level, Semester, and Course.'); return;
+            }
         }
+        
         setLoading(true); setMessage('');
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/upload-material`, {
@@ -168,14 +176,14 @@ const UploadQuestion = () => {
                     type: activeTab,
                     level,
                     semester,
-                    course_name: courseName,
+                    course_name: activeTab === 'pdf' ? null : courseName,
                     drive_link: driveLink,
                     uploader_id: user?.id || null,
                 }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Upload failed');
-            setMessage(`${activeTab === 'book' ? 'Book' : 'Note'} uploaded successfully!`);
+            setMessage(`${activeTab === 'pdf' ? 'PDF' : activeTab === 'book' ? 'Book' : 'Note'} uploaded successfully!`);
             setMaterialTitle(''); setDriveLink(''); setLevel(''); setSemester(''); setCourseName('');
         } catch (err: any) {
             setMessage(err.message);
@@ -286,8 +294,8 @@ const UploadQuestion = () => {
                         </div>
                     )}
 
-                    {/* ══ BOOK / NOTE TAB: Drive link form ══ */}
-                    {(activeTab === 'book' || activeTab === 'note') && (
+                    {/* ══ BOOK / NOTE / PDF TAB: Drive link form ══ */}
+                    {(activeTab === 'book' || activeTab === 'note' || activeTab === 'pdf') && (
                         <div className="space-y-5">
                             {/* Warning banner */}
                             <div className="flex gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl">
@@ -304,7 +312,7 @@ const UploadQuestion = () => {
                             {/* Title */}
                             <div>
                                 <label htmlFor="material-title" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
-                                    {activeTab === 'book' ? '📘 Book Title' : '📝 Note Title'}
+                                    {activeTab === 'book' ? '📘 Book Title' : activeTab === 'note' ? '📝 Note Title' : '📄 PDF Title'}
                                 </label>
                                 <input
                                     id="material-title"
@@ -363,14 +371,16 @@ const UploadQuestion = () => {
                     </div>
 
                     {/* ══ SHARED: Course ══ */}
-                    <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">Course</label>
-                        <select value={courseName} onChange={(e) => setCourseName(e.target.value)} disabled={!semester} required
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                            <option value="" disabled>Select Course...</option>
-                            {courses.map((course) => <option key={course} value={course}>{course}</option>)}
-                        </select>
-                    </div>
+                    {activeTab !== 'pdf' && (
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">Course</label>
+                            <select value={courseName} onChange={(e) => setCourseName(e.target.value)} disabled={!semester} required
+                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                <option value="" disabled>Select Course...</option>
+                                {courses.map((course) => <option key={course} value={course}>{course}</option>)}
+                            </select>
+                        </div>
+                    )}
 
                     {/* ══ QUESTION TAB: Question Type ══ */}
                     {activeTab === 'question' && (

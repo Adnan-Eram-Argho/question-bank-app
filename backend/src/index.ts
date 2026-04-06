@@ -441,27 +441,45 @@ app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> =
 
 /**
  * POST /api/upload-material
- * Inserts a new study material (book or note) record into the `study_materials` table.
+ * Inserts a new study material (book, note, or pdf) record into the `study_materials` table.
  * Accepts JSON body: { title, type, level, semester, course_name, drive_link, uploader_id }
  * No file processing — Google Drive links only.
  */
 app.post('/api/upload-material', async (req: Request, res: Response): Promise<void> => {
   const { title, type, level, semester, course_name, drive_link, uploader_id } = req.body;
 
-  if (!title || !type || !level || !semester || !course_name || !drive_link) {
-    res.status(400).json({ error: 'All fields (title, type, level, semester, course_name, drive_link) are required.' });
+  if (!title || !type || !level || !drive_link) {
+    res.status(400).json({ error: 'Fields (title, type, level, drive_link) are always required.' });
     return;
   }
 
-  if (!['book', 'note'].includes(type)) {
-    res.status(400).json({ error: 'Invalid type. Must be "book" or "note".' });
+  if ((type === 'book' || type === 'note') && (!semester || !course_name)) {
+    res.status(400).json({ error: 'Semester and Course Name are required for Books and Notes.' });
+    return;
+  }
+
+  if (type === 'pdf' && !semester) {
+    res.status(400).json({ error: 'Semester is required for Gen. PDFs.' });
+    return;
+  }
+
+  if (!['book', 'note', 'pdf'].includes(type)) {
+    res.status(400).json({ error: 'Invalid type. Must be "book", "note", or "pdf".' });
     return;
   }
 
   try {
     const { data, error } = await supabase
       .from('study_materials')
-      .insert([{ title, type, level, semester, course_name, drive_link, uploader_id: uploader_id || null }])
+      .insert([{ 
+        title, 
+        type, 
+        level, 
+        semester, 
+        course_name: type === 'pdf' ? null : course_name, 
+        drive_link, 
+        uploader_id: uploader_id || null 
+      }])
       .select();
 
     if (error) throw error;
