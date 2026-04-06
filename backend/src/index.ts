@@ -11,7 +11,6 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
 app.use(cors());
 app.use(express.json());
 
@@ -29,6 +28,7 @@ cloudinary.config({
 // Groq AI client
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+//ekhane multer user korsi file upload middlewaer
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 

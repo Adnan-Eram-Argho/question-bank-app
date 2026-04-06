@@ -4,5 +4,18 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "question-bank-app-five.vercel.app"
+        }
+      ],
+      "destination": "https://sau-eco-qstns.vercel.app/$1",
+      "permanent": true
+    }
   ]
 }
