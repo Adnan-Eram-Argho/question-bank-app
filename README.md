@@ -1,141 +1,309 @@
-# 🌾 Agricultural Economics Question Bank
+<div align="center">
 
-A full-stack, comprehensive web application built for the Economics Faculty of an Agricultural University. It serves as a centralized platform to manage, securely store, and easily browse past examination questions.
+# 📚 SAU Agricultural Economics Question Bank
 
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=Cloudinary&logoColor=white)
+**A full-stack academic resource platform for Sher-e-Bangla Agricultural University**
 
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Frontend: React](https://img.shields.io/badge/Frontend-React%2019-61DAFB?logo=react)](https://react.dev/)
+[![Backend: Node.js](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-339933?logo=node.js)](https://nodejs.org/)
+[![Database: Supabase](https://img.shields.io/badge/Database-Supabase-3ECF8E?logo=supabase)](https://supabase.com/)
+[![Deployed on Vercel](https://img.shields.io/badge/Frontend-Vercel-black?logo=vercel)](https://vercel.com/)
+[![API on Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render)](https://render.com/)
 
-## 🚀 Live Demo
-[Visit the SAU Question Bank Here](https://question-bank-app-five.vercel.app)
+[Live Demo](https://sau-agri-econ.vercel.app/) · [Report Bug](https://github.com/Adnan-Eram-Argho/question-bank-app/issues) · [Request Feature](https://github.com/Adnan-Eram-Argho/question-bank-app/issues)
 
----
-
-## 🌟 Features
-
-- **Public Repository Access**: Anyone can browse, search, and view past examination questions without needing an account.
-- **Advanced Filtering State**: Dynamically filter questions based on academic Level, Semester, Course Name, and Exam Type (Theory/Practical).
-- **Secure File Uploads**: Authorized contributors can seamlessly upload up to 2 high-quality photos per question (ideal for multi-page theory question papers).
-- **Beautiful Side-by-Side Viewing**: Questions with multiple pages are smartly rendered side-by-side for optimal reading without relying on clunky carousels.
-- **Admin Dashboard**: Secure panel to provision and manage contributor accounts (Admins only).
-- **Optimized Storage**: Image binaries are vaulted securely in **Cloudinary**, while fast, lightweight URLs are stored in **Supabase PostgreSQL** ensuring maximum performance.
-- **Dynamic Course Management**: Easily maintain and update course catalogs via a single configuration file without touching UI components.
-- **🤖 AI-Powered Tutor (Llama 3.2 Vision)**: Integrated a multimodal AI chatbot that scans question paper images using Groq API and answers student queries in real-time, explaining complex academic concepts natively.
-
-## 🛠️ Tech Stack & Architecture
-
-This application uses a robust, separated frontend-backend architecture.
-
-### **Frontend** (`/frontend`)
-- **Framework**: React.js configured with Vite for lightning-fast HMR and building.
-- **Language**: TypeScript for strong typing and error catching.
-- **Styling**: Tailwind CSS tailored with a custom earthy-green (Agriculture) and professional-blue (Economics) color palette. Dark mode supported automatically!
-- **State & Routing**: React Router DOM and Custom Context Providers for secure Auth handling.
-- **Hosting**: Designed to be statically deployed (e.g., Vercel, Netlify).
-
-### **Backend** (`/backend`)
-- **Framework**: Node.js running an Express server.
-- **Language**: TypeScript.
-- **Middleware**: `multer` (memory buffering) for handling multipart form data.
-- **Integrations**: 
-  - `@supabase/supabase-js` bypassing RLS using the `SERVICE_ROLE_KEY` to broker admin-level actions safely away from the client.
-  - `cloudinary` (via `streamifier`) to securely pipe incoming memory-buffered images into cloud storage.
-- **Hosting**: Designed for serverless or Node environments (e.g., Render, Railway).
-
-### **Database & Authentication**
-- **Supabase Auth**: JWT-driven authentication.
-- **Supabase Database**: PostgreSQL containing `users` and `questions` tables.
+</div>
 
 ---
 
-## ⚙️ How It Works (Data Flow)
+## 📋 Table of Contents
 
-1. **Viewing Questions (General User)**
-   - The React frontend securely polls Supabase's REST endpoints directly to fetch active questions. Since the table allows public `SELECT` policies, this skips the custom Node backend entirely for rapid loading.
-2. **Uploading Questions (Collector)**
-   - A logged-in Collector stages an image. The frontend validates the file type and restricts it to a maximum of 2 files.
-   - Upon submission, a `multipart/form-data` POST request is fired to the Express backend (`/api/upload`).
-   - The Backend receives it, pipes the binary buffer actively into Cloudinary, receives the permanent `secure_url`s, and inserts a relative record linking to the Uploader into Supabase. 
-3. **Provisioning Users (Admin)**
-   - An Admin submits an email/password via the Dashboard.
-   - The Frontend hits `/api/admin/create-user`. The backend handles this by using Supabase's `auth.admin.createUser()` to securely bypass public signup restrictions and provisions the explicit database profile asynchronously.
-4.**🗄️ Database Structure (Supabase)**
-- **`users` table:** `id` (UUID), `email`, `role` (admin/collector), `created_at`
-- **`questions` table:** `id`, `level`, `semester`, `course_name`, `exam_type`, `image_urls` (Array), `uploader_id` (FK), `created_at`
+- [About The Project](#about-the-project)
+- [Tech Stack](#tech-stack)
+- [Key Features](#key-features)
+- [Folder Structure](#folder-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
 ---
 
-## 💻 Installation & Local Development
+## 🎯 About The Project
+
+The **SAU Agricultural Economics Question Bank** is a centralised academic resource platform built for students and faculty at Sher-e-Bangla Agricultural University. It solves the problem of scattered, hard-to-find past exam papers and study materials by providing a single, searchable, and filterable repository.
+
+Contributors (collectors and admins) can upload previous-year question papers directly via image uploads, and link external resources such as textbooks, lecture notes, or general PDFs. Students can browse, filter by level/semester/course, and instantly access everything they need — all powered by an AI tutor assistant for on-demand academic support.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 19, TypeScript, Vite, TailwindCSS |
+| **Routing** | React Router v7 |
+| **Backend** | Node.js, Express 5, TypeScript |
+| **Database & Auth** | Supabase (PostgreSQL + Auth) |
+| **Image Storage** | Cloudinary |
+| **AI Tutor** | Groq SDK (Llama 4) |
+| **Frontend Hosting** | Vercel |
+| **Backend Hosting** | Render |
+| **SEO** | react-helmet-async |
+
+---
+
+## ✨ Key Features
+
+- **📖 Question Bank** — Browse and filter previous-year exam papers by Level, Semester, Course, and Type (Theory / Practical). Supports multi-image uploads per question.
+- **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs (e.g., syllabi, guidelines), all linked via Google Drive.
+- **🤖 Floating AI Tutor** — Domain-locked Groq-powered chat assistant specialised in SAU Agricultural Economics, with vision support for analysing question paper images.
+- **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Admins manage users and content; collectors upload resources.
+- **🛠️ Admin Dashboard** — Full moderation panel: create users, delete questions, manage study materials, with cascading filter controls.
+
+---
+
+## 📁 Folder Structure
+
+```
+question-bank-app/
+│
+├── backend/                        # Express REST API server
+│   ├── src/
+│   │   └── index.ts                # All API routes and server bootstrap
+│   ├── .env.example                # Backend environment variable template
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/                       # React (Vite) SPA
+│   ├── public/                     # Static assets served at root
+│   ├── src/
+│   │   ├── assets/                 # Images and static media
+│   │   ├── components/             # All React page components
+│   │   │   ├── AdminDashboard.tsx  # Admin control panel (users, questions, materials)
+│   │   │   ├── Contributors.tsx    # Public contributors showcase page
+│   │   │   ├── Developer.tsx       # Developer profile page
+│   │   │   ├── FloatingAITutor.tsx # Groq-powered AI chat widget
+│   │   │   ├── Layout.tsx          # Global navbar, sidebar, and footer wrapper
+│   │   │   ├── Login.tsx           # Supabase Auth login form
+│   │   │   ├── Profile.tsx         # User profile editor with avatar upload
+│   │   │   ├── QuestionList.tsx    # Filterable question paper grid
+│   │   │   ├── StudyMaterials.tsx  # Books, Notes & PDFs browsing page
+│   │   │   └── UploadQuestion.tsx  # Unified upload form (4-tab: Question/Book/Note/PDF)
+│   │   ├── context/
+│   │   │   └── AuthContext.tsx     # Supabase Auth context provider
+│   │   ├── lib/
+│   │   │   └── supabaseClient.ts   # Supabase client initialisation
+│   │   ├── data.ts                 # Static courseData (Level → Semester → Course mapping)
+│   │   ├── App.tsx                 # Root component with router and route definitions
+│   │   └── main.tsx                # App entry point
+│   ├── .env.example                # Frontend environment variable template
+│   ├── index.html                  # Vite HTML entry with SEO meta
+│   ├── tailwind.config.js
+│   ├── vite.config.ts
+│   └── package.json
+│
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18+ recommended)
-- A Supabase Project (with URL & `anon`/`service_role` keys)
-- A Cloudinary Account (with Cloud Name, API Key, and Secret)
 
-### 1. Clone the Repository
+Ensure you have the following installed before proceeding:
+
+- **Node.js** `v18` or higher ([Download](https://nodejs.org/))
+- **npm** `v9` or higher (bundled with Node.js)
+- A **Supabase** project with the `questions` and `study_materials` tables created
+- A **Cloudinary** account for image hosting
+- A **Groq** API key for the AI Tutor feature
+
+---
+
+### Installation
+
+**1. Clone the repository**
+
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Adnan-Eram-Argho/question-bank-app.git
 cd question-bank-app
 ```
 
-### 2. Environment Configuration
-You will need to set up `.env` files in both directories.
+**2. Install backend dependencies**
 
-**Backend** (`backend/.env`):
-```env
-PORT=5000
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_SERVICE_KEY=your_supabase_service_role_key
-CLOUDINARY_CLOUD_NAME=your_cloudinary_nam
-CLOUDINARY_API_KEY=your_cloudinary_key
-CLOUDINARY_API_SECRET=your_cloudinary_secret
-```
-
-**Frontend** (`frontend/.env`):
-```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_API_URL=http://localhost:5000
-```
-
-### 3. Running the Backend
 ```bash
 cd backend
 npm install
-npm run dev
-# The Express server will spin up on http://localhost:5000
 ```
 
-### 4. Running the Frontend
+**3. Install frontend dependencies**
+
+```bash
+cd ../frontend
+npm install
+```
+
+---
+
+### Environment Variables
+
+Both the `backend/` and `frontend/` directories require their own `.env` files. Copy the example files and fill in your credentials:
+
+```bash
+# From the project root
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+#### Backend (`backend/.env`)
+
+| Variable | Description | Required |
+|---|---|---|
+| `PORT` | Port for the Express server | No (default: `5000`) |
+| `SUPABASE_URL` | Your Supabase project URL | ✅ Yes |
+| `SUPABASE_SERVICE_KEY` | Supabase **service role** key (bypasses RLS) | ✅ Yes |
+| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name | ✅ Yes |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | ✅ Yes |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | ✅ Yes |
+| `GROQ_API_KEY` | Groq API key for the AI Tutor | ✅ Yes |
+
+#### Frontend (`frontend/.env`)
+
+| Variable | Description | Required |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Your Supabase project URL | ✅ Yes |
+| `VITE_SUPABASE_ANON_KEY` | Supabase **anon/public** key | ✅ Yes |
+| `VITE_API_URL` | Backend API base URL (local or hosted) | No (defaults to Render URL) |
+
+> ⚠️ **Security Note:** Never commit your `.env` files. Both are listed in their respective `.gitignore` files.
+
+---
+
+## 💻 Usage
+
+Open **two separate terminals** from the project root.
+
+**Terminal 1 — Start the backend server:**
+
+```bash
+cd backend
+npm run dev
+# Server running at http://localhost:5000
+```
+
+**Terminal 2 — Start the frontend development server:**
+
 ```bash
 cd frontend
-npm install
 npm run dev
-# The Vite server will launch, typically accessible on http://localhost:5173
+# App running at http://localhost:5173
+```
+
+Then open [http://localhost:5173](http://localhost:5173) in your browser.
+
+> 💡 **Tip:** When running locally, set `VITE_API_URL=http://localhost:5000` in `frontend/.env` so the frontend communicates with your local backend instead of the hosted Render API.
+
+---
+
+## 📡 API Reference
+
+All endpoints are served from the Express backend. Base URL: `http://localhost:5000` (local) or your Render deployment URL.
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/` | None | Health check |
+| `GET` | `/api/contributors` | None | Fetch all contributor profiles |
+| `POST` | `/api/upload` | Collector | Upload question paper images to Cloudinary + Supabase |
+| `POST` | `/api/upload-material` | Collector | Add a book, note, or PDF record (Drive link) |
+| `POST` | `/api/chat-tutor` | None | Send a message to the AI Tutor |
+| `POST` | `/api/user/profile` | Authenticated | Update user profile name, bio, and avatar |
+| `GET` | `/api/admin/users` | Admin | List all registered users |
+| `POST` | `/api/admin/create-user` | Admin | Create a new user account |
+| `DELETE` | `/api/admin/users/:id` | Admin | Delete a user and their avatar from Cloudinary |
+| `DELETE` | `/api/admin/questions/:id` | Admin | Delete a question and its images from Cloudinary |
+| `DELETE` | `/api/admin/materials/:id` | Admin | Delete a study material record |
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] **Search Bar** — Full-text search across question papers and study materials
+- [ ] **PDF Preview** — In-app preview for uploaded Drive PDFs before downloading
+- [ ] **Bookmark System** — Allow students to save favourite resources for quick access
+- [ ] **Mobile App** — React Native companion app for offline access
+- [ ] **Notifications** — Email/push alerts when new materials are uploaded for followed courses
+- [ ] **Analytics Dashboard** — View download counts and popular resources for admins
+- [x] **Multi-image Question Upload** — Upload multiple pages per question paper
+- [x] **AI Tutor** — Groq-powered domain-specific academic assistant
+- [x] **Study Materials (Books, Notes, PDFs)** — Unified upload and browse system
+
+---
+
+## 🤝 Contributing
+
+Contributions are what make the open source community such an amazing place. Any contributions are **greatly appreciated**.
+
+1. **Fork** the repository
+2. **Create** your feature branch: `git checkout -b feature/your-feature-name`
+3. **Commit** your changes: `git commit -m 'Add some feature'`
+4. **Push** to the branch: `git push origin feature/your-feature-name`
+5. Open a **Pull Request**
+
+Please ensure your code follows the existing TypeScript patterns and does not expose any credentials.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License.
+
+```
+MIT License
+
+Copyright (c) 2025 Md. Adnan Eram Argho
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 ---
 
-## 📚 General Usage
+## 🙏 Acknowledgments
 
-### Managing the Course Catalog
-You don't need to rebuild database relationships to add new semesters. The entire academic tree is centrally managed locally to ensure the quickest form responses.
-1. Open up `frontend/src/data.ts`.
-2. Add or modify Keys in the `courseData` record.
-3. The UI Dropdowns across the Search Pages and Upload Forms will instantly adapt.
-
-### Roles & Permissions
-- **Admin**: Has unrestricted dashboard access. Can provision new Collectors, modify platform settings, and forcibly delete inappropriate questions or users.
-- **Collector**: Granted access sequentially by Admins. They possess the exclusive ability to attach and publish question images into the repository. 
-- **User**: General student body. No login required to perform complex queries and read data.
+- [Supabase](https://supabase.com/) — Open-source Firebase alternative powering auth and the database
+- [Cloudinary](https://cloudinary.com/) — Cloud-based image management for question paper uploads
+- [Groq](https://groq.com/) — Ultra-fast LLM inference powering the AI Tutor
+- [Vercel](https://vercel.com/) — Seamless frontend hosting and deployment
+- [Render](https://render.com/) — Reliable backend hosting for the Express API
+- [React Hot Toast](https://react-hot-toast.com/) — Beautiful toast notifications
+- [react-helmet-async](https://github.com/staylor/react-helmet-async) — Dynamic SEO meta tag management
 
 ---
-## 🗺️ Future Roadmap
-- [ ] Implement user bookmarking for favorite questions.
-- [ ] Add an analytics dashboard to track the most searched courses.
-- [ ] Migrate from local `data.ts` course catalog to a dynamic Supabase table for easier updates.
 
-*Developed by Argho.*
+<div align="center">
+  Made with ❤️ by <a href="https://github.com/Adnan-Eram-Argho">Md. Adnan Eram Argho</a>
+</div>
