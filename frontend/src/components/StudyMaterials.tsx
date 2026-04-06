@@ -128,6 +128,7 @@ const StudyMaterials = () => {
     const [searchParams] = useSearchParams();
     const [materials, setMaterials] = useState<StudyMaterial[]>([]);
     const [loading, setLoading] = useState(true);
+    const [totalCounts, setTotalCounts] = useState({ book: 0, note: 0, pdf: 0 });
 
     const [filterLevel, setFilterLevel] = useState('');
     const [filterSemester, setFilterSemester] = useState('');
@@ -169,6 +170,23 @@ const StudyMaterials = () => {
         }
         setFilterCourse('');
     }, [filterLevel, filterSemester]);
+
+    // Fetch real totals once on mount, independent of active filters
+    useEffect(() => {
+        const fetchTotals = async () => {
+            const { data } = await supabase
+                .from('study_materials')
+                .select('type');
+            if (data) {
+                setTotalCounts({
+                    book: data.filter(m => m.type === 'book').length,
+                    note: data.filter(m => m.type === 'note').length,
+                    pdf:  data.filter(m => m.type === 'pdf').length,
+                });
+            }
+        };
+        fetchTotals();
+    }, []);
 
     useEffect(() => {
         fetchMaterials();
@@ -233,9 +251,9 @@ const StudyMaterials = () => {
 
     const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
-    const bookCount = materials.filter(m => m.type === 'book').length;
-    const noteCount = materials.filter(m => m.type === 'note').length;
-    const pdfCount = materials.filter(m => m.type === 'pdf').length;
+    const bookCount = totalCounts.book;
+    const noteCount = totalCounts.note;
+    const pdfCount = totalCounts.pdf;
 
     return (
         <div className="space-y-8 animate-fade-in">
