@@ -11,19 +11,26 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+const isOriginAllowed = (origin?: string): boolean => {
+  if (!origin) return true;
+  // If no CORS origins are configured, allow all origins to avoid deployment lockouts.
+  if (allowedOrigins.length === 0) return true;
+  return allowedOrigins.includes(origin);
+};
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isOriginAllowed(origin)) {
         callback(null, true);
         return;
       }
-      callback(new Error('CORS policy violation: origin not allowed'));
+      callback(null, false);
     },
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     credentials: false,
