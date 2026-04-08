@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 interface Message {
     id: number;
@@ -98,9 +99,18 @@ const FloatingAITutor = () => {
         setIsLoading(true);
 
         try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData.session?.access_token;
+            if (!accessToken) {
+                throw new Error('Please sign in to use the AI tutor.');
+            }
+
             const res = await fetch(`${API_URL}/api/chat-tutor`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
                 body: JSON.stringify({
                     message: trimmed,
                     history: buildHistory(),
