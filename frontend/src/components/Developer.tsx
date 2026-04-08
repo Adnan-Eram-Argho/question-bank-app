@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const DEV = {
   name: 'Adnan-Eram Argho',
@@ -81,14 +82,14 @@ const IconGlobe = () => (
 );
 
 const IconCheck = () => (
-  <svg className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+  <svg className="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
   </svg>
 );
 
 const Developer = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-4">
+    <div className="animate-fade-in py-12 px-4">
       <Helmet>
         <title>Developer | SAU Agricultural Economics Question Bank</title>
         <meta name="description"
@@ -99,12 +100,17 @@ const Developer = () => {
 
       <div className="max-w-3xl mx-auto space-y-6">
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-          <div className="h-24 bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-500" />
+        <motion.div
+          className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
+        >
+          <div className="h-32 bg-gradient-to-r from-green-500 via-emerald-400 to-amber-500" />
 
           <div className="px-8 pb-8">
-            <div className="-mt-14 mb-4 flex items-end justify-between">
-              <div className="w-24 h-24 rounded-full ring-4 ring-white dark:ring-gray-800 overflow-hidden bg-primary-500 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+            <div className="-mt-16 mb-4 flex items-end justify-between">
+              <div className="w-28 h-28 rounded-full ring-4 ring-white dark:ring-[#111827] overflow-hidden bg-white dark:bg-[#0A0F1E] flex items-center justify-center text-slate-800 dark:text-slate-200 text-3xl font-bold shadow-lg">
                 {DEV.avatarUrl
                   ? <img src={DEV.avatarUrl} alt={DEV.name} className="w-full h-full object-cover" />
                   : DEV.avatarInitials}
@@ -113,28 +119,28 @@ const Developer = () => {
               <div className="flex gap-2 mt-2">
                 {DEV.github && (
                   <a href={DEV.github} target="_blank" rel="noreferrer"
-                    className="p-2 rounded-lg text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
+                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors"
                     title="GitHub">
                     <IconGitHub />
                   </a>
                 )}
                 {DEV.linkedin && (
                   <a href={DEV.linkedin} target="_blank" rel="noreferrer"
-                    className="p-2 rounded-lg text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
+                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
                     title="LinkedIn">
                     <IconLinkedIn />
                   </a>
                 )}
                 {DEV.email && (
                   <a href={`mailto:${DEV.email}`}
-                    className="p-2 rounded-lg text-gray-500 hover:text-secondary-600 dark:hover:text-secondary-400 hover:bg-secondary-50 dark:hover:bg-secondary-900/30 transition-colors"
+                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
                     title="Email">
                     <IconMail />
                   </a>
                 )}
                 {DEV.portfolio && (
                   <a href={DEV.portfolio} target="_blank" rel="noreferrer"
-                    className="p-2 rounded-lg text-gray-500 hover:text-secondary-600 dark:hover:text-secondary-400 hover:bg-secondary-50 dark:hover:bg-secondary-900/30 transition-colors"
+                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors"
                     title="Portfolio">
                     <IconGlobe />
                   </a>
@@ -142,64 +148,82 @@ const Developer = () => {
               </div>
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{DEV.name}</h1>
-            <p className="text-primary-600 dark:text-primary-400 font-medium">{DEV.title}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{DEV.subtitle}</p>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{DEV.bio}</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-[#F1F5F9]">{DEV.name}</h1>
+            <p className="text-green-600 dark:text-green-400 font-semibold text-lg mt-1">{DEV.title}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{DEV.subtitle}</p>
+            <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{DEV.bio}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-400 mb-4">
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
+        >
+          <motion.div
+            className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6"
+            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } } }}
+          >
+            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
               Education
             </h2>
             <ul className="space-y-4">
               {DEV.education.map((edu, i) => (
                 <li key={i}>
-                  <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm leading-snug">{edu.degree}</p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">{edu.institution}</p>
-                  <span className="inline-block mt-1 text-xs font-medium bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 px-2 py-0.5 rounded-full">
+                  <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-snug">{edu.degree}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">{edu.institution}</p>
+                  <span className="inline-block mt-2 text-xs font-semibold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 px-2.5 py-1 rounded-md border border-green-200/50 dark:border-green-500/20">
                     {edu.year}
                   </span>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-400 mb-4">
+          <motion.div
+            className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6"
+            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } } }}
+          >
+            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
               Tech Stack
             </h2>
             <div className="flex flex-wrap gap-2">
               {DEV.skills.map((skill) => (
                 <span key={skill}
-                  className="px-3 py-1 text-xs font-medium rounded-full bg-secondary-100 dark:bg-secondary-900/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200 dark:border-secondary-800">
+                  className="px-3 py-1 text-xs font-semibold rounded-full bg-slate-100 dark:bg-[#0A0F1E] text-slate-700 dark:text-slate-300 border border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] shadow-sm">
                   {skill}
                 </span>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {DEV.highlights.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-400 mb-4">
+          <motion.div
+            className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
+            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
               Project Highlights
             </h2>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {DEV.highlights.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <IconCheck />
-                  <span className="text-gray-600 dark:text-gray-300 text-sm">{item}</span>
+                  <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">{item}</span>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
         )}
 
-        <div className="text-center">
-          <Link to="/" className="text-sm text-secondary-600 dark:text-secondary-400 hover:underline">
+        <div className="text-center pt-4">
+          <Link to="/" className="inline-block text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-green-500 dark:hover:text-green-400 transition-colors">
             ← Back to Question Bank
           </Link>
         </div>

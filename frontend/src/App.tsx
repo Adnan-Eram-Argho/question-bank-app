@@ -11,6 +11,8 @@ import StudyMaterials from './components/StudyMaterials';
 import Developer from './components/Developer';
 import Contributors from './components/Contributors';
 import Profile from './components/Profile';
+import AnimatedBackground from './components/AnimatedBackground';
+import PageTransition from './components/PageTransition';
 
 // ১. এই লাইনটি নতুন যোগ করা হয়েছে
 import { Analytics } from '@vercel/analytics/react'; 
@@ -31,42 +33,45 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
+          <AnimatedBackground />
           <Layout>
-            <Routes>
-              <Route path="/" element={<QuestionList />} />
-              <Route path="/login" element={<Login />} />
+            <PageTransition>
+              <Routes>
+                <Route path="/" element={<QuestionList />} />
+                <Route path="/login" element={<Login />} />
 
-              {/* Protected Routes */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute allowedRoles={['admin']}>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/upload"
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'collector']}>
-                    <UploadQuestion />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute allowedRoles={['admin', 'collector']}>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Protected Routes */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/upload"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin', 'collector']}>
+                      <UploadQuestion />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin', 'collector']}>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Public Info Routes */}
-              <Route path="/study-materials" element={<StudyMaterials />} />
-              <Route path="/developer" element={<Developer />} />
-              <Route path="/contributors" element={<Contributors />} />
-            </Routes>
+                {/* Public Info Routes */}
+                <Route path="/study-materials" element={<StudyMaterials />} />
+                <Route path="/developer" element={<Developer />} />
+                <Route path="/contributors" element={<Contributors />} />
+              </Routes>
+            </PageTransition>
           </Layout>
         </Router>
 

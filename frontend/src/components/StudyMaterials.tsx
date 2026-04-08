@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
+import { motion } from 'framer-motion';
 
 interface StudyMaterial {
     id: string;
@@ -53,11 +54,26 @@ const TYPE_CONFIG = {
     },
 };
 
+const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
+};
+
+const gridVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.07 } },
+};
+
 const MaterialCard = ({ m }: { m: StudyMaterial }) => {
     const cfg = TYPE_CONFIG[m.type];
 
     return (
-        <div className="group bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+        <motion.div
+            variants={cardVariants}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            whileTap={{ scale: 0.98 }}
+            className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative"
+        >
             {/* Top accent bar */}
             <div className={`h-1.5 w-full ${m.type === 'book' ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : m.type === 'note' ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-gradient-to-r from-rose-400 to-red-500'}`} />
 
@@ -68,7 +84,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                         {cfg.emoji}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base text-gray-900 dark:text-white leading-snug line-clamp-2">
+                        <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F5F9] leading-snug line-clamp-2">
                             {m.title}
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -79,14 +95,14 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
 
                 {/* Badges */}
                 <div className="flex flex-wrap gap-2">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border ${cfg.badgeBg} ${cfg.badgeText} ${cfg.badgeBorder}`}>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${cfg.badgeBg} ${cfg.badgeText} ${cfg.badgeBorder}`}>
                         {cfg.emoji} {cfg.label}
                     </span>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200/50 dark:border-green-500/20">
                         {m.level}
                     </span>
                     {m.semester && (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200/50 dark:border-amber-500/20">
                             {m.semester}
                         </span>
                     )}
@@ -120,7 +136,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                     View / Download
                 </a>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -263,7 +279,12 @@ const StudyMaterials = () => {
             </Helmet>
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2">
+            <motion.div
+                className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
+            >
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent leading-tight">
                         Study Materials
@@ -287,18 +308,24 @@ const StudyMaterials = () => {
                         </div>
                     </div>
                 )}
-            </div>
+            </motion.div>
 
             {/* Filter bar */}
-            <div className="bg-white dark:bg-[#1E293B] p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <motion.div 
+                className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
+            >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
                     {/* Level */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Level</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
                         <select
                             value={filterLevel}
                             onChange={(e) => setFilterLevel(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                         >
                             <option value="">All Levels</option>
                             {Object.keys(courseData).map((lvl) => (
@@ -308,13 +335,14 @@ const StudyMaterials = () => {
                     </div>
 
                     {/* Semester */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Semester</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Semester</label>
                         <select
                             value={filterSemester}
                             onChange={(e) => setFilterSemester(e.target.value)}
                             disabled={!filterLevel}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                         >
                             <option value="">All Semesters</option>
                             {availableSemesters.map((sem) => (
@@ -324,13 +352,14 @@ const StudyMaterials = () => {
                     </div>
 
                     {/* Course */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Course</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Course</label>
                         <select
                             value={filterCourse}
                             onChange={(e) => setFilterCourse(e.target.value)}
                             disabled={!filterSemester}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                         >
                             <option value="">All Courses</option>
                             {availableCourses.map((course) => (
@@ -340,12 +369,13 @@ const StudyMaterials = () => {
                     </div>
 
                     {/* Type */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Type</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                         >
                             <option value="">All Types</option>
                             <option value="book">📘 Books</option>
@@ -355,19 +385,26 @@ const StudyMaterials = () => {
                     </div>
 
                     {/* Reset */}
-                    <div className="flex flex-col justify-end">
-                        <button
+                    <div className="flex flex-col justify-end h-full">
+                        <motion.button
                             onClick={clearFilters}
-                            className="w-full h-[46px] bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 flex items-center justify-center gap-2"
+                            whileTap={{ scale: 0.97 }}
+                            className="group w-full h-[46px] bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-xl transition-colors outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-700 flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)]"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <motion.svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                className="h-4 w-4 text-slate-500 dark:text-slate-400 group-hover:text-amber-500 transition-colors" 
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                whileTap={{ rotate: 180 }}
+                                transition={{ duration: 0.3 }}
+                            >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
+                            </motion.svg>
                             Reset
-                        </button>
+                        </motion.button>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Results */}
             <div className="space-y-4">
@@ -404,11 +441,17 @@ const StudyMaterials = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <motion.div
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+                            variants={gridVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, margin: '-50px' }}
+                        >
                             {materials.map((m) => (
                                 <MaterialCard key={m.id} m={m} />
                             ))}
-                        </div>
+                        </motion.div>
 
                         {!isFiltered && (
                             <div className="text-center pt-4">

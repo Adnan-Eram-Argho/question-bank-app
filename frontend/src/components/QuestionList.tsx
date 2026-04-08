@@ -1,7 +1,35 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
+import { motion, animate } from 'framer-motion';
+import HeroParticles from './HeroParticles';
+
+const StatCounter = ({ to, label }: { to: number, label: string }) => {
+    const nodeRef = useRef<HTMLSpanElement>(null);
+    useEffect(() => {
+        const node = nodeRef.current;
+        if (node) {
+            const controls = animate(0, to, {
+                duration: 2,
+                ease: "easeOut",
+                onUpdate(value) {
+                    node.textContent = Math.round(value).toString() + "+";
+                }
+            });
+            return () => controls.stop();
+        }
+    }, [to]);
+
+    return (
+        <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
+            <span ref={nodeRef} className="text-3xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">
+                0+
+            </span>
+            <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mt-1">{label}</span>
+        </div>
+    );
+};
 
 interface Question {
     id: number;
@@ -15,18 +43,37 @@ interface Question {
     created_at: string;
 }
 
+const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
+};
+
+const gridVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.07 } },
+};
+
 const QuestionCard = ({ q }: { q: Question }) => {
     const images = q.image_urls && q.image_urls.length > 0 ? q.image_urls : (q.image_url ? [q.image_url] : []);
 
     return (
-        <div className="group bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-            <div className="relative h-56 w-full bg-gray-100 dark:bg-gray-900 overflow-hidden border-b border-gray-100 dark:border-gray-800 flex">
+        <motion.div
+            variants={cardVariants}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            whileTap={{ scale: 0.98 }}
+            viewport={{ once: true, margin: '-40px' }}
+            className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 flex flex-col h-full relative"
+        >
+            {/* Top accent bar */}
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 z-20"></div>
+
+            <div className="relative h-56 w-full bg-gray-100 dark:bg-[#0A0F1E] overflow-hidden border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.05)] flex">
                 {images.length === 1 && (
                     <a href={images[0]} target="_blank" rel="noreferrer" className="w-full h-full block relative group/full">
                         <img
                             src={images[0]}
                             alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover/full:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/full:scale-[1.02]"
                             loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/full:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -43,7 +90,7 @@ const QuestionCard = ({ q }: { q: Question }) => {
                             <img
                                 src={images[0]}
                                 alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-105"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-[1.02]"
                                 loading="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -57,7 +104,7 @@ const QuestionCard = ({ q }: { q: Question }) => {
                             <img
                                 src={images[1]}
                                 alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 2) | SAU Agricultural Economics`}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-105"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-[1.02]"
                                 loading="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -71,28 +118,28 @@ const QuestionCard = ({ q }: { q: Question }) => {
                 )}
             </div>
 
-            <div className="p-5 flex flex-col flex-grow">
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-3 line-clamp-2 leading-tight">
+            <div className="p-6 flex flex-col flex-grow">
+                <h3 className="font-bold text-lg text-slate-900 dark:text-[#F1F5F9] mb-4 line-clamp-2 leading-tight">
                     {q.course_name}
                 </h3>
 
-                <div className="flex flex-wrap gap-2 mb-4 mt-auto">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
+                <div className="flex flex-wrap gap-2 mb-6 mt-auto">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200/50 dark:border-green-500/20">
                         {q.level}
                     </span>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-100 dark:border-blue-800/50">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200/50 dark:border-amber-500/20">
                         {q.semester}
                     </span>
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${
                         q.question_type === 'Theory' 
-                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-100 dark:border-purple-800/50' 
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-100 dark:border-amber-800/50'
+                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 border-purple-200/50 dark:border-purple-500/20' 
+                            : 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200/50 dark:border-rose-500/20'
                     }`}>
                         {q.question_type}
                     </span>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between pt-4 border-t border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.06)]">
                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -104,7 +151,7 @@ const QuestionCard = ({ q }: { q: Question }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -227,23 +274,63 @@ const QuestionList = () => {
                 <meta property="og:type" content="website" />
             </Helmet>
 
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2">
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent leading-tight">
-                        Sher-e-Bangla Agricultural University (SAU) Question Bank
-                    </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-2">Previous year exam papers for Agricultural Economics</p>
+            <div className="relative overflow-hidden flex flex-col items-center text-center max-w-4xl mx-auto py-8 lg:py-12 px-4 rounded-3xl">
+                <HeroParticles />
+                <div className="relative z-10 w-full flex flex-col items-center">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 dark:bg-[#111827]/50 backdrop-blur-md border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] text-sm font-semibold text-slate-800 dark:text-slate-200 mb-6 shadow-sm"
+                    >
+                        <span className="animate-pulse">🌾</span> Agricultural Economics · SAU
+                    </motion.div>
+
+                    <motion.h1
+                        className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent leading-tight mb-6"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
+                    >
+                        Sher-e-Bangla Agricultural University Question Bank
+                    </motion.h1>
+
+                    <motion.p
+                        className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.3, ease: 'easeOut' }}
+                    >
+                        The comprehensive repository of previous year exam papers for Agricultural Economics.
+                    </motion.p>
+
+                    <motion.div
+                        className="w-full grid grid-cols-3 gap-4 mt-12"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.45, ease: 'easeOut' }}
+                    >
+                        <StatCounter to={385} label="Questions" />
+                        <StatCounter to={58} label="Courses" />
+                        <StatCounter to={3} label="Contributors" />
+                    </motion.div>
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-[#1E293B] p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Level</label>
+            <motion.div 
+                className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
+            >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
                         <select
                             value={filterLevel}
                             onChange={(e) => setFilterLevel(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                         >
                             <option value="">All Levels</option>
                             {Object.keys(courseData).map((lvl) => (
@@ -252,12 +339,13 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Semester</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Semester</label>
                         <select
                             value={filterSemester}
                             onChange={(e) => setFilterSemester(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             disabled={!filterLevel}
                         >
                             <option value="">All Semesters</option>
@@ -267,12 +355,13 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Course</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Course</label>
                         <select
                             value={filterCourse}
                             onChange={(e) => setFilterCourse(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             disabled={!filterSemester}
                         >
                             <option value="">All Courses</option>
@@ -282,12 +371,13 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ml-1">Type</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                         >
                             <option value="">All Types</option>
                             <option value="Theory">Theory</option>
@@ -295,24 +385,31 @@ const QuestionList = () => {
                         </select>
                     </div>
 
-                    <div className="flex flex-col justify-end">
-                        <button
+                    <div className="flex flex-col justify-end h-full">
+                        <motion.button
                             onClick={() => {
                                 setFilterLevel('');
                                 setFilterSemester('');
                                 setFilterCourse('');
                                 setFilterType('');
                             }}
-                            className="w-full h-[46px] bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 flex items-center justify-center gap-2"
+                            whileTap={{ scale: 0.97 }}
+                            className="group w-full h-[46px] bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-xl transition-colors outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-700 flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)]"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <motion.svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                className="h-4 w-4 text-slate-500 dark:text-slate-400 group-hover:text-amber-500 transition-colors" 
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                whileTap={{ rotate: 180 }}
+                                transition={{ duration: 0.3 }}
+                            >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
+                            </motion.svg>
                             Reset
-                        </button>
+                        </motion.button>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -352,11 +449,17 @@ const QuestionList = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <motion.div
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+                            variants={gridVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, margin: '-50px' }}
+                        >
                             {questions.map((q) => (
                                 <QuestionCard key={q.id} q={q} />
                             ))}
-                        </div>
+                        </motion.div>
 
                         {!isFiltered && (
                             <div className="text-center pt-4">

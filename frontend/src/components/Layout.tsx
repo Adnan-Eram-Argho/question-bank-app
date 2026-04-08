@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import FloatingAITutor from './FloatingAITutor';
+import { motion } from 'framer-motion';
 
 interface LayoutProps {
     children: ReactNode;
@@ -34,9 +35,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100 font-sans selection:bg-primary-200 dark:selection:bg-primary-900/50 selection:text-primary-900 dark:selection:text-primary-100">
-            <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50 transition-colors duration-300">
+        <motion.header
+            className="sticky top-0 z-50 bg-white/70 dark:bg-[#0A0F1E]/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] transition-colors duration-300"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
+        >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center relative">
-                    <Link to="/" onClick={closeMobileMenu} className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 dark:from-primary-400 dark:to-secondary-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity whitespace-nowrap">
+                    <Link to="/" onClick={closeMobileMenu} className="text-xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity whitespace-nowrap">
                         Agri-Economics Q-Bank
                     </Link>
 
@@ -73,21 +79,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
 
                     <nav className="hidden sm:flex items-center space-x-6">
-                        <Link to="/" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <Link to="/" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                             Home
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
 
-                        <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                             Blogs
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </a>
-                        <Link to="/study-materials?type=book" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <Link to="/study-materials?type=book" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                             Books
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
-                        <Link to="/study-materials?type=note" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <Link to="/study-materials?type=note" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                             Notes
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
-                        <Link to="/study-materials?type=pdf" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                        <Link to="/study-materials?type=pdf" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                             PDF
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
 
                         {user ? (
@@ -99,13 +110,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 )}
 
                                 {role === 'admin' && (
-                                    <Link to="/admin" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                                    <Link to="/admin" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                                         Admin
+                                        <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                                     </Link>
                                 )}
 
-                                <Link to="/profile" className="text-sm font-medium text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+                                <Link to="/profile" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                                     Profile
+                                    <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                                 </Link>
 
                                 <button
@@ -116,7 +129,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 </button>
                             </>
                         ) : (
-                            <Link to="/login" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 px-5 py-2 rounded-lg text-sm font-medium shadow-sm transition-all duration-300">
+                            <Link to="/login" className="bg-gradient-to-r from-green-400 to-amber-500 text-white hover:from-green-500 hover:to-amber-600 px-5 py-2 rounded-xl text-sm font-bold shadow-md shadow-[rgba(74,222,128,0.2)] hover:shadow-lg transition-all duration-300">
                                 Login
                             </Link>
                         )}
@@ -128,15 +141,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             className="p-2 rounded-full text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-gray-800 transition-all focus:outline-none"
                             aria-label="Toggle Dark Mode"
                         >
-                            {theme === 'light' ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            )}
+                            <motion.div
+                                initial={false}
+                                animate={{ rotate: theme === 'light' ? 0 : 180 }}
+                                transition={{ duration: 0.3, ease: 'backOut' }}
+                            >
+                                {theme === 'light' ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                )}
+                            </motion.div>
                         </button>
                     </nav>
                 </div>
@@ -196,7 +215,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         </nav>
                     </div>
                 )}
-            </header>
+        </motion.header>
 
             <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 transition-colors duration-300">
                 {children}
