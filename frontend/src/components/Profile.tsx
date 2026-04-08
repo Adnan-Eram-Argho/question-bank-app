@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 interface UserProfileData {
     full_name: string;
@@ -26,11 +27,23 @@ const Profile = () => {
         const fetchProfile = async () => {
             if (!user) return;
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
-                const users = await response.json();
-                const currentUser = users.find((u: any) => u.id === user.id);
+                const { data: sessionData } = await supabase.auth.getSession();
+                const accessToken = sessionData.session?.access_token;
+                if (!accessToken) {
+                    throw new Error('Missing auth session token');
+                }
 
-                if (currentUser) {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/user/profile`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+                const currentUser = await response.json();
+                if (!response.ok) {
+                    throw new Error(currentUser.error || 'Failed to fetch profile');
+                }
+
+                if (currentUser?.id) {
                     setFormData({
                         full_name: currentUser.full_name || '',
                         bio: currentUser.bio || '',
@@ -69,8 +82,17 @@ const Profile = () => {
         }
 
         try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData.session?.access_token;
+            if (!accessToken) {
+                throw new Error('Missing auth session token');
+            }
+
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/user/profile`, {
                 method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
                 body: data,
             });
 

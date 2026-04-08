@@ -114,10 +114,22 @@ const AdminDashboard: React.FC = () => {
         if (activeTab === 'materials') fetchMaterials();
     }, [mLevel, mSemester, mCourse, mType, activeTab]);
 
+    const getAccessToken = async (): Promise<string> => {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) {
+            throw new Error('Missing auth session token');
+        }
+        return accessToken;
+    };
+
     // ── Fetch functions ──
     const fetchUsers = async (): Promise<void> => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`);
+            const accessToken = await getAccessToken();
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
             if (!response.ok) throw new Error('Failed to fetch users');
             setUsers(await response.json());
         } catch (err) { console.error('[AdminDashboard] Failed to load users:', err); }
@@ -153,9 +165,13 @@ const AdminDashboard: React.FC = () => {
         e.preventDefault();
         setUserMessage('');
         try {
+            const accessToken = await getAccessToken();
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/create-user`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
                 body: JSON.stringify(formData),
             });
             const data = await response.json();
@@ -169,7 +185,11 @@ const AdminDashboard: React.FC = () => {
     const handleDeleteUser = async (userId: string) => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users/${userId}`, { method: 'DELETE' });
+            const accessToken = await getAccessToken();
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
             fetchUsers();
@@ -179,7 +199,11 @@ const AdminDashboard: React.FC = () => {
     const handleDeleteQuestion = async (questionId: number) => {
         if (!window.confirm('Delete this question? The image will also be removed from Cloudinary.')) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/questions/${questionId}`, { method: 'DELETE' });
+            const accessToken = await getAccessToken();
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/questions/${questionId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
             fetchQuestions();
@@ -189,7 +213,11 @@ const AdminDashboard: React.FC = () => {
     const handleDeleteMaterial = async (materialId: string, title: string) => {
         if (!window.confirm(`Delete "${title}"? This action cannot be undone.`)) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/materials/${materialId}`, { method: 'DELETE' });
+            const accessToken = await getAccessToken();
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/materials/${materialId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Failed to delete material');
             // Optimistic update — remove from local state immediately

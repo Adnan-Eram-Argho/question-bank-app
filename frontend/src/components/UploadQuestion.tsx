@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { courseData } from '../data';
+import { supabase } from '../lib/supabaseClient';
 
 type UploadTab = 'question' | 'book' | 'note' | 'pdf';
 
@@ -12,8 +12,6 @@ const TAB_CONFIG: { id: UploadTab; label: string; emoji: string }[] = [
 ];
 
 const UploadQuestion = () => {
-    const { user } = useAuth();
-
     // --- Tab state ---
     const [activeTab, setActiveTab] = useState<UploadTab>('question');
 
@@ -123,6 +121,14 @@ const UploadQuestion = () => {
     }, [processFiles, activeTab]);
 
     const removeFile = (index: number) => { setFiles(prev => prev.filter((_, i) => i !== index)); setMessage(''); };
+    const getAccessToken = async (): Promise<string> => {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) {
+            throw new Error('Missing auth session token');
+        }
+        return accessToken;
+    };
 
     // ---- Submit: Question ----
     const handleQuestionSubmit = async (e: React.FormEvent) => {
@@ -137,9 +143,13 @@ const UploadQuestion = () => {
         formData.append('semester', semester);
         formData.append('course_name', courseName);
         formData.append('question_type', questionType);
-        formData.append('uploaded_by', user?.email || 'Unknown');
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/upload`, { method: 'POST', body: formData });
+            const accessToken = await getAccessToken();
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/upload`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${accessToken}` },
+                body: formData,
+            });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Upload failed');
             setMessage('Question uploaded successfully!');
@@ -168,9 +178,13 @@ const UploadQuestion = () => {
         
         setLoading(true); setMessage('');
         try {
+            const accessToken = await getAccessToken();
             const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/upload-material`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
                 body: JSON.stringify({
                     title: materialTitle,
                     type: activeTab,
@@ -178,7 +192,6 @@ const UploadQuestion = () => {
                     semester,
                     course_name: activeTab === 'pdf' ? null : courseName,
                     drive_link: driveLink,
-                    uploader_id: user?.id || null,
                 }),
             });
             const data = await res.json();

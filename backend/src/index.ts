@@ -11,8 +11,31 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-app.use(cors());
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('CORS policy violation: origin not allowed'));
+    },
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    credentials: false,
+  })
+);
 app.use(express.json());
+app.use((_, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  next();
+});
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -28,9 +51,111 @@ cloudinary.config({
 // Groq AI client
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-//ekhane multer user korsi file upload middlewaer
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+  throw new Error('Missing required Supabase environment variables.');
+}
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  throw new Error('Missing required Cloudinary environment variables.');
+}
+if (!process.env.GROQ_API_KEY) {
+  throw new Error('Missing required GROQ_API_KEY.');
+}
+
+// Multer memory storage with strict validation and upload bounds.
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const imageFileFilter: multer.Options['fileFilter'] = (_req, file, callback) => {
+  if (!file.mimetype.startsWith('image/')) {
+    callback(new Error('Only image uploads are accepted.'));
+    return;
+  }
+  callback(null, true);
+};
+
+const uploadQuestions = multer({
+  storage,
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024, files: 10 },
+});
+const uploadAvatar = multer({
+  storage,
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+});
+
+type AuthenticatedRequest = Request & {
+  userId: string;
+  userRole: string;
+};
+
+const requestCounts = new Map<string, { count: number; resetAt: number }>();
+const WINDOW_MS = 60 * 1000;
+const MAX_REQUESTS_PER_WINDOW = 120;
+const basicRateLimit = (req: Request, res: Response, next: express.NextFunction): void => {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const current = requestCounts.get(ip);
+
+  if (!current || now > current.resetAt) {
+    requestCounts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    next();
+    return;
+  }
+
+  if (current.count >= MAX_REQUESTS_PER_WINDOW) {
+    res.status(429).json({ error: 'Too many requests. Try again shortly.' });
+    return;
+  }
+
+  current.count += 1;
+  requestCounts.set(ip, current);
+  next();
+};
+
+app.use(basicRateLimit);
+
+const requireAuth = async (req: Request, res: Response, next: express.NextFunction): Promise<void> => {
+  try {
+    const authHeader = req.header('authorization') || req.header('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      res.status(401).json({ error: 'Missing or invalid bearer token.' });
+      return;
+    }
+
+    const token = authHeader.slice(7).trim();
+    const { data: authUser, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !authUser.user) {
+      res.status(401).json({ error: 'Unauthorized request.' });
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('id, role')
+      .eq('id', authUser.user.id)
+      .single();
+
+    if (profileError || !profile?.id) {
+      res.status(403).json({ error: 'Unable to resolve user role.' });
+      return;
+    }
+
+    const typedReq = req as AuthenticatedRequest;
+    typedReq.userId = profile.id;
+    typedReq.userRole = profile.role || 'user';
+    next();
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Authentication middleware failed.' });
+  }
+};
+
+const requireAdmin = (req: Request, res: Response, next: express.NextFunction): void => {
+  const typedReq = req as AuthenticatedRequest;
+  if (typedReq.userRole !== 'admin') {
+    res.status(403).json({ error: 'Admin privileges required.' });
+    return;
+  }
+  next();
+};
 
 /**
  * Helper to delete an image directly from Cloudinary by extracting its public ID from the URL.
@@ -92,8 +217,16 @@ app.get('/api/contributors', async (req: Request, res: Response): Promise<void> 
  * POST /api/admin/create-user
  * Admin route to safely create a new user in Supabase Auth and the public database schema.
  */
-app.post('/api/admin/create-user', async (req: Request, res: Response): Promise<void> => {
+app.post('/api/admin/create-user', requireAuth, requireAdmin, async (req: Request, res: Response): Promise<void> => {
   const { email, password, role } = req.body;
+  if (!email || !password || !role) {
+    res.status(400).json({ error: 'Email, password, and role are required.' });
+    return;
+  }
+  if (!['admin', 'collector'].includes(role)) {
+    res.status(400).json({ error: 'Invalid role. Must be admin or collector.' });
+    return;
+  }
 
   try {
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -123,7 +256,7 @@ app.post('/api/admin/create-user', async (req: Request, res: Response): Promise<
  * POST /api/upload
  * Handles question uploads, including proxying the image to Cloudinary and storing records in Supabase.
  */
-app.post('/api/upload', upload.array('images', 10), async (req: Request, res: Response): Promise<void> => {
+app.post('/api/upload', requireAuth, uploadQuestions.array('images', 10), async (req: Request, res: Response): Promise<void> => {
   try {
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) {
@@ -131,7 +264,12 @@ app.post('/api/upload', upload.array('images', 10), async (req: Request, res: Re
       return;
     }
 
-    const { level, semester, course_name, question_type, uploaded_by } = req.body;
+    const typedReq = req as AuthenticatedRequest;
+    const { level, semester, course_name, question_type } = req.body;
+    if (!level || !semester || !course_name || !question_type) {
+      res.status(400).json({ error: 'Required fields are missing for question upload.' });
+      return;
+    }
 
     const streamUpload = (fileBuffer: Buffer): Promise<UploadApiResponse> => {
       return new Promise((resolve, reject) => {
@@ -164,7 +302,7 @@ app.post('/api/upload', upload.array('images', 10), async (req: Request, res: Re
           semester,
           course_name,
           question_type,
-          uploaded_by,
+          uploaded_by: typedReq.userId,
         },
       ])
       .select();
@@ -182,7 +320,7 @@ app.post('/api/upload', upload.array('images', 10), async (req: Request, res: Re
  * GET /api/admin/users
  * Retrieves a list of all users from the public schema.
  */
-app.get('/api/admin/users', async (req: Request, res: Response): Promise<void> => {
+app.get('/api/admin/users', requireAuth, requireAdmin, async (req: Request, res: Response): Promise<void> => {
   try {
     const { data, error } = await supabase.from('users').select('*');
     if (error) throw error;
@@ -194,29 +332,10 @@ app.get('/api/admin/users', async (req: Request, res: Response): Promise<void> =
 });
 
 /**
- * GET /api/contributors
- * Retrieves a list of all users styled as 'collector'.
- */
-app.get('/api/contributors', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('email')
-      .eq('role', 'collector');
-
-    if (error) throw error;
-    res.status(200).json(data);
-  } catch (error: any) {
-    console.error('[API Error] Fetch Contributors:', error.message);
-    res.status(500).json({ error: error.message || 'Failed to retrieve contributors' });
-  }
-});
-
-/**
  * DELETE /api/admin/users/:id
  * Force-removes a user, purging their avatar from Cloudinary and their Auth/Database records.
  */
-app.delete('/api/admin/users/:id', async (req: Request, res: Response): Promise<void> => {
+app.delete('/api/admin/users/:id', requireAuth, requireAdmin, async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id as string;
 
   try {
@@ -251,7 +370,7 @@ app.delete('/api/admin/users/:id', async (req: Request, res: Response): Promise<
  * DELETE /api/admin/questions/:id
  * Removes a specified question entry and its associated Cloudinary asset.
  */
-app.delete('/api/admin/questions/:id', async (req: Request, res: Response): Promise<void> => {
+app.delete('/api/admin/questions/:id', requireAuth, requireAdmin, async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id as string;
 
   try {
@@ -291,8 +410,30 @@ app.delete('/api/admin/questions/:id', async (req: Request, res: Response): Prom
  * POST /api/user/profile
  * Allows users to update personal data and optionally upload/rotate a new Cloudinary avatar.
  */
-app.post('/api/user/profile', upload.single('avatar'), async (req: Request, res: Response): Promise<void> => {
+app.get('/api/user/profile', requireAuth, async (req: Request, res: Response): Promise<void> => {
+  const typedReq = req as AuthenticatedRequest;
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, email, full_name, bio, avatar_url, role')
+      .eq('id', typedReq.userId)
+      .single();
+
+    if (error) throw error;
+    res.status(200).json(data);
+  } catch (error: any) {
+    console.error('[API Error] Fetch Profile:', error.message);
+    res.status(500).json({ error: error.message || 'Failed to fetch profile' });
+  }
+});
+
+app.post('/api/user/profile', requireAuth, uploadAvatar.single('avatar'), async (req: Request, res: Response): Promise<void> => {
   const { userId, fullName, bio } = req.body;
+  const typedReq = req as AuthenticatedRequest;
+  if (userId !== typedReq.userId) {
+    res.status(403).json({ error: 'You can only update your own profile.' });
+    return;
+  }
 
   try {
     let avatarUrl = null;
@@ -366,7 +507,7 @@ If the user asks about ANYTHING outside Agricultural Economics (including genera
 
 Always be helpful, clear, and educational when answering questions within your domain. If images of question papers are provided, analyze them carefully to help the student understand the questions and concepts.`;
 
-app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> => {
+app.post('/api/chat-tutor', requireAuth, async (req: Request, res: Response): Promise<void> => {
   const { message, history, images } = req.body as {
     message: string;
     history: { role: 'user' | 'assistant'; text: string }[];
@@ -445,8 +586,9 @@ app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> =
  * Accepts JSON body: { title, type, level, semester, course_name, drive_link, uploader_id }
  * No file processing — Google Drive links only.
  */
-app.post('/api/upload-material', async (req: Request, res: Response): Promise<void> => {
-  const { title, type, level, semester, course_name, drive_link, uploader_id } = req.body;
+app.post('/api/upload-material', requireAuth, async (req: Request, res: Response): Promise<void> => {
+  const typedReq = req as AuthenticatedRequest;
+  const { title, type, level, semester, course_name, drive_link } = req.body;
 
   if (!title || !type || !level || !drive_link) {
     res.status(400).json({ error: 'Fields (title, type, level, drive_link) are always required.' });
@@ -478,7 +620,7 @@ app.post('/api/upload-material', async (req: Request, res: Response): Promise<vo
         semester, 
         course_name: type === 'pdf' ? null : course_name, 
         drive_link, 
-        uploader_id: uploader_id || null 
+        uploader_id: typedReq.userId || null 
       }])
       .select();
 
@@ -496,7 +638,7 @@ app.post('/api/upload-material', async (req: Request, res: Response): Promise<vo
  * Removes a study material record from the `study_materials` table.
  * Uses the service key to bypass Row Level Security.
  */
-app.delete('/api/admin/materials/:id', async (req: Request, res: Response): Promise<void> => {
+app.delete('/api/admin/materials/:id', requireAuth, requireAdmin, async (req: Request, res: Response): Promise<void> => {
   const id = req.params.id as string;
 
   try {
@@ -512,6 +654,19 @@ app.delete('/api/admin/materials/:id', async (req: Request, res: Response): Prom
     console.error('[API Error] Delete Material:', error.message);
     res.status(500).json({ error: error.message || 'Failed to delete study material' });
   }
+});
+
+app.use((error: any, _req: Request, res: Response, _next: express.NextFunction) => {
+  if (error instanceof multer.MulterError) {
+    res.status(400).json({ error: `Upload rejected: ${error.message}` });
+    return;
+  }
+  if (error?.message === 'Only image uploads are accepted.') {
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  console.error('[Unhandled Error]', error);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(PORT, () => {
