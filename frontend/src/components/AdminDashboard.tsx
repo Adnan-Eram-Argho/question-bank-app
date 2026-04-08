@@ -64,7 +64,11 @@ const AdminDashboard: React.FC = () => {
     const [mAvailableCourses, setMAvailableCourses] = useState<string[]>([]);
 
     // ── Initial load ──
-    useEffect(() => { fetchUsers(); }, []);
+    useEffect(() => {
+        if (user) {
+            fetchUsers();
+        }
+    }, [user]);
 
     // ── Questions cascading filters ──
     useEffect(() => {
@@ -130,9 +134,15 @@ const AdminDashboard: React.FC = () => {
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/users`, {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
-            if (!response.ok) throw new Error('Failed to fetch users');
-            setUsers(await response.json());
-        } catch (err) { console.error('[AdminDashboard] Failed to load users:', err); }
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.error || 'Failed to fetch users');
+            setUsers(payload);
+            setUserMessage('');
+        } catch (err: any) {
+            console.error('[AdminDashboard] Failed to load users:', err);
+            setUsers([]);
+            setUserMessage(err.message || 'Unable to load users');
+        }
     };
 
     const fetchQuestions = async () => {
