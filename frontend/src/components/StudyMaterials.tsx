@@ -232,20 +232,23 @@ const StudyMaterials = () => {
             if (fetchedMaterials.length > 0) {
                 const uploaderIds = Array.from(new Set(fetchedMaterials.map(m => m.uploader_id).filter(id => id)));
                 if (uploaderIds.length > 0) {
-                    const { data: usersData, error: usersError } = await supabase
-                        .from('users')
-                        .select('id, full_name, email')
-                        .in('id', uploaderIds);
-                        
-                    if (!usersError && usersData) {
-                        const userMap = usersData.reduce((acc: any, user: any) => {
-                            acc[user.id] = user;
-                            return acc;
-                        }, {});
-                        fetchedMaterials = fetchedMaterials.map(m => ({
-                            ...m,
-                            users: m.uploader_id ? userMap[m.uploader_id] : null
-                        }));
+                    try {
+                        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`);
+                        if (response.ok) {
+                            const usersData = await response.json();
+                            const userMap = usersData.reduce((acc: any, user: any) => {
+                                if (user.id) {
+                                    acc[user.id] = user;
+                                }
+                                return acc;
+                            }, {});
+                            fetchedMaterials = fetchedMaterials.map(m => ({
+                                ...m,
+                                users: m.uploader_id ? userMap[m.uploader_id] : null
+                            }));
+                        }
+                    } catch (err) {
+                        console.error('Failed to fetch contributors for mapping:', err);
                     }
                 }
             }

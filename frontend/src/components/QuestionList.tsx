@@ -130,11 +130,10 @@ const QuestionCard = ({ q }: { q: Question }) => {
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200/50 dark:border-amber-500/20">
                         {q.semester}
                     </span>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${
-                        q.question_type === 'Theory' 
-                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 border-purple-200/50 dark:border-purple-500/20' 
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${q.question_type === 'Theory'
+                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 border-purple-200/50 dark:border-purple-500/20'
                             : 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200/50 dark:border-rose-500/20'
-                    }`}>
+                        }`}>
                         {q.question_type}
                     </span>
                 </div>
@@ -247,14 +246,12 @@ const QuestionList = () => {
 
     const buildMetaDescription = (): string => {
         if (filterCourse && filterLevel && filterSemester) {
-            return `Download and view ${filterCourse} past exam question papers for ${filterLevel} ${filterSemester}${
-                filterType ? ` (${filterType})` : ''
-            } at Sher-e-Bangla Agricultural University (SAU) Agricultural Economics faculty.`;
+            return `Download and view ${filterCourse} past exam question papers for ${filterLevel} ${filterSemester}${filterType ? ` (${filterType})` : ''
+                } at Sher-e-Bangla Agricultural University (SAU) Agricultural Economics faculty.`;
         }
         if (filterLevel && filterSemester) {
-            return `Browse ${filterLevel} ${filterSemester}${
-                filterType ? ` ${filterType}` : ''
-            } past exam questions for the SAU Agricultural Economics faculty. Filter by course for more specific results.`;
+            return `Browse ${filterLevel} ${filterSemester}${filterType ? ` ${filterType}` : ''
+                } past exam questions for the SAU Agricultural Economics faculty. Filter by course for more specific results.`;
         }
         if (filterType) {
             return `Browse ${filterType} past exam questions for the Agricultural Economics faculty of Sher-e-Bangla Agricultural University (SAU).`;
@@ -317,7 +314,7 @@ const QuestionList = () => {
                 </div>
             </div>
 
-            <motion.div 
+            <motion.div
                 className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -396,9 +393,9 @@ const QuestionList = () => {
                             whileTap={{ scale: 0.97 }}
                             className="group w-full h-[46px] bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-xl transition-colors outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-700 flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)]"
                         >
-                            <motion.svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                className="h-4 w-4 text-slate-500 dark:text-slate-400 group-hover:text-amber-500 transition-colors" 
+                            <motion.svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-slate-500 dark:text-slate-400 group-hover:text-amber-500 transition-colors"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                 whileTap={{ rotate: 180 }}
                                 transition={{ duration: 0.3 }}
@@ -417,7 +414,7 @@ const QuestionList = () => {
                         {isFiltered ? (
                             <>Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
                         ) : (
-                            <>Showing <span className="text-gray-900 dark:text-white font-bold">latest {questions.length}</span> question{questions.length !== 1 && 's'} &mdash; use filters to search all</>  
+                            <>Showing <span className="text-gray-900 dark:text-white font-bold">latest {questions.length}</span> question{questions.length !== 1 && 's'} &mdash; use filters to search all</>
                         )}
                     </p>
                 </div>
@@ -434,7 +431,7 @@ const QuestionList = () => {
                             Try adjusting your filters or check back later for new uploads.
                         </p>
                         {isFiltered && (
-                            <button 
+                            <button
                                 onClick={() => {
                                     setFilterLevel('');
                                     setFilterSemester('');

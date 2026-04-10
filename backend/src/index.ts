@@ -208,7 +208,7 @@ app.get('/api/contributors', async (req: Request, res: Response): Promise<void> 
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('email, full_name, bio, avatar_url, role')
+      .select('id, email, full_name, bio, avatar_url, role')
       .in('role', ['collector', 'admin'])
       .order('full_name', { ascending: true });
 
