@@ -228,36 +228,40 @@ const StudyMaterials = () => {
             const { data, error } = await query;
             if (error) throw error;
             
-            let fetchedMaterials = data || [];
+            const fetchedMaterials = data || [];
+            
+            // Set materials immediately and disable loading so the UI updates
+            setMaterials(fetchedMaterials);
+            setLoading(false);
 
+            // Fetch contributor names asynchronously without blocking the UI
             if (fetchedMaterials.length > 0) {
                 const uploaderIds = Array.from(new Set(fetchedMaterials.map(m => m.uploader_id).filter(id => id)));
                 if (uploaderIds.length > 0) {
-                    try {
-                        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`);
-                        if (response.ok) {
-                            const usersData = await response.json();
+                    fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`)
+                        .then(response => {
+                            if (response.ok) return response.json();
+                            throw new Error('Network response not ok');
+                        })
+                        .then(usersData => {
                             const userMap = usersData.reduce((acc: any, user: any) => {
                                 if (user.id) {
                                     acc[user.id] = user;
                                 }
                                 return acc;
                             }, {});
-                            fetchedMaterials = fetchedMaterials.map(m => ({
+                            setMaterials(prev => prev.map(m => ({
                                 ...m,
-                                users: m.uploader_id ? userMap[m.uploader_id] : null
-                            }));
-                        }
-                    } catch (err) {
-                        console.error('Failed to fetch contributors for mapping:', err);
-                    }
+                                users: m.uploader_id ? userMap[m.uploader_id] : m.users
+                            })));
+                        })
+                        .catch(err => {
+                            console.error('Failed to fetch contributors for mapping (background):', err);
+                        });
                 }
             }
-            
-            setMaterials(fetchedMaterials);
         } catch (err) {
             console.error('[StudyMaterials] Fetch error:', err);
-        } finally {
             setLoading(false);
         }
     };
