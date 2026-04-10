@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
+import ScrollReveal from './ScrollReveal';
 
 interface UserProfileData {
     full_name: string;
@@ -119,7 +120,8 @@ const Profile = () => {
 
     return (
         <div className="max-w-xl mx-auto p-4 sm:p-8 animate-fade-in mt-6">
-            <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 sm:p-10">
+            <ScrollReveal direction="up" delay={0.1}>
+                <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 sm:p-10">
                 <div className="mb-8 text-center border-b border-gray-100 dark:border-gray-800 pb-6">
                     <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent mb-2">My Profile</h2>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your personal information and avatar</p>
@@ -213,7 +215,8 @@ const Profile = () => {
                     </div>
 
                 </form>
-            </div>
+                </div>
+            </ScrollReveal>
         </div>
     );
 };

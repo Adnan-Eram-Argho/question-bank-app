@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ScrollReveal from './ScrollReveal';
 
 const DEV = {
   name: 'Adnan-Eram Argho',
@@ -201,13 +202,8 @@ const Developer = () => {
         </motion.div>
 
         {DEV.highlights.length > 0 && (
-          <motion.div
-            className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-          >
+          <ScrollReveal direction="up" delay={0.2}>
+            <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6">
             <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
               Project Highlights
             </h2>
@@ -219,7 +215,8 @@ const Developer = () => {
                 </li>
               ))}
             </ul>
-          </motion.div>
+            </div>
+          </ScrollReveal>
         )}
 
         <div className="text-center pt-4">

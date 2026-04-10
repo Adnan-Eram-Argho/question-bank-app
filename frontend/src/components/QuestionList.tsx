@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
 import { motion, animate } from 'framer-motion';
 import HeroParticles from './HeroParticles';
+import ScrollReveal from './ScrollReveal';
 
 const StatCounter = ({ to, label }: { to: number, label: string }) => {
     const nodeRef = useRef<HTMLSpanElement>(null);
@@ -314,12 +315,8 @@ const QuestionList = () => {
                 </div>
             </div>
 
-            <motion.div
-                className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-            >
+            <ScrollReveal direction="up" delay={0.2}>
+                <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
                     <div className="flex flex-col gap-2">
                         <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
@@ -406,18 +403,21 @@ const QuestionList = () => {
                         </motion.button>
                     </div>
                 </div>
-            </motion.div>
+                </div>
+            </ScrollReveal>
 
             <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {isFiltered ? (
-                            <>Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
-                        ) : (
-                            <>Showing <span className="text-gray-900 dark:text-white font-bold">latest {questions.length}</span> question{questions.length !== 1 && 's'} &mdash; use filters to search all</>
-                        )}
-                    </p>
-                </div>
+                <ScrollReveal direction="up">
+                    <div className="flex justify-between items-center">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            {isFiltered ? (
+                                <>Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
+                            ) : (
+                                <>Showing <span className="text-gray-900 dark:text-white font-bold">latest {questions.length}</span> question{questions.length !== 1 && 's'} &mdash; use filters to search all</>
+                            )}
+                        </p>
+                    </div>
+                </ScrollReveal>
 
                 {questions.length === 0 ? (
                     <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">

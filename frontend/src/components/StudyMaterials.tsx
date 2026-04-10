@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
 import { motion } from 'framer-motion';
+import ScrollReveal from './ScrollReveal';
 
 interface StudyMaterial {
     id: string;
@@ -314,12 +315,8 @@ const StudyMaterials = () => {
             </motion.div>
 
             {/* Filter bar */}
-            <motion.div 
-                className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-            >
+            <ScrollReveal direction="up" delay={0.2}>
+                <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
                     {/* Level */}
                     <div className="flex flex-col gap-2">
@@ -407,7 +404,8 @@ const StudyMaterials = () => {
                         </motion.button>
                     </div>
                 </div>
-            </motion.div>
+                </div>
+            </ScrollReveal>
 
             {/* Results */}
             <div className="space-y-4">
@@ -425,23 +423,25 @@ const StudyMaterials = () => {
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500" />
                     </div>
                 ) : materials.length === 0 ? (
-                    <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
-                        <div className="bg-gray-50 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                            📚
+                    <ScrollReveal direction="up">
+                        <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
+                            <div className="bg-gray-50 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                                📚
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No materials found</h3>
+                            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                                No books or notes match your current filters. Try adjusting or resetting them.
+                            </p>
+                            {isFiltered && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="mt-6 text-primary-600 dark:text-primary-400 font-medium hover:underline"
+                                >
+                                    Clear all filters
+                                </button>
+                            )}
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No materials found</h3>
-                        <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
-                            No books or notes match your current filters. Try adjusting or resetting them.
-                        </p>
-                        {isFiltered && (
-                            <button
-                                onClick={clearFilters}
-                                className="mt-6 text-primary-600 dark:text-primary-400 font-medium hover:underline"
-                            >
-                                Clear all filters
-                            </button>
-                        )}
-                    </div>
+                    </ScrollReveal>
                 ) : (
                     <>
                         <motion.div

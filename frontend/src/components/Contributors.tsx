@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ScrollReveal from './ScrollReveal';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com';
 
@@ -76,15 +77,19 @@ const Contributors = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </div>
+          <ScrollReveal direction="up">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+          </ScrollReveal>
         ) : contributors.length === 0 ? (
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
-            <p className="text-gray-500 dark:text-gray-400">No contributors found yet.</p>
-          </div>
+          <ScrollReveal direction="up">
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
+              <p className="text-gray-500 dark:text-gray-400">No contributors found yet.</p>
+            </div>
+          </ScrollReveal>
         ) : (
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
