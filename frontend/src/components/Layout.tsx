@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import FloatingAITutor from './FloatingAITutor';
+import DeveloperBadge from './DeveloperBadge';
 import { motion } from 'framer-motion';
 
 interface LayoutProps {
@@ -238,6 +239,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </p>
                 </div>
             </footer>
+            <DeveloperBadge />
             <FloatingAITutor />
         </div>
     );
