@@ -20,7 +20,7 @@ I am passionate about programming and continuously learning new technologies to 
   github: 'https://github.com/Adnan-Eram-Argho',
   linkedin: 'https://www.linkedin.com/in/md-adnan-eram-argho/',
   email: 'adnaneramargho@gmail.com',
-  portfolio: 'https://portfolio-dusky-five-42.vercel.app/',
+  portfolio: 'https://adnan-eram-argho.github.io/portfolio/',
 
   education: [
     {
@@ -204,17 +204,17 @@ const Developer = () => {
         {DEV.highlights.length > 0 && (
           <ScrollReveal direction="up" delay={0.2}>
             <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
-              Project Highlights
-            </h2>
-            <ul className="space-y-3">
-              {DEV.highlights.map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <IconCheck />
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">{item}</span>
-                </li>
-              ))}
-            </ul>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
+                Project Highlights
+              </h2>
+              <ul className="space-y-3">
+                {DEV.highlights.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <IconCheck />
+                    <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </ScrollReveal>
         )}
