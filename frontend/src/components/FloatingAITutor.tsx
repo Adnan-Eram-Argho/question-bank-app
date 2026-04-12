@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useFaculty } from '../context/FacultyContext';
 
 interface Message {
     id: number;
@@ -54,6 +55,7 @@ const WELCOME_MESSAGE: Message = {
 };
 
 const FloatingAITutor = () => {
+    const { activeFaculty } = useFaculty();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
     const [input, setInput] = useState('');
@@ -116,6 +118,7 @@ const FloatingAITutor = () => {
                     message: trimmed,
                     history: buildHistory(),
                     images: [], // extend here to pass question image URLs if needed
+                    faculty: activeFaculty,
                 }),
             });
 

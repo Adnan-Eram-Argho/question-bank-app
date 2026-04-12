@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
 import { motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
+import { useFaculty } from '../context/FacultyContext';
 
 interface StudyMaterial {
     id: string;
@@ -142,6 +143,9 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
 };
 
 const StudyMaterials = () => {
+    const { activeFaculty } = useFaculty();
+    const facultyData = (courseData as any)[activeFaculty] || {};
+
     const [searchParams] = useSearchParams();
     const [materials, setMaterials] = useState<StudyMaterial[]>([]);
     const [loading, setLoading] = useState(true);
@@ -163,8 +167,12 @@ const StudyMaterials = () => {
 
     // Cascade: Level → Semesters
     useEffect(() => {
-        if (filterLevel && courseData[filterLevel as keyof typeof courseData]) {
-            setAvailableSemesters(Object.keys(courseData[filterLevel as keyof typeof courseData]));
+        setFilterLevel('');
+    }, [activeFaculty]);
+
+    useEffect(() => {
+        if (filterLevel && facultyData[filterLevel]) {
+            setAvailableSemesters(Object.keys(facultyData[filterLevel] || {}));
         } else {
             setAvailableSemesters([]);
         }
@@ -176,9 +184,9 @@ const StudyMaterials = () => {
     // Cascade: Semester → Courses
     useEffect(() => {
         if (filterLevel && filterSemester) {
-            const levelData = courseData[filterLevel as keyof typeof courseData];
-            if (levelData && levelData[filterSemester as keyof typeof levelData]) {
-                setAvailableCourses(levelData[filterSemester as keyof typeof levelData]);
+            const levelData = facultyData[filterLevel] || {};
+            if (levelData && levelData[filterSemester]) {
+                setAvailableCourses(levelData[filterSemester]);
             } else {
                 setAvailableCourses([]);
             }
@@ -193,9 +201,9 @@ const StudyMaterials = () => {
         const fetchTotals = async () => {
             // Fetch only the counts from the database, not the actual row data
             const [bookRes, noteRes, pdfRes] = await Promise.all([
-                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'book'),
-                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'note'),
-                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'pdf'),
+                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'book').eq('faculty', activeFaculty),
+                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'note').eq('faculty', activeFaculty),
+                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'pdf').eq('faculty', activeFaculty),
             ]);
 
             setTotalCounts({
@@ -205,11 +213,11 @@ const StudyMaterials = () => {
             });
         };
         fetchTotals();
-    }, []);
+    }, [activeFaculty]);
 
     useEffect(() => {
         fetchMaterials();
-    }, [filterLevel, filterSemester, filterCourse, filterType]);
+    }, [filterLevel, filterSemester, filterCourse, filterType, activeFaculty]);
 
     const fetchMaterials = async () => {
         setLoading(true);
@@ -219,6 +227,7 @@ const StudyMaterials = () => {
                 .select('*')
                 .order('created_at', { ascending: false });
 
+            if (activeFaculty) query = query.eq('faculty', activeFaculty);
             if (filterLevel) query = query.eq('level', filterLevel);
             if (filterSemester) query = query.eq('semester', filterSemester);
             if (filterCourse) query = query.eq('course_name', filterCourse);
@@ -334,7 +343,7 @@ const StudyMaterials = () => {
                             style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                         >
                             <option value="">All Levels</option>
-                            {Object.keys(courseData).map((lvl) => (
+                            {Object.keys(facultyData).map((lvl) => (
                                 <option key={lvl} value={lvl}>{lvl}</option>
                             ))}
                         </select>

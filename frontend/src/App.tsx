@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { FacultyProvider } from './context/FacultyContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
@@ -31,7 +32,8 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode, allow
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
+      <FacultyProvider>
+        <AuthProvider>
         <Router>
           <AnimatedBackground />
           <Layout>
@@ -100,7 +102,8 @@ function App() {
             },
           }}
         />
-      </AuthProvider>
+        </AuthProvider>
+      </FacultyProvider>
     </ThemeProvider>
   );
 }

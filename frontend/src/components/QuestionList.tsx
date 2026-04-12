@@ -5,6 +5,7 @@ import { courseData } from '../data';
 import { motion, animate } from 'framer-motion';
 import HeroParticles from './HeroParticles';
 import ScrollReveal from './ScrollReveal';
+import { useFaculty } from '../context/FacultyContext';
 
 const StatCounter = ({ to, label }: { to: number, label: string }) => {
     const nodeRef = useRef<HTMLSpanElement>(null);
@@ -151,6 +152,9 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
 };
 
 const QuestionList = () => {
+    const { activeFaculty } = useFaculty();
+    const facultyData = (courseData as any)[activeFaculty] || {};
+
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -163,8 +167,12 @@ const QuestionList = () => {
     const [availableCourses, setAvailableCourses] = useState<string[]>([]);
 
     useEffect(() => {
-        if (filterLevel && courseData[filterLevel as keyof typeof courseData]) {
-            const semesters = Object.keys(courseData[filterLevel as keyof typeof courseData]);
+        setFilterLevel('');
+    }, [activeFaculty]);
+
+    useEffect(() => {
+        if (filterLevel && facultyData[filterLevel]) {
+            const semesters = Object.keys(facultyData[filterLevel] || {});
             setAvailableSemesters(semesters);
         } else {
             setAvailableSemesters([]);
@@ -176,9 +184,9 @@ const QuestionList = () => {
 
     useEffect(() => {
         if (filterLevel && filterSemester) {
-            const levelData = courseData[filterLevel as keyof typeof courseData];
-            if (levelData && levelData[filterSemester as keyof typeof levelData]) {
-                const courses = levelData[filterSemester as keyof typeof levelData];
+            const levelData = facultyData[filterLevel] || {};
+            if (levelData && levelData[filterSemester]) {
+                const courses = levelData[filterSemester];
                 setAvailableCourses(courses);
             } else {
                 setAvailableCourses([]);
@@ -194,7 +202,7 @@ const QuestionList = () => {
         const partialLSCSelection = (filterLevel || filterSemester || filterCourse) && !allThreeSet;
         if (partialLSCSelection && !filterType) return;
         fetchQuestions();
-    }, [filterLevel, filterSemester, filterCourse, filterType]);
+    }, [filterLevel, filterSemester, filterCourse, filterType, activeFaculty]);
 
     const isFiltered = !!(filterLevel && filterSemester) || !!(filterCourse || filterType);
 
@@ -203,6 +211,7 @@ const QuestionList = () => {
         try {
             let query = supabase.from('questions').select('*').order('created_at', { ascending: false });
 
+            if (activeFaculty) query = query.eq('faculty', activeFaculty);
             if (filterLevel) query = query.eq('level', filterLevel);
             if (filterSemester) query = query.eq('semester', filterSemester);
             if (filterCourse) query = query.eq('course_name', filterCourse);
@@ -322,7 +331,7 @@ const QuestionList = () => {
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
                                 <option value="">All Levels</option>
-                                {Object.keys(courseData).map((lvl) => (
+                                {Object.keys(facultyData).map((lvl) => (
                                     <option key={lvl} value={lvl}>{lvl}</option>
                                 ))}
                             </select>

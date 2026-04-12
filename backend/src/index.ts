@@ -274,7 +274,7 @@ app.post('/api/upload', requireAuth, uploadQuestions.array('images', 10), async 
     }
 
     const typedReq = req as AuthenticatedRequest;
-    const { level, semester, course_name, question_type } = req.body;
+    const { level, semester, course_name, question_type, faculty } = req.body;
     if (!level || !semester || !course_name || !question_type) {
       res.status(400).json({ error: 'Required fields are missing for question upload.' });
       return;
@@ -307,6 +307,7 @@ app.post('/api/upload', requireAuth, uploadQuestions.array('images', 10), async 
         {
           image_url: imageUrl,
           image_urls: imageUrls,
+          faculty: faculty || 'Agricultural Economics',
           level,
           semester,
           course_name,
@@ -497,7 +498,17 @@ app.post('/api/user/profile', requireAuth, uploadAvatar.single('avatar'), async 
  * Accepts: message (string), history (array of {role, text}), images (optional Cloudinary URL array).
  * Enforces strict Agricultural Economics domain guardrails.
  */
-const GROQ_SYSTEM_INSTRUCTION = `You are a specialized AI Tutor built exclusively for the Agricultural Economics Question Bank at Sher-e-Bangla Agricultural University (SAU), Bangladesh.
+app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> => {
+  const { message, history, images, faculty } = req.body as {
+    message: string;
+    history: { role: 'user' | 'assistant'; text: string }[];
+    images?: string[];
+    faculty?: string;
+  };
+
+  const currentFaculty = faculty || 'Agricultural Economics';
+
+  const GROQ_SYSTEM_INSTRUCTION = `You are a specialized AI Tutor built exclusively for the ${currentFaculty} Question Bank at Sher-e-Bangla Agricultural University (SAU), Bangladesh.
 
 CRITICAL RULES — you must follow all of these without exception:
 
@@ -505,19 +516,12 @@ RULE 1 — IDENTITY (HIGHEST PRIORITY):
 If the user asks "Who made you?", "Who created you?", "Who developed this?", "Who built you?", or any similar question about your creator, developer, or the application's author, you MUST reply with EXACTLY this phrase: "Md. Adnan Eram Argho made me." Do not add anything else about the creator.
 
 RULE 2 — DOMAIN RESTRICTION:
-You are STRICTLY limited to helping with Agricultural Economics and related subjects taught at SAU. Your knowledge domain includes: Principles of Economics, Micro Economics, Macro Economics, Agricultural Marketing, Farm Management, Agricultural Finance, Production Economics, Econometrics, Mathematical Economics, Environmental Economics, Agricultural Policy and Planning, Agricultural Development Economics, Supply Chain Management, Financial Management, Organizational Behavior, Bangladesh Studies, Human Resource Management, and any other subject within the SAU Agricultural Economics curriculum. You may also analyze and explain exam question papers if images are provided.
+You are STRICTLY limited to helping with ${currentFaculty} and related subjects taught at SAU. You may also analyze and explain exam question papers if images are provided.
 
 RULE 3 — REJECTION:
-If the user asks about ANYTHING outside Agricultural Economics (including general knowledge, entertainment, movies, weather, coding, mathematics unrelated to economics, physics, chemistry, sports, politics, etc.), you MUST respond with EXACTLY: "I am here to help you only with Agricultural Economics and your exam questions." Do not attempt to answer off-topic questions under any circumstances.
+If the user asks about ANYTHING outside ${currentFaculty} (including general knowledge, entertainment, movies, weather, coding, mathematics, physics, chemistry, sports, politics, etc.), you MUST respond with EXACTLY: "I am here to help you only with ${currentFaculty} and your exam questions." Do not attempt to answer off-topic questions under any circumstances.
 
 Always be helpful, clear, and educational when answering questions within your domain. If images of question papers are provided, analyze them carefully to help the student understand the questions and concepts.`;
-
-app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> => {
-  const { message, history, images } = req.body as {
-    message: string;
-    history: { role: 'user' | 'assistant'; text: string }[];
-    images?: string[];
-  };
 
   if (!message || typeof message !== 'string') {
     res.status(400).json({ error: 'A valid message string is required.' });
@@ -585,7 +589,7 @@ app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> =
  */
 app.post('/api/upload-material', requireAuth, async (req: Request, res: Response): Promise<void> => {
   const typedReq = req as AuthenticatedRequest;
-  const { title, type, level, semester, course_name, drive_link } = req.body;
+  const { title, type, level, semester, course_name, drive_link, faculty } = req.body;
 
   if (!title || !type || !level || !drive_link) {
     res.status(400).json({ error: 'Fields (title, type, level, drive_link) are always required.' });
@@ -613,6 +617,7 @@ app.post('/api/upload-material', requireAuth, async (req: Request, res: Response
       .insert([{ 
         title, 
         type, 
+        faculty: faculty || 'Agricultural Economics',
         level, 
         semester, 
         course_name: type === 'pdf' ? null : course_name, 

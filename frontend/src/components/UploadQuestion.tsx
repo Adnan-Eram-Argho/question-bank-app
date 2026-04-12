@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { courseData } from '../data';
 import { supabase } from '../lib/supabaseClient';
+import { useFaculty } from '../context/FacultyContext';
 
 type UploadTab = 'question' | 'book' | 'note' | 'pdf';
 
@@ -12,6 +13,9 @@ const TAB_CONFIG: { id: UploadTab; label: string; emoji: string }[] = [
 ];
 
 const UploadQuestion = () => {
+    const { activeFaculty } = useFaculty();
+    const facultyData = (courseData as any)[activeFaculty] || {};
+
     // --- Tab state ---
     const [activeTab, setActiveTab] = useState<UploadTab>('question');
 
@@ -46,8 +50,12 @@ const UploadQuestion = () => {
 
     // Cascade: Level → Semesters
     useEffect(() => {
-        if (level && courseData[level as keyof typeof courseData]) {
-            setSemesters(Object.keys(courseData[level as keyof typeof courseData]));
+        setLevel('');
+    }, [activeFaculty]);
+
+    useEffect(() => {
+        if (level && facultyData[level]) {
+            setSemesters(Object.keys(facultyData[level] || {}));
             setSemester('');
             setCourseName('');
             setCourses([]);
@@ -59,10 +67,10 @@ const UploadQuestion = () => {
 
     // Cascade: Semester → Courses
     useEffect(() => {
-        if (level && semester && courseData[level as keyof typeof courseData]) {
-            const semData = courseData[level as keyof typeof courseData];
-            if (semData[semester as keyof typeof semData]) {
-                setCourses(semData[semester as keyof typeof semData]);
+        if (level && semester && facultyData[level]) {
+            const semData = facultyData[level] || {};
+            if (semData[semester]) {
+                setCourses(semData[semester]);
                 setCourseName('');
             }
         } else {
@@ -144,6 +152,7 @@ const UploadQuestion = () => {
         formData.append('semester', semester);
         formData.append('course_name', courseName);
         formData.append('question_type', questionType);
+        formData.append('faculty', activeFaculty);
         try {
             const accessToken = await getAccessToken();
             const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/upload`, {
@@ -193,6 +202,7 @@ const UploadQuestion = () => {
                     semester,
                     course_name: activeTab === 'pdf' ? null : courseName,
                     drive_link: driveLink,
+                    faculty: activeFaculty,
                 }),
             });
             const data = await res.json();
@@ -371,7 +381,7 @@ const UploadQuestion = () => {
                             <select value={level} onChange={(e) => setLevel(e.target.value)} required
                                 className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
                                 <option value="" disabled>Select Level...</option>
-                                {Object.keys(courseData).map((lvl) => <option key={lvl} value={lvl}>{lvl}</option>)}
+                                {Object.keys(facultyData).map((lvl) => <option key={lvl} value={lvl}>{lvl}</option>)}
                             </select>
                         </div>
                         <div>

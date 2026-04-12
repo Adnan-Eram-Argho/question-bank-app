@@ -5,7 +5,9 @@ import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import FloatingAITutor from './FloatingAITutor';
 import DeveloperBadge from './DeveloperBadge';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useFaculty } from '../context/FacultyContext';
+import { courseData } from '../data';
 
 interface LayoutProps {
     children: ReactNode;
@@ -22,6 +24,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const { user, role, signOut } = useAuth();
     const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { activeFaculty, setActiveFaculty } = useFaculty();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const faculties = Object.keys(courseData);
 
     const handleSignOut = async (): Promise<void> => {
         await signOut();
@@ -80,6 +86,55 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
 
                     <nav className="hidden sm:flex items-center space-x-6">
+                        {/* Faculty Dropdown Desktop */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                className="flex items-center space-x-1 text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm backdrop-blur-sm"
+                            >
+                                <span>{activeFaculty}</span>
+                                <svg className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <AnimatePresence>
+                                {isDropdownOpen && (
+                                    <>
+                                        {/* Backdrop to click outside */}
+                                        <div 
+                                            className="fixed inset-0 z-40" 
+                                            onClick={() => setIsDropdownOpen(false)}
+                                            aria-hidden="true"
+                                        />
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl py-2 z-50"
+                                        >
+                                            {faculties.map((faculty) => (
+                                                <button
+                                                    key={faculty}
+                                                    onClick={() => {
+                                                        setActiveFaculty(faculty);
+                                                        setIsDropdownOpen(false);
+                                                    }}
+                                                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                                                        activeFaculty === faculty 
+                                                        ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 font-medium' 
+                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/80'
+                                                    }`}
+                                                >
+                                                    {faculty}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
                         <Link to="/" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
                             Home
                             <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
@@ -164,6 +219,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {isMobileMenuOpen && (
                     <div className="sm:hidden border-t border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-xl absolute top-full left-0 w-full shadow-lg shadow-black/5 dark:shadow-black/20 animate-fade-in z-40">
                         <nav className="flex flex-col px-4 pt-2 pb-6 space-y-2">
+                            {/* Faculty Select Mobile */}
+                            <div className="mb-2 bg-gray-50/50 dark:bg-gray-800/30 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                    Select Faculty
+                                </label>
+                                <div className="space-y-1">
+                                    {faculties.map((faculty) => (
+                                        <button
+                                            key={faculty}
+                                            onClick={() => {
+                                                setActiveFaculty(faculty);
+                                                closeMobileMenu();
+                                            }}
+                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                                activeFaculty === faculty 
+                                                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 shadow-sm' 
+                                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                            }`}
+                                        >
+                                            {faculty} {activeFaculty === faculty && '✓'}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="h-px w-full bg-gray-200/50 dark:bg-gray-800/50 my-1" />
+
                             <Link to="/" onClick={closeMobileMenu} className="block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 Home
                             </Link>
