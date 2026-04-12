@@ -230,8 +230,7 @@ const AdminDashboard: React.FC = () => {
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Failed to delete material');
-            // Optimistic update — remove from local state immediately
-            setMaterials(prev => prev.filter(m => m.id !== materialId));
+            fetchMaterials();
         } catch (err: any) { alert(err.message || 'Failed to delete material'); }
     };
 
@@ -241,7 +240,7 @@ const AdminDashboard: React.FC = () => {
     const TABS = [
         { id: 'users' as const,     label: 'Manage Users' },
         { id: 'questions' as const, label: 'Questions' },
-        { id: 'materials' as const, label: 'Books & Notes' },
+        { id: 'materials' as const, label: 'Materials' },
     ];
 
     return (
@@ -489,6 +488,7 @@ const AdminDashboard: React.FC = () => {
                                     <option value="">All Types</option>
                                     <option value="book">📘 Books</option>
                                     <option value="note">📝 Notes</option>
+                                    <option value="pdf">📄 Gen. PDFs</option>
                                 </select>
                             </div>
                             <div className="flex flex-col justify-end h-full">

@@ -72,13 +72,14 @@ const UploadQuestion = () => {
 
     // ---- File / drag-drop / paste logic (question tab only) ----
     const processFiles = useCallback((incoming: File[]) => {
-        const imageFiles = incoming.filter(f => ['image/jpeg', 'image/png'].includes(f.type));
-        const invalid = incoming.filter(f => !['image/jpeg', 'image/png'].includes(f.type));
-        if (invalid.length > 0) { setMessage('Only JPG and PNG files are allowed.'); return; }
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const imageFiles = incoming.filter(f => allowedTypes.includes(f.type));
+        const invalid = incoming.filter(f => !allowedTypes.includes(f.type));
+        if (invalid.length > 0) { setMessage('Only JPG, PNG, and WebP files are allowed.'); return; }
         setFiles(prev => {
-            const merged = [...prev, ...imageFiles];
-            if (merged.length > 2) { setMessage('You can upload a maximum of 2 images at once.'); return prev; }
-            setMessage('');
+            const merged = [...prev, ...imageFiles].slice(0, 2); 
+            if (merged.length !== prev.length + imageFiles.length) { setMessage('Reached maximum of 2 images. Only the first 2 were kept.'); }
+            else { setMessage(''); }
             return merged;
         });
     }, []);
@@ -272,12 +273,12 @@ const UploadQuestion = () => {
                                     <div className="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
                                         <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1 focus-within:ring-primary-500 dark:focus-within:ring-offset-gray-900">
                                             <span>Click to browse</span>
-                                            <input id="file-upload" name="file-upload" type="file" multiple accept=".jpg,.jpeg,.png" onChange={handleFileChange} className="sr-only" />
+                                            <input id="file-upload" name="file-upload" type="file" multiple accept=".jpg,.jpeg,.png,.webp" onChange={handleFileChange} className="sr-only" />
                                         </label>
                                         <p className="pl-1">, drag &amp; drop, or <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-mono">Ctrl+V</kbd> to paste</p>
                                     </div>
                                     <p className="text-xs text-gray-500 dark:text-gray-500">
-                                        {isDragging ? 'Release to drop your images here' : 'PNG, JPG up to 5MB — max 2 files'}
+                                        {isDragging ? 'Release to drop your images here' : 'PNG, JPG, WebP up to 5MB — max 2 files'}
                                     </p>
                                     {files.length > 0 && (
                                         <div className="flex gap-3 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 w-full justify-center">

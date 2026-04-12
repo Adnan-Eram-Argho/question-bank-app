@@ -65,7 +65,10 @@ const Profile = () => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setAvatarFile(file);
-            setPreviewUrl(URL.createObjectURL(file)); // Create local preview
+            if (previewUrl && previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl); // Clean up previous blob to prevent memory leak
+            }
+            setPreviewUrl(URL.createObjectURL(file));
         }
     };
 
@@ -75,7 +78,6 @@ const Profile = () => {
         setMessage('');
 
         const data = new FormData();
-        data.append('userId', user?.id || '');
         data.append('fullName', formData.full_name);
         data.append('bio', formData.bio);
         if (avatarFile) {

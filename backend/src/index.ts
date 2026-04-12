@@ -109,6 +109,8 @@ const basicRateLimit = (req: Request, res: Response, next: express.NextFunction)
   }
 
   if (current.count >= MAX_REQUESTS_PER_WINDOW) {
+    const retryAfterSeconds = Math.ceil((current.resetAt - Date.now()) / 1000);
+    res.set('Retry-After', String(retryAfterSeconds));
     res.status(429).json({ error: 'Too many requests. Try again shortly.' });
     return;
   }
@@ -435,12 +437,8 @@ app.get('/api/user/profile', requireAuth, async (req: Request, res: Response): P
 });
 
 app.post('/api/user/profile', requireAuth, uploadAvatar.single('avatar'), async (req: Request, res: Response): Promise<void> => {
-  const { userId, fullName, bio } = req.body;
+  const { fullName, bio } = req.body;
   const typedReq = req as AuthenticatedRequest;
-  if (userId !== typedReq.userId) {
-    res.status(403).json({ error: 'You can only update your own profile.' });
-    return;
-  }
 
   try {
     let avatarUrl = null;
@@ -448,7 +446,7 @@ app.post('/api/user/profile', requireAuth, uploadAvatar.single('avatar'), async 
     const { data: existingUser } = await supabase
       .from('users')
       .select('avatar_url')
-      .eq('id', userId)
+      .eq('id', typedReq.userId)
       .single();
 
     if (req.file) {
@@ -481,7 +479,7 @@ app.post('/api/user/profile', requireAuth, uploadAvatar.single('avatar'), async 
     const { data, error } = await supabase
       .from('users')
       .update(updateData)
-      .eq('id', userId)
+      .eq('id', typedReq.userId)
       .select();
 
     if (error) throw error;
@@ -527,22 +525,14 @@ app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> =
   }
 
   try {
-    // Convert Cloudinary image URLs to base64 for vision input
+    // Pass Cloudinary URLs directly to Groq to save server bandwidth and reduce latency
     const imageContentParts: { type: 'image_url'; image_url: { url: string } }[] = [];
     if (images && Array.isArray(images) && images.length > 0) {
       for (const url of images) {
-        try {
-          const imgResponse = await fetch(url);
-          const arrayBuffer = await imgResponse.arrayBuffer();
-          const base64 = Buffer.from(arrayBuffer).toString('base64');
-          const mimeType = imgResponse.headers.get('content-type') || 'image/jpeg';
-          imageContentParts.push({
-            type: 'image_url',
-            image_url: { url: `data:${mimeType};base64,${base64}` },
-          });
-        } catch (imgErr) {
-          console.warn(`[Groq] Could not fetch image: ${url}`, imgErr);
-        }
+        imageContentParts.push({
+          type: 'image_url',
+          image_url: { url: url },
+        });
       }
     }
 

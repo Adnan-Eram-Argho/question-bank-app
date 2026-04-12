@@ -28,15 +28,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            if (session?.user) {
-                fetchRole(session.user.id);
-            } else {
-                setLoading(false);
-            }
-        });
-
+        // onAuthStateChange fires immediately with the current session on mount,
+        // which eliminates the need for a separate getSession() call and prevents double-fetching the role.
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
             if (session?.user) {

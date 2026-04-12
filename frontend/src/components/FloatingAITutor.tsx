@@ -131,10 +131,13 @@ const FloatingAITutor = () => {
             setMessages((prev) => [...prev, aiMessage]);
         } catch (err: any) {
             const detail = err?.message || 'Unknown error';
+            const isNetworkError = detail === 'Failed to fetch'; // Actual network failure vs API rejection
             const errorMessage: Message = {
                 id: messageIdRef.current++,
                 role: 'model',
-                text: `⚠️ Could not reach the AI service. (${detail}) — Please try again in a moment.`,
+                text: isNetworkError 
+                    ? `⚠️ Network error. Please check your internet connection.`
+                    : `⚠️ ${detail}`,
             };
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
@@ -232,7 +235,11 @@ const FloatingAITutor = () => {
                             id="ai-tutor-input"
                             rows={1}
                             value={input}
-                            onChange={(e) => setInput(e.target.value)}
+                            onChange={(e) => {
+                                setInput(e.target.value);
+                                e.target.style.height = 'auto';
+                                e.target.style.height = `${Math.min(e.target.scrollHeight, 112)}px`; // 112px matches max-h-28
+                            }}
                             onKeyDown={handleKeyDown}
                             placeholder="Ask about Agri Economics..."
                             disabled={isLoading}

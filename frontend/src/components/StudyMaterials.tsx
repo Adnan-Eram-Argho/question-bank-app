@@ -73,7 +73,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
             variants={cardVariants}
             whileHover={{ y: -6, transition: { duration: 0.2 } }}
             whileTap={{ scale: 0.98 }}
-            className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative"
+            className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] flex flex-col h-full relative"
         >
             {/* Top accent bar */}
             <div className={`h-1.5 w-full ${m.type === 'book' ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : m.type === 'note' ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-gradient-to-r from-rose-400 to-red-500'}`} />
@@ -191,16 +191,18 @@ const StudyMaterials = () => {
     // Fetch real totals once on mount, independent of active filters
     useEffect(() => {
         const fetchTotals = async () => {
-            const { data } = await supabase
-                .from('study_materials')
-                .select('type');
-            if (data) {
-                setTotalCounts({
-                    book: data.filter(m => m.type === 'book').length,
-                    note: data.filter(m => m.type === 'note').length,
-                    pdf:  data.filter(m => m.type === 'pdf').length,
-                });
-            }
+            // Fetch only the counts from the database, not the actual row data
+            const [bookRes, noteRes, pdfRes] = await Promise.all([
+                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'book'),
+                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'note'),
+                supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'pdf'),
+            ]);
+
+            setTotalCounts({
+                book: bookRes.count ?? 0,
+                note: noteRes.count ?? 0,
+                pdf: pdfRes.count ?? 0,
+            });
         };
         fetchTotals();
     }, []);
@@ -321,7 +323,7 @@ const StudyMaterials = () => {
             {/* Filter bar */}
             <ScrollReveal direction="up" delay={0.2}>
                 <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 items-end">
                     {/* Level */}
                     <div className="flex flex-col gap-2">
                         <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
