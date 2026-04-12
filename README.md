@@ -105,7 +105,9 @@ question-bank-app/
 │   │   │   ├── StudyMaterials.tsx  # Books, Notes & PDFs browsing page
 │   │   │   └── UploadQuestion.tsx  # Unified upload form (4-tab: Question/Book/Note/PDF)
 │   │   ├── context/
-│   │   │   └── AuthContext.tsx     # Supabase Auth context provider
+│   │   │   ├── AuthContext.tsx     # Supabase Auth context provider
+│   │   │   ├── FacultyContext.tsx  # Global faculty state scaling provider
+│   │   │   └── ThemeContext.tsx    # Light/Dark mode context provider
 │   │   ├── lib/
 │   │   │   └── supabaseClient.ts   # Supabase client initialisation
 │   │   ├── data.ts                 # Static courseData (Level → Semester → Course mapping)

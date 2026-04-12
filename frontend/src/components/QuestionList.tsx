@@ -285,7 +285,7 @@ const QuestionList = () => {
                         transition={{ duration: 0.5, ease: 'easeOut' }}
                         className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 dark:bg-[#111827]/50 backdrop-blur-md border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] text-sm font-semibold text-slate-800 dark:text-slate-200 mb-6 shadow-sm"
                     >
-                        <span className="animate-pulse">🌾</span> Agricultural Economics · SAU
+                        <span className="animate-pulse">🌾</span> {activeFaculty} · SAU
                     </motion.div>
 
                     <motion.h1
@@ -294,7 +294,7 @@ const QuestionList = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
                     >
-                        Sher-e-Bangla Agricultural University <br className="hidden sm:block" /><span className="bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">Question Bank</span>
+                        Sher-e-Bangla Agricultural University <br className="hidden sm:block" /><span className="bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">{activeFaculty} Question Bank</span>
                     </motion.h1>
 
                     <motion.p
@@ -303,7 +303,7 @@ const QuestionList = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.3, ease: 'easeOut' }}
                     >
-                        The comprehensive repository of previous year exam papers for Agricultural Economics.
+                        The comprehensive repository of previous year exam papers for {activeFaculty}.
                     </motion.p>
 
                     <motion.div

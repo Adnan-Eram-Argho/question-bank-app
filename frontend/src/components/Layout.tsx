@@ -42,15 +42,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100 font-sans selection:bg-primary-200 dark:selection:bg-primary-900/50 selection:text-primary-900 dark:selection:text-primary-100">
-        <motion.header
-            className="sticky top-0 z-50 bg-white/70 dark:bg-[#0A0F1E]/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] transition-colors duration-300"
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-        >
+            <motion.header
+                className="sticky top-0 z-50 bg-white/70 dark:bg-[#0A0F1E]/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] transition-colors duration-300"
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center relative">
                     <Link to="/" onClick={closeMobileMenu} className="text-xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity whitespace-nowrap">
-                        Agri-Economics Q-Bank
+                        SAU Q-Bank
                     </Link>
 
                     <div className="flex items-center space-x-2 sm:hidden">
@@ -101,8 +101,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 {isDropdownOpen && (
                                     <>
                                         {/* Backdrop to click outside */}
-                                        <div 
-                                            className="fixed inset-0 z-40" 
+                                        <div
+                                            className="fixed inset-0 z-40"
                                             onClick={() => setIsDropdownOpen(false)}
                                             aria-hidden="true"
                                         />
@@ -111,7 +111,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                             transition={{ duration: 0.2 }}
-                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl py-2 z-50"
+                                            onBlur={() => setIsDropdownOpen(false)}
+                                            tabIndex={-1}
+                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl py-2 z-50 focus:outline-none"
                                         >
                                             {faculties.map((faculty) => (
                                                 <button
@@ -120,11 +122,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                                         setActiveFaculty(faculty);
                                                         setIsDropdownOpen(false);
                                                     }}
-                                                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                                                        activeFaculty === faculty 
-                                                        ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 font-medium' 
+                                                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${activeFaculty === faculty
+                                                        ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 font-medium'
                                                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/80'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {faculty}
                                                 </button>
@@ -232,11 +233,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                                 setActiveFaculty(faculty);
                                                 closeMobileMenu();
                                             }}
-                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                                                activeFaculty === faculty 
-                                                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 shadow-sm' 
+                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeFaculty === faculty
+                                                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 shadow-sm'
                                                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                            }`}
+                                                }`}
                                         >
                                             {faculty} {activeFaculty === faculty && '✓'}
                                         </button>
@@ -297,7 +297,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         </nav>
                     </div>
                 )}
-        </motion.header>
+            </motion.header>
 
             <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 transition-colors duration-300">
                 {children}

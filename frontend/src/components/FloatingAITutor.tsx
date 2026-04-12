@@ -51,7 +51,7 @@ const renderText = (text: string) => {
 const WELCOME_MESSAGE: Message = {
     id: 0,
     role: 'model',
-    text: "Hello! I'm your Agricultural Economics AI Tutor for SAU. Ask me anything about your courses, concepts, or exam questions. I'm here to help! 🌾",
+    text: `Hello! I'm your AI Tutor for SAU. Ask me anything about your courses, concepts, or exam questions. I'm here to help! 🌾`,
 };
 
 const FloatingAITutor = () => {
@@ -103,7 +103,7 @@ const FloatingAITutor = () => {
         try {
             const { data: sessionData } = await supabase.auth.getSession();
             const accessToken = sessionData.session?.access_token;
-            
+
             const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
             };
@@ -138,7 +138,7 @@ const FloatingAITutor = () => {
             const errorMessage: Message = {
                 id: messageIdRef.current++,
                 role: 'model',
-                text: isNetworkError 
+                text: isNetworkError
                     ? `⚠️ Network error. Please check your internet connection.`
                     : `⚠️ ${detail}`,
             };
@@ -179,7 +179,7 @@ const FloatingAITutor = () => {
                             <SparkleIcon />
                         </div>
                         <div>
-                            <p className="font-semibold text-sm leading-tight">SAU Agri-Econ Tutor</p>
+                            <p className="font-semibold text-sm leading-tight">SAU AI Tutor</p>
                         </div>
                     </div>
                     <button
@@ -244,7 +244,7 @@ const FloatingAITutor = () => {
                                 e.target.style.height = `${Math.min(e.target.scrollHeight, 112)}px`; // 112px matches max-h-28
                             }}
                             onKeyDown={handleKeyDown}
-                            placeholder="Ask about Agri Economics..."
+                            placeholder="Ask about your courses..."
                             disabled={isLoading}
                             className="flex-1 bg-transparent text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 resize-none focus:outline-none max-h-28 overflow-y-auto disabled:opacity-50"
                             style={{ minHeight: '24px' }}
@@ -260,7 +260,7 @@ const FloatingAITutor = () => {
                         </button>
                     </div>
                     <p className="text-center text-[10px] text-gray-400 dark:text-gray-600 mt-1.5">
-                        Agricultural Economics domain only · History clears on refresh
+                        Faculty-specific answers · History clears on refresh
                     </p>
                 </div>
             </div>

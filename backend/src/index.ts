@@ -496,7 +496,7 @@ app.post('/api/user/profile', requireAuth, uploadAvatar.single('avatar'), async 
  * POST /api/chat-tutor
  * Domain-specific AI Tutor powered by Groq (llama-3.2-90b-vision-preview).
  * Accepts: message (string), history (array of {role, text}), images (optional Cloudinary URL array).
- * Enforces strict Agricultural Economics domain guardrails.
+  * Context-aware AI Tutor that dynamically enforces domain guardrails based on the active faculty.
  */
 app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> => {
   const { message, history, images, faculty } = req.body as {

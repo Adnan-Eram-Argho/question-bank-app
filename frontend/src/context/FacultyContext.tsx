@@ -11,11 +11,15 @@ const FacultyContext = createContext<FacultyContextType | undefined>(undefined);
 export const FacultyProvider = ({ children }: { children: ReactNode }) => {
   const [activeFaculty, setActiveFaculty] = useState<string>(() => {
     const saved = localStorage.getItem('activeFaculty');
+    // Fallback to Agri-Econ if the saved value is invalid or missing
     return saved || 'Agricultural Economics';
   });
 
   useEffect(() => {
-    localStorage.setItem('activeFaculty', activeFaculty);
+    // Only save to localStorage if it's a real faculty to prevent poisoning
+    if (activeFaculty && activeFaculty !== 'undefined') {
+      localStorage.setItem('activeFaculty', activeFaculty);
+    }
   }, [activeFaculty]);
 
   return (
