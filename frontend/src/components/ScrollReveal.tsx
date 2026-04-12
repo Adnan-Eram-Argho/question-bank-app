@@ -11,52 +11,35 @@ interface ScrollRevealProps {
     amount?: number | 'some' | 'all';
 }
 
-/**
- * A beautiful, reusable wrapper for animating components as they scroll into view.
- * Utilizes framer-motion's whileInView API safely.
- */
-const ScrollReveal: React.FC<ScrollRevealProps> = ({ 
-    children, 
-    className = '', 
+const ScrollReveal: React.FC<ScrollRevealProps> = ({
+    children,
+    className = '',
     direction = 'up',
     delay = 0,
-    duration = 0.5,
-    amount = 0.1
+    duration = 0.6,
+    amount = 0.15
 }) => {
-    // Define the directional offsets
-    const variants = {
-        hidden: { 
-            opacity: 0,
-            y: direction === 'up' ? 30 : direction === 'down' ? -30 : 0,
-            x: direction === 'left' ? 30 : direction === 'right' ? -30 : 0,
-            scale: direction === 'none' ? 0.95 : 1 // slight scale for non-directional fades
-        },
-        visible: {
-            opacity: 1,
-            y: 0,
-            x: 0,
-            scale: 1,
-            transition: {
-                type: 'spring' as const,
-                stiffness: 260,
-                damping: 25,
-                delay,
-                duration
-            }
+    const getInitial = () => {
+        switch (direction) {
+            case 'up': return { opacity: 0, y: 40 };
+            case 'down': return { opacity: 0, y: -40 };
+            case 'left': return { opacity: 0, x: 40 };
+            case 'right': return { opacity: 0, x: -40 };
+            case 'none': return { opacity: 0, scale: 0.96 };
+            default: return { opacity: 0, y: 40 };
         }
     };
 
-    if (direction === 'none') {
-        variants.hidden.y = 0;
-        variants.hidden.x = 0;
-    }
-
     return (
         <motion.div
-            variants={variants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount }}
+            initial={getInitial()}
+            whileInView={{ opacity: 1, y: 0, x: 0, scale: 1 }}
+            viewport={{ once: true, amount, margin: '-60px' }}
+            transition={{
+                duration,
+                delay,
+                ease: [0.21, 0.47, 0.32, 0.98]
+            }}
             className={className}
         >
             {children}

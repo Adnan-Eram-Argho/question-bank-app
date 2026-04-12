@@ -29,7 +29,7 @@ const PageTransition = ({ children }: PageTransitionProps) => {
         animate="animate"
         exit="exit"
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        style={{ width: '100%' }}
+        style={{ width: '100%', willChange: 'opacity, transform' }}
       >
         {children}
       </motion.div>

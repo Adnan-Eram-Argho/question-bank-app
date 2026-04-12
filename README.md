@@ -48,7 +48,7 @@ Contributors (collectors and admins) can upload previous-year question papers di
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React 19, TypeScript, Vite, TailwindCSS |
+| **Frontend** | React 19, TypeScript, Vite, TailwindCSS, Framer Motion |
 | **Routing** | React Router v7 |
 | **Backend** | Node.js, Express 5, TypeScript |
 | **Database & Auth** | Supabase (PostgreSQL + Auth) |
@@ -65,6 +65,7 @@ Contributors (collectors and admins) can upload previous-year question papers di
 - **📖 Question Bank** — Browse and filter previous-year exam papers by Level, Semester, Course, and Type (Theory / Practical). Supports multi-image uploads per question.
 - **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs (e.g., syllabi, guidelines), all linked via Google Drive.
 - **🤖 Floating AI Tutor** — Domain-locked Groq-powered chat assistant specialised in SAU Agricultural Economics, with vision support for analysing question paper images.
+- **✨ Premium UI & Animations** — High-performance scroll reveals, responsive page transitions, and interactive visual elements powered by Framer Motion.
 - **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Admins manage users and content; collectors upload resources.
 - **🛠️ Admin Dashboard** — Full moderation panel: create users, delete questions, manage study materials, with cascading filter controls.
 
@@ -88,13 +89,18 @@ question-bank-app/
 │   │   ├── assets/                 # Images and static media
 │   │   ├── components/             # All React page components
 │   │   │   ├── AdminDashboard.tsx  # Admin control panel (users, questions, materials)
+│   │   │   ├── AnimatedBackground.tsx# Global particle background elements
 │   │   │   ├── Contributors.tsx    # Public contributors showcase page
 │   │   │   ├── Developer.tsx       # Developer profile page
+│   │   │   ├── DeveloperBadge.tsx  # Interactive "Developed By" floating badge
 │   │   │   ├── FloatingAITutor.tsx # Groq-powered AI chat widget
+│   │   │   ├── HeroParticles.tsx   # Premium Framer Motion Hero Animation
 │   │   │   ├── Layout.tsx          # Global navbar, sidebar, and footer wrapper
 │   │   │   ├── Login.tsx           # Supabase Auth login form
+│   │   │   ├── PageTransition.tsx  # Framer Motion page transitions and routing wrapper
 │   │   │   ├── Profile.tsx         # User profile editor with avatar upload
 │   │   │   ├── QuestionList.tsx    # Filterable question paper grid
+│   │   │   ├── ScrollReveal.tsx    # Unified smooth scroll-reveal wrapper
 │   │   │   ├── StudyMaterials.tsx  # Books, Notes & PDFs browsing page
 │   │   │   └── UploadQuestion.tsx  # Unified upload form (4-tab: Question/Book/Note/PDF)
 │   │   ├── context/
