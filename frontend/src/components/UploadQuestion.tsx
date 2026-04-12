@@ -14,33 +14,28 @@ const TAB_CONFIG: { id: UploadTab; label: string; emoji: string }[] = [
 
 const UploadQuestion = () => {
     const { activeFaculty } = useFaculty();
-    const facultyData = (courseData as any)[activeFaculty] || {};
+    const facultyData = courseData[activeFaculty] || {};
 
-    // --- Tab state ---
     const [activeTab, setActiveTab] = useState<UploadTab>('question');
 
-    // --- Shared form state ---
     const [level, setLevel] = useState('');
     const [semester, setSemester] = useState('');
     const [courseName, setCourseName] = useState('');
     const [semesters, setSemesters] = useState<string[]>([]);
     const [courses, setCourses] = useState<string[]>([]);
 
-    // --- Question-specific state ---
     const [files, setFiles] = useState<File[]>([]);
     const [questionType, setQuestionType] = useState('Theory');
     const [isDragging, setIsDragging] = useState(false);
     const dragCounterRef = useRef(0);
 
-    // --- Material-specific state (book/note) ---
     const [materialTitle, setMaterialTitle] = useState('');
     const [driveLink, setDriveLink] = useState('');
 
-    // --- Feedback state ---
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
-    // Reset material fields when tab changes
+    // Reset fields on tab switch so stale data doesn't bleed across tabs
     useEffect(() => {
         setMessage('');
         setMaterialTitle('');
@@ -78,7 +73,7 @@ const UploadQuestion = () => {
         }
     }, [level, semester]);
 
-    // ---- File / drag-drop / paste logic (question tab only) ----
+    // ---- File / drag-drop / paste ----
     const processFiles = useCallback((incoming: File[]) => {
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
         const imageFiles = incoming.filter(f => allowedTypes.includes(f.type));
@@ -139,7 +134,6 @@ const UploadQuestion = () => {
         return accessToken;
     };
 
-    // ---- Submit: Question ----
     const handleQuestionSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (files.length === 0 || !level || !semester || !courseName || !questionType) {
@@ -166,14 +160,13 @@ const UploadQuestion = () => {
             setFiles([]); setLevel(''); setSemester(''); setCourseName(''); setQuestionType('Theory');
             const fi = document.getElementById('file-upload') as HTMLInputElement;
             if (fi) fi.value = '';
-        } catch (err: any) {
-            setMessage(err.message);
+        } catch (err: unknown) {
+            setMessage(err instanceof Error ? err.message : 'Upload failed');
         } finally {
             setLoading(false);
         }
     };
 
-    // ---- Submit: Material / PDF ----
     const handleMaterialSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (activeTab === 'pdf') {
@@ -209,8 +202,8 @@ const UploadQuestion = () => {
             if (!res.ok) throw new Error(data.error || 'Upload failed');
             setMessage(`${activeTab === 'pdf' ? 'PDF' : activeTab === 'book' ? 'Book' : 'Note'} uploaded successfully!`);
             setMaterialTitle(''); setDriveLink(''); setLevel(''); setSemester(''); setCourseName('');
-        } catch (err: any) {
-            setMessage(err.message);
+        } catch (err: unknown) {
+            setMessage(err instanceof Error ? err.message : 'Upload failed');
         } finally {
             setLoading(false);
         }

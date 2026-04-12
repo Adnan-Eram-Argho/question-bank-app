@@ -6,6 +6,7 @@ import { courseData } from '../data';
 import { motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 import { useFaculty } from '../context/FacultyContext';
+import { UserIcon, ExternalLinkIcon } from './icons';
 
 interface StudyMaterial {
     id: string;
@@ -119,9 +120,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                 {!m.course_name && <div className="flex-grow"></div>}
 
                 <div className="flex items-center gap-2 pt-2 mt-auto text-xs text-gray-500 dark:text-gray-400 pb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <UserIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                     <span className="truncate font-medium">{m.users?.full_name || m.users?.email || 'Unknown Contributor'}</span>
                 </div>
 
@@ -132,9 +131,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                     rel="noopener noreferrer"
                     className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-white text-sm font-semibold shadow-md ${cfg.btnBg} ${cfg.btnShadow} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300`}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
+                    <ExternalLinkIcon />
                     View / Download
                 </a>
             </div>
@@ -144,7 +141,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
 
 const StudyMaterials = () => {
     const { activeFaculty } = useFaculty();
-    const facultyData = (courseData as any)[activeFaculty] || {};
+    const facultyData = courseData[activeFaculty] || {};
 
     const [searchParams] = useSearchParams();
     const [materials, setMaterials] = useState<StudyMaterial[]>([]);

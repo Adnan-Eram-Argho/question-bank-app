@@ -33,23 +33,17 @@ interface StudyMaterial {
     created_at: string;
 }
 
-/**
- * Administrative control panel enabling user provisioning, role management,
- * and bulk repository content moderation (questions, books, and notes).
- */
 const AdminDashboard: React.FC = () => {
     const { user, signOut } = useAuth();
     const { activeFaculty } = useFaculty();
-    const facultyData = (courseData as any)[activeFaculty] || {};
+    const facultyData = courseData[activeFaculty] || {};
 
     const [activeTab, setActiveTab] = useState<'users' | 'questions' | 'materials'>('users');
 
-    // ── Users state ──
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [formData, setFormData] = useState({ email: '', password: '', role: 'collector' });
     const [userMessage, setUserMessage] = useState('');
 
-    // ── Questions state ──
     const [questions, setQuestions] = useState<Question[]>([]);
     const [qLevel, setQLevel] = useState('');
     const [qSemester, setQSemester] = useState('');
@@ -57,7 +51,6 @@ const AdminDashboard: React.FC = () => {
     const [availableSemesters, setAvailableSemesters] = useState<string[]>([]);
     const [availableCourses, setAvailableCourses] = useState<string[]>([]);
 
-    // ── Materials state ──
     const [materials, setMaterials] = useState<StudyMaterial[]>([]);
     const [mLevel, setMLevel] = useState('');
     const [mSemester, setMSemester] = useState('');
@@ -66,14 +59,12 @@ const AdminDashboard: React.FC = () => {
     const [mAvailableSemesters, setMAvailableSemesters] = useState<string[]>([]);
     const [mAvailableCourses, setMAvailableCourses] = useState<string[]>([]);
 
-    // ── Initial load ──
     useEffect(() => {
         if (user) {
             fetchUsers();
         }
     }, [user]);
 
-    // ── Questions cascading filters ──
     useEffect(() => {
         setQLevel('');
         setMLevel('');
@@ -102,7 +93,6 @@ const AdminDashboard: React.FC = () => {
         if (activeTab === 'questions') fetchQuestions();
     }, [qLevel, qSemester, qCourse, activeTab]);
 
-    // ── Materials cascading filters ──
     useEffect(() => {
         if (mLevel && facultyData[mLevel]) {
             setMAvailableSemesters(Object.keys(facultyData[mLevel] || {}));
@@ -146,10 +136,11 @@ const AdminDashboard: React.FC = () => {
             if (!response.ok) throw new Error(payload.error || 'Failed to fetch users');
             setUsers(payload);
             setUserMessage('');
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Unable to load users';
             console.error('[AdminDashboard] Failed to load users:', err);
             setUsers([]);
-            setUserMessage(err.message || 'Unable to load users');
+            setUserMessage(msg);
         }
     };
 
@@ -197,7 +188,7 @@ const AdminDashboard: React.FC = () => {
             setUserMessage('User created successfully!');
             setFormData({ email: '', password: '', role: 'collector' });
             fetchUsers();
-        } catch (err: any) { setUserMessage(err.message); }
+        } catch (err: unknown) { setUserMessage(err instanceof Error ? err.message : 'Failed to create user'); }
     };
 
     const handleDeleteUser = async (userId: string) => {
@@ -211,7 +202,7 @@ const AdminDashboard: React.FC = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
             fetchUsers();
-        } catch (err: any) { alert(err.message); }
+        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Failed to delete user'); }
     };
 
     const handleDeleteQuestion = async (questionId: number) => {
@@ -225,7 +216,7 @@ const AdminDashboard: React.FC = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
             fetchQuestions();
-        } catch (err: any) { alert(err.message); }
+        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Failed to delete question'); }
     };
 
     const handleDeleteMaterial = async (materialId: string, title: string) => {
@@ -239,12 +230,11 @@ const AdminDashboard: React.FC = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Failed to delete material');
             fetchMaterials();
-        } catch (err: any) { alert(err.message || 'Failed to delete material'); }
+        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Failed to delete material'); }
     };
 
     if (!user) return null;
 
-    // ── Tab config ──
     const TABS = [
         { id: 'users' as const,     label: 'Manage Users' },
         { id: 'questions' as const, label: 'Questions' },

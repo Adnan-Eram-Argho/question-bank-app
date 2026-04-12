@@ -1,4 +1,11 @@
-export const courseData = {
+// Semester names → list of course names
+type SemesterMap = Record<string, string[]>;
+// Level names (e.g. "Level-1") → semesters
+type LevelMap = Record<string, SemesterMap>;
+// Faculty names → levels
+export type CourseData = Record<string, LevelMap>;
+
+export const courseData: CourseData = {
   "Agricultural Economics": {
     "Level-1": {
       "Semester-I": ["Basic English", "Introduction to Agribusiness", "Sociology", "Elements of Fisheries", "Principles of Field Crop Management", "Principles of Economics", "General Animal Science"],

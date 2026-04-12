@@ -8,6 +8,7 @@ import DeveloperBadge from './DeveloperBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFaculty } from '../context/FacultyContext';
 import { courseData } from '../data';
+import { MoonIcon, SunIcon, HamburgerIcon, XIcon, ChevronDownIcon } from './icons';
 
 interface LayoutProps {
     children: ReactNode;
@@ -59,15 +60,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             className="p-2 rounded-full text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-gray-800 transition-all focus:outline-none"
                             aria-label="Toggle Dark Mode"
                         >
-                            {theme === 'light' ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            )}
+                            {theme === 'light' ? <MoonIcon /> : <SunIcon />}
                         </button>
 
                         <button
@@ -75,13 +68,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             className="p-2 rounded-lg text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-gray-800 transition-colors focus:outline-none"
                             aria-label="Toggle Navigation Menu"
                         >
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                {isMobileMenuOpen ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                )}
-                            </svg>
+                            {isMobileMenuOpen ? <XIcon /> : <HamburgerIcon />}
                         </button>
                     </div>
 
@@ -93,9 +80,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 className="flex items-center space-x-1 text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm backdrop-blur-sm"
                             >
                                 <span>{activeFaculty}</span>
-                                <svg className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
+                                <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
                             <AnimatePresence>
                                 {isDropdownOpen && (
@@ -203,15 +188,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 animate={{ rotate: theme === 'light' ? 0 : 180 }}
                                 transition={{ duration: 0.3, ease: 'backOut' }}
                             >
-                                {theme === 'light' ? (
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                    </svg>
-                                ) : (
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                    </svg>
-                                )}
+                                {theme === 'light' ? <MoonIcon /> : <SunIcon />}
                             </motion.div>
                         </button>
                     </nav>
