@@ -69,6 +69,8 @@ Contributors (collectors and admins) can upload previous-year question papers di
 - **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, and smooth page transitions.
 - **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Highly optimized auth flow with redundant database queries removed for instant logins and secure profile updates.
 - **🛠️ Admin Dashboard** — Full moderation panel: create users, delete questions, manage study materials, with cascading filter controls.
+- **🧩 Centralised SVG Icons** — All reusable icons extracted into `src/components/icons.tsx` with typed props, eliminating repeated inline SVG markup across components.
+- **🔒 Strict TypeScript** — Replaced all `as any` casts with proper `CourseData` interface types; all `catch` blocks use `unknown` with `instanceof Error` narrowing.
 
 ---
 
@@ -79,7 +81,17 @@ question-bank-app/
 │
 ├── backend/                        # Express REST API server
 │   ├── src/
-│   │   └── index.ts                # All API routes and server bootstrap
+│   │   ├── lib/
+│   │   │   ├── supabase.ts         # Supabase admin client singleton
+│   │   │   └── cloudinary.ts       # Cloudinary config, streamUpload, deleteFromCloudinary
+│   │   ├── middleware/
+│   │   │   └── index.ts            # requireAuth, requireAdmin, rate limiter, multer instances
+│   │   ├── routes/
+│   │   │   ├── auth.ts             # GET/POST /api/user/profile
+│   │   │   ├── uploads.ts          # POST /api/upload, POST /api/upload-material
+│   │   │   ├── ai.ts               # POST /api/chat-tutor (Groq)
+│   │   │   └── admin.ts            # /api/contributors + all /api/admin/* routes
+│   │   └── index.ts                # App bootstrap: env validation, middleware, route mounting
 │   ├── .env.example                # Backend environment variable template
 │   ├── package.json
 │   └── tsconfig.json
@@ -95,7 +107,8 @@ question-bank-app/
 │   │   │   ├── Developer.tsx       # Developer profile page
 │   │   │   ├── DeveloperBadge.tsx  # Interactive "Developed By" floating badge
 │   │   │   ├── FloatingAITutor.tsx # Groq-powered AI chat widget
-│   │   │   ├── HeroParticles.tsx   # Premium Framer Motion Hero Animation
+│   │   │   ├── HeroParticles.tsx   # Canvas-based Framer Motion hero animation
+│   │   │   ├── icons.tsx           # Centralised typed SVG icon components
 │   │   │   ├── Layout.tsx          # Global navbar, sidebar, and footer wrapper
 │   │   │   ├── Login.tsx           # Supabase Auth login form
 │   │   │   ├── PageTransition.tsx  # Framer Motion page transitions and routing wrapper
@@ -110,7 +123,7 @@ question-bank-app/
 │   │   │   └── ThemeContext.tsx    # Light/Dark mode context provider
 │   │   ├── lib/
 │   │   │   └── supabaseClient.ts   # Supabase client initialisation
-│   │   ├── data.ts                 # Static courseData (Level → Semester → Course mapping)
+│   │   ├── data.ts                 # Typed CourseData (Level → Semester → Course mapping)
 │   │   ├── App.tsx                 # Root component with router and route definitions
 │   │   └── main.tsx                # App entry point
 │   ├── .env.example                # Frontend environment variable template
@@ -256,6 +269,9 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - [x] **Performance Optimizations** — Asynchronous material fetching and optimized DB queries
 - [x] **Premium Animations** — Unified Framer Motion scroll reveals and interactive widgets
 - [x] **Study Materials (Books, Notes, PDFs)** — Unified upload and browse system
+- [x] **Backend Modularisation** — `index.ts` split into `lib/`, `middleware/`, and `routes/` layers
+- [x] **SVG Icon System** — All inline SVGs extracted into a single typed `icons.tsx` component file
+- [x] **TypeScript Strictness** — Eliminated all `as any` casts with a proper `CourseData` interface; `catch` blocks use `unknown` with runtime narrowing
 
 ---
 
@@ -280,7 +296,7 @@ Distributed under the MIT License.
 ```
 MIT License
 
-Copyright (c) 2025 Md. Adnan Eram Argho
+Copyright (c) 2026 Md. Adnan Eram Argho
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

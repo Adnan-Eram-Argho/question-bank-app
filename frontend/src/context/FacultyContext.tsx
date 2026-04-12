@@ -11,8 +11,11 @@ const FacultyContext = createContext<FacultyContextType | undefined>(undefined);
 export const FacultyProvider = ({ children }: { children: ReactNode }) => {
   const [activeFaculty, setActiveFaculty] = useState<string>(() => {
     const saved = localStorage.getItem('activeFaculty');
-    // Fallback to Agri-Econ if the saved value is invalid or missing
-    return saved || 'Agricultural Economics';
+    // Fallback to Agri-Econ if the saved value is invalid, "null", or missing
+    if (saved && saved !== 'null' && saved !== 'undefined' && saved.trim() !== '') {
+      return saved.trim();
+    }
+    return 'Agricultural Economics';
   });
 
   useEffect(() => {
@@ -22,8 +25,15 @@ export const FacultyProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [activeFaculty]);
 
+  // Sanitize incoming faculty strings to prevent crashes in data.ts lookups
+  const handleSetFaculty = (faculty: string) => {
+    if (typeof faculty === 'string' && faculty.trim() !== '' && faculty !== 'undefined') {
+      setActiveFaculty(faculty.trim());
+    }
+  };
+
   return (
-    <FacultyContext.Provider value={{ activeFaculty, setActiveFaculty }}>
+    <FacultyContext.Provider value={{ activeFaculty, setActiveFaculty: handleSetFaculty }}>
       {children}
     </FacultyContext.Provider>
   );

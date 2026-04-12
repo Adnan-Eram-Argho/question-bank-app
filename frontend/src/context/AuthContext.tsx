@@ -45,6 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     /**
      * Resolves and sets the current user's authorization role from the database schema.
+     * Safeguards against race conditions by ignoring responses for stale user IDs.
      * 
      * @param userId - The UUID of the authenticated user to query.
      */
@@ -57,10 +58,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 .single();
 
             if (error) throw error;
-            setRole(data.role);
+
+            // Prevent stale slow requests from overwriting a newer role
+            if (userId === user?.id || !user) {
+                setRole(data.role);
+            }
         } catch (error) {
             console.error('[AuthContext] Role retrieval failed:', error);
-            setRole(null);
+            if (userId === user?.id || !user) {
+                setRole(null);
+            }
         } finally {
             setLoading(false);
         }
@@ -71,9 +78,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
      */
     const signOut = async (): Promise<void> => {
         try {
-            await supabase.auth.signOut();
-            setUser(null);
-            setRole(null);
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            // Let onAuthStateChange handle clearing state to prevent UI desync
         } catch (error) {
             console.error('[AuthContext] Session invalidation failed:', error);
         }

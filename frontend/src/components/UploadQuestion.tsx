@@ -7,9 +7,9 @@ type UploadTab = 'question' | 'book' | 'note' | 'pdf';
 
 const TAB_CONFIG: { id: UploadTab; label: string; emoji: string }[] = [
     { id: 'question', label: 'Upload Question', emoji: '🖼️' },
-    { id: 'book',     label: 'Upload Book',     emoji: '📘' },
-    { id: 'note',     label: 'Upload Note',      emoji: '📝' },
-    { id: 'pdf',      label: 'General PDF',     emoji: '📄' },
+    { id: 'book', label: 'Upload Book', emoji: '📘' },
+    { id: 'note', label: 'Upload Note', emoji: '📝' },
+    { id: 'pdf', label: 'General PDF', emoji: '📄' },
 ];
 
 const UploadQuestion = () => {
@@ -80,7 +80,7 @@ const UploadQuestion = () => {
         const invalid = incoming.filter(f => !allowedTypes.includes(f.type));
         if (invalid.length > 0) { setMessage('Only JPG, PNG, and WebP files are allowed.'); return; }
         setFiles(prev => {
-            const merged = [...prev, ...imageFiles].slice(0, 2); 
+            const merged = [...prev, ...imageFiles].slice(0, 2);
             if (merged.length !== prev.length + imageFiles.length) { setMessage('Reached maximum of 2 images. Only the first 2 were kept.'); }
             else { setMessage(''); }
             return merged;
@@ -169,6 +169,11 @@ const UploadQuestion = () => {
 
     const handleMaterialSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!driveLink.includes('drive.google.com')) {
+            setMessage('Please provide a valid Google Drive link.'); return;
+        }
+
         if (activeTab === 'pdf') {
             if (!materialTitle || !driveLink || !level || !semester) {
                 setMessage('Please fill in Level, Semester, Title, and Drive Link.'); return;
@@ -178,7 +183,7 @@ const UploadQuestion = () => {
                 setMessage('Please fill in all fields including Level, Semester, and Course.'); return;
             }
         }
-        
+
         setLoading(true); setMessage('');
         try {
             const accessToken = await getAccessToken();
@@ -231,11 +236,10 @@ const UploadQuestion = () => {
                             role="tab"
                             aria-selected={activeTab === tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all duration-200 focus:outline-none ${
-                                activeTab === tab.id
+                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all duration-200 focus:outline-none ${activeTab === tab.id
                                     ? 'bg-white dark:bg-[#1E293B] text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-gray-700'
                                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                            }`}
+                                }`}
                         >
                             <span>{tab.emoji}</span>
                             <span className="hidden sm:inline">{tab.label}</span>
@@ -257,11 +261,10 @@ const UploadQuestion = () => {
                                 onDragLeave={handleDragLeave}
                                 onDragOver={handleDragOver}
                                 onDrop={handleDrop}
-                                className={`mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-dashed rounded-xl transition-all duration-200 ${
-                                    isDragging
+                                className={`mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-dashed rounded-xl transition-all duration-200 ${isDragging
                                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-400/30'
                                         : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500'
-                                }`}
+                                    }`}
                             >
                                 <div className="space-y-2 text-center flex flex-col items-center w-full">
                                     {isDragging ? (
@@ -419,11 +422,10 @@ const UploadQuestion = () => {
 
                     {/* ══ Feedback Message ══ */}
                     {message && (
-                        <div className={`p-4 rounded-xl flex items-center gap-3 ${
-                            message.toLowerCase().includes('success')
+                        <div className={`p-4 rounded-xl flex items-center gap-3 ${message.toLowerCase().includes('success')
                                 ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50'
                                 : 'bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50'
-                        }`}>
+                            }`}>
                             {message.toLowerCase().includes('success') ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -433,11 +435,10 @@ const UploadQuestion = () => {
                                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                 </svg>
                             )}
-                            <p className={`text-sm font-medium ${
-                                message.toLowerCase().includes('success')
+                            <p className={`text-sm font-medium ${message.toLowerCase().includes('success')
                                     ? 'text-emerald-700 dark:text-emerald-400'
                                     : 'text-amber-700 dark:text-amber-400'
-                            }`}>{message}</p>
+                                }`}>{message}</p>
                         </div>
                     )}
 
