@@ -56,7 +56,7 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                 delay: index * 0.1,
                 ease: [0.21, 0.47, 0.32, 0.98]
             }}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
             whileTap={{ scale: 0.98 }}
             className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 flex flex-col h-full relative"
         >
@@ -69,7 +69,7 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                         <img
                             src={images[0]}
                             alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover/full:scale-[1.02]"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover/full:scale-105"
                             loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/full:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -86,7 +86,7 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                             <img
                                 src={images[0]}
                                 alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-[1.02]"
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover/half:scale-105"
                                 loading="lazy"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -115,11 +115,11 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
             </div>
 
             <div className="p-6 flex flex-col flex-grow">
-                <h3 className="font-bold text-lg text-slate-900 dark:text-[#F1F5F9] mb-4 line-clamp-2 leading-tight">
+                <h3 className="font-bold text-lg text-slate-900 dark:text-[#F1F5F9] mb-2 line-clamp-2 leading-tight">
                     {q.course_name}
                 </h3>
 
-                <div className="flex flex-wrap gap-2 mb-6 mt-auto">
+                <div className="flex flex-wrap gap-2 mt-auto">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200/50 dark:border-green-500/20">
                         {q.level}
                     </span>
@@ -134,14 +134,14 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                     </span>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.06)]">
-                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-between pt-3 border-t border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.06)]">
+                    <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         <span className="truncate max-w-[120px]">{q.uploaded_by || 'Unknown'}</span>
                     </div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500">
+                    <div className="text-[11px] text-gray-400 dark:text-gray-500">
                         {new Date(q.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                     </div>
                 </div>
@@ -285,7 +285,7 @@ const QuestionList = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
                     >
-                        Sher-e-Bangla Agricultural University Question Bank
+                        Sher-e-Bangla Agricultural University <br className="hidden sm:block" /><span className="bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">Question Bank</span>
                     </motion.h1>
 
                     <motion.p
@@ -298,7 +298,7 @@ const QuestionList = () => {
                     </motion.p>
 
                     <motion.div
-                        className="w-full grid grid-cols-3 gap-4 mt-12"
+                        className="w-full grid grid-cols-3 gap-6 mt-12"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.45, ease: 'easeOut' }}
@@ -312,7 +312,7 @@ const QuestionList = () => {
 
             <ScrollReveal direction="up" delay={0.2}>
                 <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 items-end">
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
                             <select

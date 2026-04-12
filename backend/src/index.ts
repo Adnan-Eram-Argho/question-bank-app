@@ -514,7 +514,7 @@ If the user asks about ANYTHING outside Agricultural Economics (including genera
 
 Always be helpful, clear, and educational when answering questions within your domain. If images of question papers are provided, analyze them carefully to help the student understand the questions and concepts.`;
 
-app.post('/api/chat-tutor', requireAuth, async (req: Request, res: Response): Promise<void> => {
+app.post('/api/chat-tutor', async (req: Request, res: Response): Promise<void> => {
   const { message, history, images } = req.body as {
     message: string;
     history: { role: 'user' | 'assistant'; text: string }[];

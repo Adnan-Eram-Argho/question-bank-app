@@ -101,16 +101,17 @@ const FloatingAITutor = () => {
         try {
             const { data: sessionData } = await supabase.auth.getSession();
             const accessToken = sessionData.session?.access_token;
-            if (!accessToken) {
-                throw new Error('Please sign in to use the AI tutor.');
+            
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+            if (accessToken) {
+                headers['Authorization'] = `Bearer ${accessToken}`;
             }
 
             const res = await fetch(`${API_URL}/api/chat-tutor`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
+                headers,
                 body: JSON.stringify({
                     message: trimmed,
                     history: buildHistory(),
