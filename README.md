@@ -38,9 +38,9 @@
 
 ## 🎯 About The Project
 
-The **SAU Agricultural Economics Question Bank** is a centralised academic resource platform built for students and faculty at Sher-e-Bangla Agricultural University. It solves the problem of scattered, hard-to-find past exam papers and study materials by providing a single, searchable, and filterable repository.
+The **SAU Question Bank & Study Hub** is a scalable, multi-faculty academic resource platform built for students and teachers at Sher-e-Bangla Agricultural University. It solves the problem of scattered, hard-to-find past exam papers and study materials by providing a single, searchable, and filterable repository that supports multiple academic domains.
 
-Contributors (collectors and admins) can upload previous-year question papers directly via image uploads, and link external resources such as textbooks, lecture notes, or general PDFs. Students can browse, filter by level/semester/course, and instantly access everything they need — all powered by an AI tutor assistant for on-demand academic support.
+Contributors (collectors and admins) can upload previous-year question papers directly via image uploads, and link external resources such as textbooks, lecture notes, or general PDFs. Students can browse, filter by faculty/level/semester/course, and instantly access everything they need — all powered by a context-aware AI tutor assistant that dynamically adapts its domain knowledge based on the selected faculty for robust on-demand academic support.
 
 ---
 
@@ -62,11 +62,12 @@ Contributors (collectors and admins) can upload previous-year question papers di
 
 ## ✨ Key Features
 
-- **📖 Question Bank** — Browse and filter previous-year exam papers by Level, Semester, Course, and Type (Theory / Practical). Supports multi-image uploads per question.
-- **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs (e.g., syllabi, guidelines), all linked via Google Drive.
-- **🤖 Floating AI Tutor** — Domain-locked Groq-powered chat assistant specialised in SAU Agricultural Economics, with vision support for analysing question paper images.
-- **✨ Premium UI & Animations** — High-performance scroll reveals, responsive page transitions, and interactive visual elements powered by Framer Motion.
-- **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Admins manage users and content; collectors upload resources.
+- **🌐 Multi-Faculty Architecture** — Seamlessly switch across different faculties to access domain-specific study environments, courses, and resources.
+- **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads.
+- **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs, featuring optimized asynchronous loading and accurate contributor profile mapping.
+- **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant that dynamically adapts its strict system instructions based on the active faculty context, featuring robust error handling and optimized image processing.
+- **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, and smooth page transitions.
+- **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Highly optimized auth flow with redundant database queries removed for instant logins and secure profile updates.
 - **🛠️ Admin Dashboard** — Full moderation panel: create users, delete questions, manage study materials, with cascading filter controls.
 
 ---
@@ -249,7 +250,9 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - [ ] **Notifications** — Email/push alerts when new materials are uploaded for followed courses
 - [ ] **Analytics Dashboard** — View download counts and popular resources for admins
 - [x] **Multi-image Question Upload** — Upload multiple pages per question paper
-- [x] **AI Tutor** — Groq-powered domain-specific academic assistant
+- [x] **Global Faculty Architecture** — Context-aware AI tutor and faculty switching mechanics
+- [x] **Performance Optimizations** — Asynchronous material fetching and optimized DB queries
+- [x] **Premium Animations** — Unified Framer Motion scroll reveals and interactive widgets
 - [x] **Study Materials (Books, Notes, PDFs)** — Unified upload and browse system
 
 ---
