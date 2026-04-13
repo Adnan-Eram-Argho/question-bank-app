@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
@@ -62,7 +62,6 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
             whileTap={{ scale: 0.98 }}
             className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 flex flex-col h-full relative"
         >
-            {/* Top accent bar */}
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 z-20"></div>
 
             <div className="relative h-56 w-full bg-gray-100 dark:bg-[#0A0F1E] overflow-hidden border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.05)] flex">
@@ -70,7 +69,7 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                     <a href={images[0]} target="_blank" rel="noreferrer" className="w-full h-full block relative group/full">
                         <img
                             src={images[0]}
-                            alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
+                            alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover/full:scale-105"
                             loading="lazy"
                         />
@@ -85,7 +84,7 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                         <a href={images[0]} target="_blank" rel="noreferrer" className="w-1/2 h-full block relative border-r border-white/20 dark:border-gray-800 group/half flex-shrink-0">
                             <img
                                 src={images[0]}
-                                alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU Agricultural Economics`}
+                                alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU`}
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover/half:scale-105"
                                 loading="lazy"
                             />
@@ -97,7 +96,7 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                         <a href={images[1]} target="_blank" rel="noreferrer" className="w-1/2 h-full block relative group/half flex-shrink-0">
                             <img
                                 src={images[1]}
-                                alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 2) | SAU Agricultural Economics`}
+                                alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 2) | SAU`}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-[1.02]"
                                 loading="lazy"
                             />
@@ -105,6 +104,17 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                             <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/half:opacity-100 translate-y-2 group-hover/half:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Page 2">
                                 <ExpandIcon />
                             </div>
+                            {images.length > 2 && (
+                                <a
+                                    href={images[2]}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="absolute top-4 left-4 bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full hover:bg-black/90 transition-colors z-10"
+                                    title={`View remaining ${images.length - 2} pages`}
+                                >
+                                    +{images.length - 2} more
+                                </a>
+                            )}
                         </a>
                     </>
                 )}
@@ -148,8 +158,13 @@ const QuestionList = () => {
     const { activeFaculty } = useFaculty();
     const facultyData = courseData[activeFaculty] || {};
 
+    const BATCH_SIZE = 9;
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const observerRef = useRef<IntersectionObserver | null>(null);
 
     const [filterLevel, setFilterLevel] = useState('');
     const [filterSemester, setFilterSemester] = useState('');
@@ -190,17 +205,17 @@ const QuestionList = () => {
         setFilterCourse('');
     }, [filterLevel, filterSemester]);
 
-    useEffect(() => {
-        const allThreeSet = filterLevel && filterSemester && filterCourse;
-        const partialLSCSelection = (filterLevel || filterSemester || filterCourse) && !allThreeSet;
-        if (partialLSCSelection && !filterType) return;
-        fetchQuestions();
-    }, [filterLevel, filterSemester, filterCourse, filterType, activeFaculty]);
+    const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
-    const isFiltered = !!(filterLevel && filterSemester) || !!(filterCourse || filterType);
+    const fetchQuestions = useCallback(async (pageNum: number, isReset = false) => {
+        if (isReset) {
+            setLoading(true);
+            setQuestions([]);
+            setHasMore(true);
+        } else {
+            setLoadingMore(true);
+        }
 
-    const fetchQuestions = async () => {
-        setLoading(true);
         try {
             let query = supabase.from('questions').select('*').order('created_at', { ascending: false });
 
@@ -210,20 +225,55 @@ const QuestionList = () => {
             if (filterCourse) query = query.eq('course_name', filterCourse);
             if (filterType) query = query.eq('question_type', filterType);
 
-            const hasMinimumFilter = (filterLevel && filterSemester) || filterCourse || filterType;
-            if (!hasMinimumFilter) {
-                query = query.limit(10);
-            }
+            const from = pageNum * BATCH_SIZE;
+            const to = from + BATCH_SIZE - 1;
+            query = query.range(from, to);
 
             const { data, error } = await query;
             if (error) throw error;
-            setQuestions(data || []);
+
+            const newQuestions = data || [];
+
+            if (isReset) {
+                setQuestions(newQuestions);
+            } else {
+                setQuestions(prev => [...prev, ...newQuestions]);
+            }
+
+            if (newQuestions.length < BATCH_SIZE) {
+                setHasMore(false);
+            }
         } catch (error) {
             console.error('Error fetching questions:', error);
         } finally {
             setLoading(false);
+            setLoadingMore(false);
         }
-    };
+    }, [activeFaculty, filterLevel, filterSemester, filterCourse, filterType]);
+
+    useEffect(() => {
+        setPage(0);
+        fetchQuestions(0, true);
+    }, [fetchQuestions]);
+
+    useEffect(() => {
+        if (page > 0) {
+            fetchQuestions(page, false);
+        }
+    }, [page, fetchQuestions]);
+
+    const lastQuestionElementRef = useCallback((node: HTMLDivElement | null) => {
+        if (loadingMore || !hasMore) return;
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMore) {
+                setPage(prev => prev + 1);
+            }
+        });
+
+        if (node) observerRef.current.observe(node);
+    }, [loadingMore, hasMore]);
 
     if (loading) return (
         <div className="flex justify-center items-center h-64">
@@ -238,23 +288,23 @@ const QuestionList = () => {
         if (filterLevel) parts.push(filterLevel);
         if (filterSemester) parts.push(filterSemester);
         if (filterType) parts.push(filterType);
-        if (parts.length === 0) return 'SAU Agricultural Economics Question Bank | Sher-e-Bangla Agricultural University';
-        return `${parts.join(' | ')} | SAU Agricultural Economics Question Bank`;
+        if (parts.length === 0) return `SAU ${activeFaculty} Question Bank | Sher-e-Bangla Agricultural University`;
+        return `${parts.join(' | ')} | SAU ${activeFaculty} Question Bank`;
     };
 
     const buildMetaDescription = (): string => {
         if (filterCourse && filterLevel && filterSemester) {
             return `Download and view ${filterCourse} past exam question papers for ${filterLevel} ${filterSemester}${filterType ? ` (${filterType})` : ''
-                } at Sher-e-Bangla Agricultural University (SAU) Agricultural Economics faculty.`;
+                } at Sher-e-Bangla Agricultural University (SAU) ${activeFaculty} faculty.`;
         }
         if (filterLevel && filterSemester) {
             return `Browse ${filterLevel} ${filterSemester}${filterType ? ` ${filterType}` : ''
-                } past exam questions for the SAU Agricultural Economics faculty. Filter by course for more specific results.`;
+                } past exam questions for the SAU ${activeFaculty} faculty. Filter by course for more specific results.`;
         }
         if (filterType) {
-            return `Browse ${filterType} past exam questions for the Agricultural Economics faculty of Sher-e-Bangla Agricultural University (SAU).`;
+            return `Browse ${filterType} past exam questions for the ${activeFaculty} faculty of Sher-e-Bangla Agricultural University (SAU).`;
         }
-        return 'Browse past exam questions for the Agricultural Economics faculty of Sher-e-Bangla Agricultural University (SAU). Search by level, semester, course, and question type.';
+        return `Browse past exam questions for the ${activeFaculty} faculty of Sher-e-Bangla Agricultural University (SAU). Search by level, semester, course, and question type.`;
     };
 
     return (
@@ -410,7 +460,7 @@ const QuestionList = () => {
                             {isFiltered ? (
                                 <>Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
                             ) : (
-                                <>Showing <span className="text-gray-900 dark:text-white font-bold">latest {questions.length}</span> question{questions.length !== 1 && 's'} &mdash; use filters to search all</>
+                                <>Showing <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
                             )}
                         </p>
                     </div>
@@ -442,18 +492,29 @@ const QuestionList = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                            {questions.map((q, index) => (
-                                <QuestionCard key={q.id} q={q} index={index} />
-                            ))}
+                            {questions.map((q, index) => {
+                                if (questions.length === index + 1) {
+                                    return (
+                                        <div ref={lastQuestionElementRef} key={q.id}>
+                                            <QuestionCard q={q} index={index} />
+                                        </div>
+                                    );
+                                } else {
+                                    return <QuestionCard key={q.id} q={q} index={index} />;
+                                }
+                            })}
                         </div>
 
-                        {!isFiltered && (
-                            <div className="text-center pt-4">
-                                <p className="text-sm text-gray-400 dark:text-gray-500 mb-3">Looking for a specific question?</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Use the <span className="font-semibold text-gray-700 dark:text-gray-300">filters above</span> to search by level, semester, course, or type — results will load without any limit.
-                                </p>
+                        {loadingMore && (
+                            <div className="flex justify-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
                             </div>
+                        )}
+
+                        {!hasMore && questions.length > 0 && (
+                            <p className="text-center text-sm text-gray-400 dark:text-gray-500 pt-4">
+                                You've reached the end of the list.
+                            </p>
                         )}
                     </>
                 )}

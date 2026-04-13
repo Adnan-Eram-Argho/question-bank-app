@@ -53,7 +53,8 @@ Contributors (collectors and admins) can upload previous-year question papers di
 | **Backend** | Node.js, Express 5, TypeScript |
 | **Database & Auth** | Supabase (PostgreSQL + Auth) |
 | **Image Storage** | Cloudinary |
-| **AI Tutor** | Groq SDK (Llama 4) |
+| **AI Tutor** | Groq SDK (Llama 4 Scout — `meta-llama/llama-4-scout-17b-16e-instruct`) |
+| **Analytics** | Vercel Analytics (`@vercel/analytics`) |
 | **Frontend Hosting** | Vercel |
 | **Backend Hosting** | Render |
 | **SEO** | react-helmet-async |
@@ -64,13 +65,14 @@ Contributors (collectors and admins) can upload previous-year question papers di
 
 - **🌐 Multi-Faculty Architecture** — Seamlessly switch across different faculties to access domain-specific study environments, courses, and resources.
 - **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads.
-- **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs, featuring optimized asynchronous loading and accurate contributor profile mapping.
-- **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant that dynamically adapts its strict system instructions based on the active faculty context, featuring robust error handling and optimized image processing.
-- **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, and smooth page transitions.
-- **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Highly optimized auth flow with redundant database queries removed for instant logins and secure profile updates.
+- **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs. Supports URL-synced type filters (`?type=book`), infinite scroll pagination (batches of 9), real-time type counts, and asynchronous contributor profile resolution.
+- **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 4 Scout) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 Cloudinary URLs per message), robust error handling, and strict domain guardrails.
+- **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, smooth page transitions, and micro-interaction hover effects throughout.
+- **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Optimized auth flow with redundant DB queries removed for instant logins and secure profile updates.
 - **🛠️ Admin Dashboard** — Full moderation panel: create users, delete questions, manage study materials, with cascading filter controls.
 - **🧩 Centralised SVG Icons** — All reusable icons extracted into `src/components/icons.tsx` with typed props, eliminating repeated inline SVG markup across components.
-- **🔒 Strict TypeScript** — Replaced all `as any` casts with proper `CourseData` interface types; all `catch` blocks use `unknown` with `instanceof Error` narrowing.
+- **🔒 Strict TypeScript** — Replaced all `as any` casts with a proper `CourseData` interface; all `catch` blocks use `unknown` with `instanceof Error` narrowing.
+- **📊 Vercel Analytics** — First-party, privacy-friendly page-view and event tracking integrated via `@vercel/analytics/react`.
 
 ---
 
@@ -89,7 +91,7 @@ question-bank-app/
 │   │   ├── routes/
 │   │   │   ├── auth.ts             # GET/POST /api/user/profile
 │   │   │   ├── uploads.ts          # POST /api/upload, POST /api/upload-material
-│   │   │   ├── ai.ts               # POST /api/chat-tutor (Groq)
+│   │   │   ├── ai.ts               # POST /api/chat-tutor — faculty-aware Groq (Llama 4 Scout)
 │   │   │   └── admin.ts            # /api/contributors + all /api/admin/* routes
 │   │   └── index.ts                # App bootstrap: env validation, middleware, route mounting
 │   ├── .env.example                # Backend environment variable template
@@ -100,22 +102,22 @@ question-bank-app/
 │   ├── public/                     # Static assets served at root
 │   ├── src/
 │   │   ├── assets/                 # Images and static media
-│   │   ├── components/             # All React page components
+│   │   ├── components/             # All React page & UI components
 │   │   │   ├── AdminDashboard.tsx  # Admin control panel (users, questions, materials)
-│   │   │   ├── AnimatedBackground.tsx# Global particle background elements
+│   │   │   ├── AnimatedBackground.tsx # Global particle background elements
 │   │   │   ├── Contributors.tsx    # Public contributors showcase page
 │   │   │   ├── Developer.tsx       # Developer profile page
 │   │   │   ├── DeveloperBadge.tsx  # Interactive "Developed By" floating badge
-│   │   │   ├── FloatingAITutor.tsx # Groq-powered AI chat widget
+│   │   │   ├── FloatingAITutor.tsx # Groq-powered AI chat widget (image-aware)
 │   │   │   ├── HeroParticles.tsx   # Canvas-based Framer Motion hero animation
-│   │   │   ├── icons.tsx           # Centralised typed SVG icon components
+│   │   │   ├── icons.tsx           # Centralised typed SVG icon components (12 icons)
 │   │   │   ├── Layout.tsx          # Global navbar, sidebar, and footer wrapper
 │   │   │   ├── Login.tsx           # Supabase Auth login form
 │   │   │   ├── PageTransition.tsx  # Framer Motion page transitions and routing wrapper
 │   │   │   ├── Profile.tsx         # User profile editor with avatar upload
 │   │   │   ├── QuestionList.tsx    # Filterable question paper grid
 │   │   │   ├── ScrollReveal.tsx    # Unified smooth scroll-reveal wrapper
-│   │   │   ├── StudyMaterials.tsx  # Books, Notes & PDFs browsing page
+│   │   │   ├── StudyMaterials.tsx  # Books, Notes & PDFs page — infinite scroll, URL-synced filters
 │   │   │   └── UploadQuestion.tsx  # Unified upload form (4-tab: Question/Book/Note/PDF)
 │   │   ├── context/
 │   │   │   ├── AuthContext.tsx     # Supabase Auth context provider
@@ -123,8 +125,10 @@ question-bank-app/
 │   │   │   └── ThemeContext.tsx    # Light/Dark mode context provider
 │   │   ├── lib/
 │   │   │   └── supabaseClient.ts   # Supabase client initialisation
+│   │   ├── App.css                 # Global base styles
+│   │   ├── App.tsx                 # Root component: router, providers, Vercel Analytics & Toaster
 │   │   ├── data.ts                 # Typed CourseData (Level → Semester → Course mapping)
-│   │   ├── App.tsx                 # Root component with router and route definitions
+│   │   ├── index.css               # Tailwind directives & CSS custom properties
 │   │   └── main.tsx                # App entry point
 │   ├── .env.example                # Frontend environment variable template
 │   ├── index.html                  # Vite HTML entry with SEO meta
@@ -246,13 +250,29 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 | `GET` | `/api/contributors` | None | Fetch all contributor profiles |
 | `POST` | `/api/upload` | Collector | Upload question paper images to Cloudinary + Supabase |
 | `POST` | `/api/upload-material` | Collector | Add a book, note, or PDF record (Drive link) |
-| `POST` | `/api/chat-tutor` | None | Send a message to the AI Tutor |
+| `POST` | `/api/chat-tutor` | None | Send message + optional images (≤5) to the faculty-aware AI Tutor (Llama 4 Scout) |
 | `POST` | `/api/user/profile` | Authenticated | Update user profile name, bio, and avatar |
 | `GET` | `/api/admin/users` | Admin | List all registered users |
 | `POST` | `/api/admin/create-user` | Admin | Create a new user account |
 | `DELETE` | `/api/admin/users/:id` | Admin | Delete a user and their avatar from Cloudinary |
 | `DELETE` | `/api/admin/questions/:id` | Admin | Delete a question and its images from Cloudinary |
 | `DELETE` | `/api/admin/materials/:id` | Admin | Delete a study material record |
+
+### `POST /api/chat-tutor` — Request Body
+
+```json
+{
+  "message": "Explain the law of demand.",
+  "faculty": "Agricultural Economics",
+  "history": [
+    { "role": "user", "text": "Hello" },
+    { "role": "assistant", "text": "Hi! How can I help?" }
+  ],
+  "images": ["https://res.cloudinary.com/.../question.jpg"]
+}
+```
+
+> The `faculty` field drives the system prompt; defaults to `"Agricultural Economics"` if omitted. The `images` array accepts up to 5 Cloudinary URLs and is passed directly to the Groq vision API.
 
 ---
 
@@ -264,13 +284,16 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - [ ] **Mobile App** — React Native companion app for offline access
 - [ ] **Notifications** — Email/push alerts when new materials are uploaded for followed courses
 - [ ] **Analytics Dashboard** — View download counts and popular resources for admins
+- [x] **Vercel Analytics** — First-party, privacy-friendly page-view tracking via `@vercel/analytics`
+- [x] **Infinite Scroll Pagination** — Study Materials page loads content in batches of 9 using `IntersectionObserver`
+- [x] **URL-Synced Type Filters** — Study Materials `?type=book/note/pdf` query param preserved on navigation
 - [x] **Multi-image Question Upload** — Upload multiple pages per question paper
 - [x] **Global Faculty Architecture** — Context-aware AI tutor and faculty switching mechanics
-- [x] **Performance Optimizations** — Asynchronous material fetching and optimized DB queries
+- [x] **Performance Optimizations** — Asynchronous contributor fetching and optimized DB queries
 - [x] **Premium Animations** — Unified Framer Motion scroll reveals and interactive widgets
 - [x] **Study Materials (Books, Notes, PDFs)** — Unified upload and browse system
 - [x] **Backend Modularisation** — `index.ts` split into `lib/`, `middleware/`, and `routes/` layers
-- [x] **SVG Icon System** — All inline SVGs extracted into a single typed `icons.tsx` component file
+- [x] **SVG Icon System** — All inline SVGs extracted into a single typed `icons.tsx` component file (12 icons)
 - [x] **TypeScript Strictness** — Eliminated all `as any` casts with a proper `CourseData` interface; `catch` blocks use `unknown` with runtime narrowing
 
 ---
@@ -323,11 +346,12 @@ SOFTWARE.
 
 - [Supabase](https://supabase.com/) — Open-source Firebase alternative powering auth and the database
 - [Cloudinary](https://cloudinary.com/) — Cloud-based image management for question paper uploads
-- [Groq](https://groq.com/) — Ultra-fast LLM inference powering the AI Tutor
-- [Vercel](https://vercel.com/) — Seamless frontend hosting and deployment
+- [Groq](https://groq.com/) — Ultra-fast LLM inference powering the AI Tutor (Llama 4 Scout)
+- [Vercel](https://vercel.com/) — Seamless frontend hosting, deployment, and analytics
 - [Render](https://render.com/) — Reliable backend hosting for the Express API
 - [React Hot Toast](https://react-hot-toast.com/) — Beautiful toast notifications
 - [react-helmet-async](https://github.com/staylor/react-helmet-async) — Dynamic SEO meta tag management
+- [Framer Motion](https://www.framer.com/motion/) — Production-ready animation library
 
 ---
 

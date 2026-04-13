@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabaseClient';
@@ -77,11 +77,9 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
             whileTap={{ scale: 0.98 }}
             className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] flex flex-col h-full relative"
         >
-            {/* Top accent bar */}
             <div className={`h-1.5 w-full ${m.type === 'book' ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : m.type === 'note' ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-gradient-to-r from-rose-400 to-red-500'}`} />
 
             <div className="p-6 flex flex-col flex-grow gap-4">
-                {/* Icon + Title */}
                 <div className="flex items-start gap-4">
                     <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${cfg.iconBg}`}>
                         {cfg.emoji}
@@ -96,7 +94,6 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                     </div>
                 </div>
 
-                {/* Badges */}
                 <div className="flex flex-wrap gap-2">
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${cfg.badgeBg} ${cfg.badgeText} ${cfg.badgeBorder}`}>
                         {cfg.emoji} {cfg.label}
@@ -111,7 +108,6 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                     )}
                 </div>
 
-                {/* Course name */}
                 {m.course_name && (
                     <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2 flex-grow">
                         {m.course_name}
@@ -121,10 +117,9 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
 
                 <div className="flex items-center gap-2 pt-2 mt-auto text-xs text-gray-500 dark:text-gray-400 pb-2">
                     <UserIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                    <span className="truncate font-medium">{m.users?.full_name || m.users?.email || 'Unknown Contributor'}</span>
+                    <span className="truncate font-medium">{m.users?.full_name || m.users?.email || 'Unknown'}</span>
                 </div>
 
-                {/* CTA Button */}
                 <a
                     href={m.drive_link}
                     target="_blank"
@@ -143,9 +138,17 @@ const StudyMaterials = () => {
     const { activeFaculty } = useFaculty();
     const facultyData = courseData[activeFaculty] || {};
 
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const BATCH_SIZE = 9;
     const [materials, setMaterials] = useState<StudyMaterial[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const requestIdRef = useRef(0);
+
     const [totalCounts, setTotalCounts] = useState({ book: 0, note: 0, pdf: 0 });
 
     const [filterLevel, setFilterLevel] = useState('');
@@ -153,7 +156,6 @@ const StudyMaterials = () => {
     const [filterCourse, setFilterCourse] = useState('');
     const [filterType, setFilterType] = useState(() => searchParams.get('type') || '');
 
-    // Sync filterType when URL query param changes (e.g. clicking Books vs Notes in nav)
     useEffect(() => {
         const typeFromUrl = searchParams.get('type') || '';
         setFilterType(typeFromUrl);
@@ -162,7 +164,6 @@ const StudyMaterials = () => {
     const [availableSemesters, setAvailableSemesters] = useState<string[]>([]);
     const [availableCourses, setAvailableCourses] = useState<string[]>([]);
 
-    // Cascade: Level → Semesters
     useEffect(() => {
         setFilterLevel('');
     }, [activeFaculty]);
@@ -178,7 +179,6 @@ const StudyMaterials = () => {
         setAvailableCourses([]);
     }, [filterLevel]);
 
-    // Cascade: Semester → Courses
     useEffect(() => {
         if (filterLevel && filterSemester) {
             const levelData = facultyData[filterLevel] || {};
@@ -193,10 +193,8 @@ const StudyMaterials = () => {
         setFilterCourse('');
     }, [filterLevel, filterSemester]);
 
-    // Fetch real totals once on mount, independent of active filters
     useEffect(() => {
         const fetchTotals = async () => {
-            // Fetch only the counts from the database, not the actual row data
             const [bookRes, noteRes, pdfRes] = await Promise.all([
                 supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'book').eq('faculty', activeFaculty),
                 supabase.from('study_materials').select('id', { count: 'exact', head: true }).eq('type', 'note').eq('faculty', activeFaculty),
@@ -212,12 +210,19 @@ const StudyMaterials = () => {
         fetchTotals();
     }, [activeFaculty]);
 
-    useEffect(() => {
-        fetchMaterials();
-    }, [filterLevel, filterSemester, filterCourse, filterType, activeFaculty]);
+    const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
-    const fetchMaterials = async () => {
-        setLoading(true);
+    const fetchMaterials = useCallback(async (pageNum: number, isReset = false) => {
+        const currentRequestId = ++requestIdRef.current;
+
+        if (isReset) {
+            setLoading(true);
+            setMaterials([]);
+            setHasMore(true);
+        } else {
+            setLoadingMore(true);
+        }
+
         try {
             let query = supabase
                 .from('study_materials')
@@ -230,17 +235,26 @@ const StudyMaterials = () => {
             if (filterCourse) query = query.eq('course_name', filterCourse);
             if (filterType) query = query.eq('type', filterType);
 
-            const hasFilter = filterLevel || filterSemester || filterCourse || filterType;
-            if (!hasFilter) query = query.limit(20);
+            const from = pageNum * BATCH_SIZE;
+            const to = from + BATCH_SIZE - 1;
+            query = query.range(from, to);
 
             const { data, error } = await query;
             if (error) throw error;
 
             const fetchedMaterials = data || [];
 
-            // Set materials immediately and disable loading so the UI updates
-            setMaterials(fetchedMaterials);
-            setLoading(false);
+            if (currentRequestId !== requestIdRef.current) return;
+
+            if (isReset) {
+                setMaterials(fetchedMaterials);
+            } else {
+                setMaterials(prev => [...prev, ...fetchedMaterials]);
+            }
+
+            if (fetchedMaterials.length < BATCH_SIZE) {
+                setHasMore(false);
+            }
 
             // Fetch contributor names asynchronously without blocking the UI
             if (fetchedMaterials.length > 0) {
@@ -269,19 +283,46 @@ const StudyMaterials = () => {
                 }
             }
         } catch (err) {
-            console.error('[StudyMaterials] Fetch error:', err);
-            setLoading(false);
+            if (currentRequestId === requestIdRef.current) console.error('[StudyMaterials] Fetch error:', err);
+        } finally {
+            if (currentRequestId === requestIdRef.current) {
+                setLoading(false);
+                setLoadingMore(false);
+            }
         }
-    };
+    }, [activeFaculty, filterLevel, filterSemester, filterCourse, filterType]);
+
+    useEffect(() => {
+        setPage(0);
+        fetchMaterials(0, true);
+    }, [fetchMaterials]);
+
+    useEffect(() => {
+        if (page > 0) {
+            fetchMaterials(page, false);
+        }
+    }, [page, fetchMaterials]);
+
+    const lastMaterialElementRef = useCallback((node: HTMLDivElement | null) => {
+        if (loadingMore || !hasMore) return;
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMore) {
+                setPage(prev => prev + 1);
+            }
+        });
+
+        if (node) observerRef.current.observe(node);
+    }, [loadingMore, hasMore]);
 
     const clearFilters = () => {
         setFilterLevel('');
         setFilterSemester('');
         setFilterCourse('');
         setFilterType('');
+        setSearchParams({});
     };
-
-    const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
     const bookCount = totalCounts.book;
     const noteCount = totalCounts.note;
@@ -290,11 +331,10 @@ const StudyMaterials = () => {
     return (
         <div className="space-y-8 animate-fade-in">
             <Helmet>
-                <title>Study Materials — Books, Notes & PDFs | SAU Agricultural Economics</title>
-                <meta name="description" content="Browse curated books, notes, and general PDFs for SAU Agricultural Economics courses. Filter by level, semester, and course to find the resources you need." />
+                <title>Study Materials — Books, Notes & PDFs | SAU {activeFaculty}</title>
+                <meta name="description" content={`Browse curated books, notes, and general PDFs for SAU ${activeFaculty} courses. Filter by level, semester, and course to find the resources you need.`} />
             </Helmet>
 
-            {/* Header */}
             <motion.div
                 className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2"
                 initial={{ opacity: 0, y: 12 }}
@@ -310,7 +350,6 @@ const StudyMaterials = () => {
                     </p>
                 </div>
 
-                {/* Summary stats */}
                 {!loading && (
                     <div className="flex gap-3 flex-shrink-0">
                         <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-xl text-sm font-semibold border border-indigo-100 dark:border-indigo-800/50">
@@ -326,11 +365,9 @@ const StudyMaterials = () => {
                 )}
             </motion.div>
 
-            {/* Filter bar */}
             <ScrollReveal direction="up" delay={0.2}>
                 <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all">
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 items-end">
-                        {/* Level */}
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
                             <select
@@ -346,7 +383,6 @@ const StudyMaterials = () => {
                             </select>
                         </div>
 
-                        {/* Semester */}
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Semester</label>
                             <select
@@ -363,7 +399,6 @@ const StudyMaterials = () => {
                             </select>
                         </div>
 
-                        {/* Course */}
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Course</label>
                             <select
@@ -380,7 +415,6 @@ const StudyMaterials = () => {
                             </select>
                         </div>
 
-                        {/* Type */}
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
                             <select
@@ -396,7 +430,6 @@ const StudyMaterials = () => {
                             </select>
                         </div>
 
-                        {/* Reset */}
                         <div className="flex flex-col justify-end h-full">
                             <motion.button
                                 onClick={clearFilters}
@@ -419,18 +452,17 @@ const StudyMaterials = () => {
                 </div>
             </ScrollReveal>
 
-            {/* Results */}
             <div className="space-y-4">
                 {!loading && (
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {isFiltered
                             ? <><span className="text-gray-900 dark:text-white font-bold">{materials.length}</span> material{materials.length !== 1 ? 's' : ''} found</>
-                            : <>Showing <span className="text-gray-900 dark:text-white font-bold">latest {materials.length}</span> material{materials.length !== 1 ? 's' : ''} — use filters to search all</>
+                            : <>Showing <span className="text-gray-900 dark:text-white font-bold">{materials.length}</span> material{materials.length !== 1 ? 's' : ''}</>
                         }
                     </p>
                 )}
 
-                {loading ? (
+                {loading && materials.length === 0 ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500" />
                     </div>
@@ -463,18 +495,29 @@ const StudyMaterials = () => {
                             whileInView="visible"
                             viewport={{ once: true, margin: '-50px' }}
                         >
-                            {materials.map((m) => (
-                                <MaterialCard key={m.id} m={m} />
-                            ))}
+                            {materials.map((m, index) => {
+                                if (materials.length === index + 1) {
+                                    return (
+                                        <div ref={lastMaterialElementRef} key={m.id}>
+                                            <MaterialCard m={m} />
+                                        </div>
+                                    );
+                                } else {
+                                    return <MaterialCard key={m.id} m={m} />;
+                                }
+                            })}
                         </motion.div>
 
-                        {!isFiltered && (
-                            <div className="text-center pt-4">
-                                <p className="text-sm text-gray-400 dark:text-gray-500 mb-3">Looking for something specific?</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Use the <span className="font-semibold text-gray-700 dark:text-gray-300">filters above</span> to search by level, semester, course, or type.
-                                </p>
+                        {loadingMore && (
+                            <div className="flex justify-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500" />
                             </div>
+                        )}
+
+                        {!hasMore && materials.length > 0 && (
+                            <p className="text-center text-sm text-gray-400 dark:text-gray-500 pt-4">
+                                You've reached the end of the list.
+                            </p>
                         )}
                     </>
                 )}
