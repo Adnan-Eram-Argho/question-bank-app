@@ -62,10 +62,7 @@ const cardVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
 };
 
-const gridVariants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.07 } },
-};
+
 
 const MaterialCard = ({ m }: { m: StudyMaterial }) => {
     const cfg = TYPE_CONFIG[m.type];
@@ -73,6 +70,9 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
     return (
         <motion.div
             variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-40px' }}
             whileHover={{ y: -6, transition: { duration: 0.2 } }}
             whileTap={{ scale: 0.98 }}
             className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] flex flex-col h-full relative"
@@ -488,13 +488,7 @@ const StudyMaterials = () => {
                     </ScrollReveal>
                 ) : (
                     <>
-                        <motion.div
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-                            variants={gridVariants}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true, margin: '-50px' }}
-                        >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                             {materials.map((m, index) => {
                                 if (materials.length === index + 1) {
                                     return (
@@ -506,7 +500,7 @@ const StudyMaterials = () => {
                                     return <MaterialCard key={m.id} m={m} />;
                                 }
                             })}
-                        </motion.div>
+                        </div>
 
                         {loadingMore && (
                             <div className="flex justify-center py-8">
