@@ -170,8 +170,11 @@ const UploadQuestion = () => {
     const handleMaterialSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!driveLink.includes('drive.google.com')) {
-            setMessage('Please provide a valid Google Drive link.'); return;
+        const isValidGoogleLink =
+            driveLink.includes('drive.google.com') ||
+            driveLink.includes('docs.google.com');
+        if (!isValidGoogleLink) {
+            setMessage('Please provide a valid Google Drive or Google Docs link.'); return;
         }
 
         if (activeTab === 'pdf') {
@@ -323,7 +326,7 @@ const UploadQuestion = () => {
                                 <div>
                                     <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Before you submit</p>
                                     <p className="text-sm text-amber-700 dark:text-amber-400 mt-0.5">
-                                        Please make sure your Google Drive link is set to{' '}
+                                        Please make sure your Google Drive or Google Docs link is set to{' '}
                                         <span className="font-bold">"Anyone with the link"</span> before submitting, otherwise students won't be able to open it.
                                     </p>
                                 </div>
@@ -345,10 +348,10 @@ const UploadQuestion = () => {
                                 />
                             </div>
 
-                            {/* Drive link */}
+                            {/* Drive / Docs link */}
                             <div>
                                 <label htmlFor="drive-link" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
-                                    Google Drive Link
+                                    Google Drive / Docs Link
                                 </label>
                                 <div className="relative">
                                     <span className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -361,7 +364,7 @@ const UploadQuestion = () => {
                                         type="url"
                                         value={driveLink}
                                         onChange={(e) => setDriveLink(e.target.value)}
-                                        placeholder="https://drive.google.com/file/d/..."
+                                        placeholder="https://drive.google.com/... or https://docs.google.com/..."
                                         required
                                         className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-gray-400 dark:placeholder-gray-600"
                                     />
