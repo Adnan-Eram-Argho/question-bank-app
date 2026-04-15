@@ -26,10 +26,11 @@ router.get('/profile', requireAuth, async (req: Request, res: Response): Promise
 router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: Request, res: Response): Promise<void> => {
   const { fullName, bio } = req.body;
   const { userId } = req as AuthenticatedRequest;
+  
+  // 🛡️ Rollback এর জন্য ভেরিয়েবলটি try ব্লকের বাইরে রাখা হলো
+  let avatarUrl: string | null = null; 
 
   try {
-    let avatarUrl: string | null = null;
-
     const { data: existingUser } = await supabase
       .from('users')
       .select('avatar_url')
@@ -52,15 +53,24 @@ router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: 
       .eq('id', userId)
       .select();
 
+    // ডাটাবেস আপডেট ফেইল করলে সাথে সাথে catch ব্লকে পাঠিয়ে দেবে
     if (error) throw error;
+    if (!data || data.length === 0) throw new Error('User profile not found for update.');
 
-    // Delete old avatar only AFTER DB update succeeds
-    if (req.file && existingUser?.avatar_url) {
-      await deleteFromCloudinary(existingUser.avatar_url, 'user_avatars');
+    // 🛡️ Issue #8 Fix: ডাটাবেস ১০০% সাকসেসফুল হলে তবেই ইউজারের "পুরনো" ছবি ডিলিট হবে
+    if (avatarUrl && existingUser?.avatar_url) {
+      await deleteFromCloudinary(existingUser.avatar_url, 'user_avatars').catch(() => {});
     }
 
     res.status(200).json({ message: 'Profile updated', user: data[0] });
   } catch (err: unknown) {
+    // 🛡️ ROLLBACK: ডাটাবেস ফেইল করেছে, কিন্তু ছবি Cloudinary তে উঠে গেছে! 
+    // তাই "নতুন আপলোড হওয়া" ছবিটা সাথে সাথে ক্লাউডিনারি থেকে মুছে দাও, যাতে স্টোরেজ ফুল না হয়।
+    if (avatarUrl) {
+      console.warn(`[Rollback] DB update failed. Deleting orphaned avatar from Cloudinary: ${avatarUrl}`);
+      await deleteFromCloudinary(avatarUrl, 'user_avatars').catch(() => {});
+    }
+
     const msg = err instanceof Error ? err.message : 'Profile update failed';
     console.error('[Auth] Update profile:', msg);
     res.status(500).json({ error: msg });

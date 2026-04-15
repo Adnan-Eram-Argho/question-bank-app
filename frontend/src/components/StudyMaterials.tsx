@@ -148,6 +148,9 @@ const StudyMaterials = () => {
     const [loadingMore, setLoadingMore] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
     const requestIdRef = useRef(0);
+    
+    // Cache for contributor data to avoid repeated API calls
+    const contributorsCache = useRef<Map<string, { full_name: string; email: string }>>(new Map());
 
     const [totalCounts, setTotalCounts] = useState({ book: 0, note: 0, pdf: 0 });
 
@@ -212,6 +215,59 @@ const StudyMaterials = () => {
 
     const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
+    /**
+     * Fetches contributor names and enriches materials with user data.
+     * Uses caching to prevent redundant API calls and merges data in a single state update.
+     */
+    const enrichWithContributors = useCallback(async (fetchedMaterials: StudyMaterial[]) => {
+        const uploaderIds = Array.from(new Set(fetchedMaterials.map(m => m.uploader_id).filter((id): id is string => !!id)));
+        
+        if (uploaderIds.length === 0) {
+            return fetchedMaterials;
+        }
+
+        try {
+            // Check cache first
+            const cachedContributors = new Map(contributorsCache.current);
+            const uncachedIds = uploaderIds.filter(id => !cachedContributors.has(id));
+
+            // Fetch only uncached contributors
+            if (uncachedIds.length > 0) {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`);
+                if (!response.ok) throw new Error('Network response not ok');
+                
+                const usersData = await response.json();
+                const userMap = usersData.reduce((acc: Record<string, { full_name: string; email: string }>, user: { id: string; full_name: string; email: string }) => {
+                    if (user.id) {
+                        acc[user.id] = user;
+                        contributorsCache.current.set(user.id, user);
+                    }
+                    return acc;
+                }, {});
+
+                // Merge cached and newly fetched
+                uncachedIds.forEach(id => {
+                    if (userMap[id]) {
+                        cachedContributors.set(id, userMap[id]);
+                    }
+                });
+            }
+
+            // Enrich materials with contributor data in a single pass
+            return fetchedMaterials.map(m => ({
+                ...m,
+                users: m.uploader_id ? cachedContributors.get(m.uploader_id) || null : null
+            }));
+        } catch (err) {
+            console.error('[StudyMaterials] Failed to fetch contributors:', err);
+            // Return materials without contributor data rather than failing completely
+            return fetchedMaterials.map(m => ({
+                ...m,
+                users: m.uploader_id ? contributorsCache.current.get(m.uploader_id) || null : null
+            }));
+        }
+    }, []);
+
     const fetchMaterials = useCallback(async (pageNum: number, isReset = false) => {
         const currentRequestId = ++requestIdRef.current;
 
@@ -244,53 +300,40 @@ const StudyMaterials = () => {
 
             const fetchedMaterials = data || [];
 
-            if (currentRequestId !== requestIdRef.current) return;
+            // Check if this is still the latest request
+            if (currentRequestId !== requestIdRef.current) {
+                return;
+            }
 
+            // Enrich with contributor data before updating state
+            const enrichedMaterials = await enrichWithContributors(fetchedMaterials);
+
+            // Check again after async operation
+            if (currentRequestId !== requestIdRef.current) {
+                return;
+            }
+
+            // Single state update with enriched data
             if (isReset) {
-                setMaterials(fetchedMaterials);
+                setMaterials(enrichedMaterials);
             } else {
-                setMaterials(prev => [...prev, ...fetchedMaterials]);
+                setMaterials(prev => [...prev, ...enrichedMaterials]);
             }
 
             if (fetchedMaterials.length < BATCH_SIZE) {
                 setHasMore(false);
             }
-
-            // Fetch contributor names asynchronously without blocking the UI
-            if (fetchedMaterials.length > 0) {
-                const uploaderIds = Array.from(new Set(fetchedMaterials.map(m => m.uploader_id).filter(id => id)));
-                if (uploaderIds.length > 0) {
-                    fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`)
-                        .then(response => {
-                            if (response.ok) return response.json();
-                            throw new Error('Network response not ok');
-                        })
-                        .then(usersData => {
-                            const userMap = usersData.reduce((acc: any, user: any) => {
-                                if (user.id) {
-                                    acc[user.id] = user;
-                                }
-                                return acc;
-                            }, {});
-                            setMaterials(prev => prev.map(m => ({
-                                ...m,
-                                users: m.uploader_id ? userMap[m.uploader_id] : m.users
-                            })));
-                        })
-                        .catch(err => {
-                            console.error('Failed to fetch contributors for mapping (background):', err);
-                        });
-                }
-            }
         } catch (err) {
-            if (currentRequestId === requestIdRef.current) console.error('[StudyMaterials] Fetch error:', err);
+            if (currentRequestId === requestIdRef.current) {
+                console.error('[StudyMaterials] Fetch error:', err);
+            }
         } finally {
             if (currentRequestId === requestIdRef.current) {
                 setLoading(false);
                 setLoadingMore(false);
             }
         }
-    }, [activeFaculty, filterLevel, filterSemester, filterCourse, filterType]);
+    }, [activeFaculty, filterLevel, filterSemester, filterCourse, filterType, enrichWithContributors]);
 
     useEffect(() => {
         setPage(0);

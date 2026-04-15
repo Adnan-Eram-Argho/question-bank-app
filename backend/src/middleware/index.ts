@@ -33,24 +33,60 @@ export const uploadAvatar = multer({
   limits: { fileSize: 2 * 1024 * 1024, files: 1 },
 });
 
-// ── Rate limiter ──────────────────────────────────────────────────────────────
+// ── Rate limiter with memory protection ──────────────────────────────────────
 
 const requestCounts = new Map<string, { count: number; resetAt: number }>();
-const WINDOW_MS = 60 * 1000;
+const WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 120;
+const MAX_MAP_SIZE = 10000; // Prevent memory exhaustion under DDoS
+const CLEANUP_INTERVAL_MS = 60 * 1000; // Clean up every 1 minute (more aggressive)
 
-// Memory leak fix: prune expired entries every 5 minutes
-setInterval(() => {
+/**
+ * Prunes expired entries and enforces maximum map size.
+ * Uses LRU-like eviction when map exceeds MAX_MAP_SIZE.
+ */
+const pruneRateLimitMap = (): void => {
   const now = Date.now();
-  for (const [ip, data] of requestCounts) {
-    if (now > data.resetAt) requestCounts.delete(ip);
+  const entries = Array.from(requestCounts.entries());
+  
+  // First pass: remove expired entries
+  for (const [ip, data] of entries) {
+    if (now > data.resetAt) {
+      requestCounts.delete(ip);
+    }
   }
-}, 5 * 60 * 1000);
+  
+  // Second pass: enforce max size by removing oldest entries if still too large
+  if (requestCounts.size > MAX_MAP_SIZE) {
+    const sortedEntries = Array.from(requestCounts.entries())
+      .sort((a, b) => a[1].resetAt - b[1].resetAt); // Sort by expiry time (oldest first)
+    
+    const excessCount = requestCounts.size - MAX_MAP_SIZE;
+    for (let i = 0; i < excessCount; i++) {
+      requestCounts.delete(sortedEntries[i][0]);
+    }
+    
+    console.warn(`[RateLimiter] Evicted ${excessCount} entries to prevent memory exhaustion. Current size: ${requestCounts.size}`);
+  }
+};
+
+// Run cleanup every minute
+const cleanupInterval = setInterval(pruneRateLimitMap, CLEANUP_INTERVAL_MS);
+
+// Prevent interval from keeping process alive
+cleanupInterval.unref();
 
 export const basicRateLimit = (req: Request, res: Response, next: NextFunction): void => {
   const ip = req.header('x-forwarded-for')?.split(',')[0]?.trim() || req.ip || 'unknown';
   const now = Date.now();
   const current = requestCounts.get(ip);
+
+  // Safety check: if map is full, reject new IPs temporarily
+  if (!current && requestCounts.size >= MAX_MAP_SIZE) {
+    console.warn(`[RateLimiter] Map at capacity (${MAX_MAP_SIZE}). Rejecting request from ${ip}`);
+    res.status(429).json({ error: 'Service temporarily unavailable due to high load. Try again later.' });
+    return;
+  }
 
   if (!current || now > current.resetAt) {
     requestCounts.set(ip, { count: 1, resetAt: now + WINDOW_MS });

@@ -5,6 +5,13 @@ import { requireAuth, requireAdmin, AuthenticatedRequest } from '../middleware';
 
 const router = Router();
 
+// Get master admin ID from environment variable (never hardcode sensitive IDs)
+const MASTER_ADMIN_ID = process.env.MASTER_ADMIN_ID;
+
+if (!MASTER_ADMIN_ID && process.env.NODE_ENV === 'production') {
+  console.warn('[Security] MASTER_ADMIN_ID not set in production. Admin deletion protection is disabled.');
+}
+
 // Public — uses the service key so RLS is bypassed intentionally
 router.get('/contributors', async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -82,10 +89,9 @@ router.delete('/users/:id', requireAuth, requireAdmin, async (req: Request, res:
     return;
   }
 
-  // 🛡️ Master Admin Protection Lock 
-  const MASTER_ADMIN_ID = "0e8ada8c-79e8-4e48-8bec-5f45a03b5bb4";
-
-  if (id === MASTER_ADMIN_ID) {
+  // 🛡️ Master Admin Protection Lock (configured via environment variable)
+  if (MASTER_ADMIN_ID && id === MASTER_ADMIN_ID) {
+    console.warn(`[Security] Deletion attempt blocked for master admin by user: ${userId}`);
     res.status(403).json({ error: 'Action Denied: This is the permanent master creator account and cannot be deleted.' });
     return;
   }

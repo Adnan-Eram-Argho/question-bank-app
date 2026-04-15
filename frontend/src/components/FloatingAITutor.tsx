@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useFaculty } from '../context/FacultyContext';
 import { SparkleIcon, SendIcon, CloseIcon } from './icons';
+import { courseData } from '../data';
 
 interface Message {
     id: number;
@@ -10,6 +11,9 @@ interface Message {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com';
+
+// Valid faculties whitelist (must match backend)
+const VALID_FACULTIES = Object.keys(courseData);
 
 
 // Typing indicator dots
@@ -69,6 +73,18 @@ const FloatingAITutor = () => {
             }));
     };
 
+    /**
+     * Validates faculty against whitelist before sending to backend.
+     * Prevents prompt injection through manipulated faculty context.
+     */
+    const validateFaculty = (faculty: string): string => {
+        if (VALID_FACULTIES.includes(faculty)) {
+            return faculty;
+        }
+        console.warn(`[AI Tutor] Invalid faculty detected: "${faculty}". Defaulting to Agricultural Economics.`);
+        return 'Agricultural Economics';
+    };
+
     const handleSend = async () => {
         const trimmed = input.trim();
         if (!trimmed || isLoading) return;
@@ -94,6 +110,9 @@ const FloatingAITutor = () => {
                 headers['Authorization'] = `Bearer ${accessToken}`;
             }
 
+            // Validate faculty before sending to prevent injection
+            const validatedFaculty = validateFaculty(activeFaculty);
+
             const res = await fetch(`${API_URL}/api/chat-tutor`, {
                 method: 'POST',
                 headers,
@@ -101,7 +120,7 @@ const FloatingAITutor = () => {
                     message: trimmed,
                     history: buildHistory(),
                     images: [], // extend here to pass question image URLs if needed
-                    faculty: activeFaculty,
+                    faculty: validatedFaculty,
                 }),
             });
 
@@ -115,6 +134,7 @@ const FloatingAITutor = () => {
                 text: data.reply,
             };
             setMessages((prev) => [...prev, aiMessage]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             const detail = err?.message || 'Unknown error';
             const isNetworkError = detail === 'Failed to fetch'; // Actual network failure vs API rejection
