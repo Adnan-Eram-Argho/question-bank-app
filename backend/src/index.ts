@@ -31,18 +31,21 @@ app.set('trust proxy', 1);
 // 🛡️ Issue #4 Fix: Strict CORS Configuration
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
-  : ['http://localhost:5173']; // .env না থাকলে ডিফল্টভাবে শুধু তোমার লোকাল পিসি অ্যালাও করবে, পুরো দুনিয়া নয়!
+  : ['http://localhost:5173']; // .env না থাকলে ডিফল্টভাবে শুধু তোমার লোকাল পিসি অ্যালাও করবে, পুরো দুনিয়া নয়!
+
+// Log allowed origins on startup for debugging
+console.log(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // !origin মানে হলো সার্ভার-টু-সার্ভার বা মোবাইল অ্যাপের রিকোয়েস্ট (যেগুলো ব্রাউজার থেকে আসে না)
+      // !origin মানে হলো সার্ভার-টু-সার্ভার বা মোবাইল অ্যাপের রিকোয়েস্ট (যেগুলো ব্রাউজার থেকে আসে না)
       if (!origin) return callback(null, true);
       
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        // অন্য কোনো ওয়েবসাইট (যেমন হ্যাকারদের সাইট) রিকোয়েস্ট করলে ব্লক করে দেবে!
+        // অন্য কোনো ওয়েবসাইট (যেমন হ্যাকারদের সাইট) রিকোয়েস্ট করলে ব্লক করে দেবে!
         console.warn(`[CORS Blocked] Unauthorized origin attempted access: ${origin}`);
         callback(new Error('Blocked by CORS policy')); 
       }
