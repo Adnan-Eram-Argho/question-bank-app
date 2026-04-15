@@ -82,6 +82,14 @@ router.delete('/users/:id', requireAuth, requireAdmin, async (req: Request, res:
     return;
   }
 
+  // 🛡️ Master Admin Protection Lock 
+  const MASTER_ADMIN_ID = "0e8ada8c-79e8-4e48-8bec-5f45a03b5bb4";
+
+  if (id === MASTER_ADMIN_ID) {
+    res.status(403).json({ error: 'Action Denied: This is the permanent master creator account and cannot be deleted.' });
+    return;
+  }
+
   try {
     const { data: user } = await supabase
       .from('users')
