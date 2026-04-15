@@ -220,32 +220,32 @@ const UploadQuestion = () => {
     const currentTab = TAB_CONFIG.find(t => t.id === activeTab)!;
 
     return (
-        <div className="max-w-3xl mx-auto p-4 sm:p-8 animate-fade-in">
-            <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 sm:p-10 transition-all">
+        <div className="max-w-3xl mx-auto p-2 sm:p-4 md:p-8 animate-fade-in">
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-4 sm:p-6 md:p-10 transition-all">
 
                 {/* Page header */}
-                <div className="mb-8 text-center sm:text-left border-b border-gray-100 dark:border-gray-800 pb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent mb-2">
+                <div className="mb-6 sm:mb-8 text-center sm:text-left border-b border-gray-100 dark:border-gray-800 pb-4 sm:pb-6">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent mb-2">
                         Upload Resource
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Contribute questions, books, or notes to the repository.</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Contribute questions, books, or notes to the repository.</p>
                 </div>
 
-                {/* ── 3-way Tab Toggle ── */}
-                <div className="flex gap-2 p-1.5 bg-gray-100 dark:bg-gray-900/60 rounded-xl mb-8" role="tablist">
+                {/* ── Tab Toggle ── */}
+                <div className="grid grid-cols-2 md:flex sm:flex-wrap gap-2 p-1.5 bg-gray-100 dark:bg-gray-900/60 rounded-xl mb-6 sm:mb-8" role="tablist">
                     {TAB_CONFIG.map(tab => (
                         <button
                             key={tab.id}
                             role="tab"
                             aria-selected={activeTab === tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all duration-200 focus:outline-none ${activeTab === tab.id
+                            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 focus:outline-none ${activeTab === tab.id
                                     ? 'bg-white dark:bg-[#1E293B] text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-gray-700'
                                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                                 }`}
                         >
-                            <span>{tab.emoji}</span>
-                            <span className="hidden sm:inline">{tab.label}</span>
+                            <span className="text-base sm:text-sm">{tab.emoji}</span>
+                            <span className="hidden sm:inline whitespace-nowrap">{tab.label}</span>
                             <span className="sm:hidden">{tab.label.split(' ')[1]}</span>
                         </button>
                     ))}
@@ -264,7 +264,7 @@ const UploadQuestion = () => {
                                 onDragLeave={handleDragLeave}
                                 onDragOver={handleDragOver}
                                 onDrop={handleDrop}
-                                className={`mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-dashed rounded-xl transition-all duration-200 ${isDragging
+                                className={`mt-1 flex justify-center px-4 sm:px-6 pt-5 pb-5 sm:pt-6 sm:pb-6 border-2 border-dashed rounded-xl transition-all duration-200 ${isDragging
                                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-400/30'
                                         : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500'
                                     }`}
@@ -279,12 +279,15 @@ const UploadQuestion = () => {
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                     )}
-                                    <div className="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
+                                    <div className="flex flex-wrap text-sm text-gray-600 dark:text-gray-400 justify-center text-center px-2">
                                         <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1 focus-within:ring-primary-500 dark:focus-within:ring-offset-gray-900">
                                             <span>Click to browse</span>
                                             <input id="file-upload" name="file-upload" type="file" multiple accept=".jpg,.jpeg,.png,.webp" onChange={handleFileChange} className="sr-only" />
                                         </label>
-                                        <p className="pl-1">, drag &amp; drop, or <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-mono">Ctrl+V</kbd> to paste</p>
+                                        <p className="pl-1 ">, drag &amp; drop,</p>
+                                        <p className="w-full sm:w-auto mt-1 sm:mt-0 sm:pl-1">
+                                            or <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-mono mx-0.5">Ctrl+V</kbd> to paste
+                                        </p>
                                     </div>
                                     <p className="text-xs text-gray-500 dark:text-gray-500">
                                         {isDragging ? 'Release to drop your images here' : 'PNG, JPG, WebP up to 5MB — max 2 files'}
@@ -425,16 +428,16 @@ const UploadQuestion = () => {
 
                     {/* ══ Feedback Message ══ */}
                     {message && (
-                        <div className={`p-4 rounded-xl flex items-center gap-3 ${message.toLowerCase().includes('success')
+                        <div className={`p-3 sm:p-4 rounded-xl flex items-start sm:items-center gap-3 ${message.toLowerCase().includes('success')
                                 ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50'
                                 : 'bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50'
                             }`}>
                             {message.toLowerCase().includes('success') ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5 sm:mt-0" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                 </svg>
                             ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5 sm:mt-0" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                 </svg>
                             )}
