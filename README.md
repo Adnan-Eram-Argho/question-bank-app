@@ -92,11 +92,11 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 ## ✨ Key Features
 
 - **🌐 Multi-Faculty Architecture** — Seamlessly switch across 3 faculties (Agricultural Economics, Agriculture, ASVM) to access domain-specific study environments with up to 5 academic levels per faculty.
-- **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads (up to 10 images per question, 5MB each).
+- **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads (up to 2 images per question, 5MB each) with drag-and-drop, paste (Ctrl+V), and instant preview.
 - **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs. Supports URL-synced type filters (`?type=book`), infinite scroll pagination (batches of 9), real-time type counts, and asynchronous contributor profile resolution with intelligent in-memory caching (~60% API call reduction).
 - **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 Cloudinary URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
 - **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, smooth page transitions, and micro-interaction hover effects throughout.
-- **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Optimized auth flow with race condition prevention using `useRef`, redundant DB queries removed for instant logins, and secure profile updates with atomic operations.
+- **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Optimized auth flow with race condition prevention using `useRef` to track latest user ID, redundant DB queries removed for instant logins, and secure profile updates with atomic operations.
 - **🛠️ Admin Dashboard** — Full moderation panel: create users with rollback on failure, delete questions/materials/users with cascading Cloudinary cleanup, manage study materials, with master admin protection via environment variable configuration.
 - **🧩 Centralised SVG Icons** — All reusable icons extracted into `src/components/icons.tsx` with typed props and optional className overrides, eliminating repeated inline SVG markup across components (12 icons total).
 - **🔒 Strict TypeScript** — Replaced all `as any` casts with proper interfaces (`CourseData`, `GroqMessage`, `ContentPart`); all `catch` blocks use `unknown` with `instanceof Error` narrowing; zero compilation errors.
@@ -299,7 +299,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `POST` | `/api/upload` | Collector | Upload question paper images (1-10 files, max 5MB each) to Cloudinary + Supabase |
+| `POST` | `/api/upload` | Collector | Upload question paper images (1-2 files, max 5MB each) to Cloudinary + Supabase |
 | `POST` | `/api/upload-material` | Collector | Add a book, note, or PDF record with Google Drive link |
 
 ### Admin Endpoints
@@ -344,7 +344,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 #### `POST /api/upload` — Multipart Form Data
 
 **Fields:**
-- `images`: File array (1-10 files, JPEG/PNG only, max 5MB each)
+- `images`: File array (1-2 files, JPEG/PNG/WebP only, max 5MB each)
 - `level`: String (e.g., "Level-1")
 - `semester`: String (e.g., "Semester-I")
 - `course_name`: String
@@ -414,9 +414,9 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 
 ### Completed Milestones
 - [x] **Vercel Analytics** — First-party, privacy-friendly page-view tracking via `@vercel/analytics`
-- [x] **Infinite Scroll Pagination** — Study Materials page loads content in batches of 9 using `IntersectionObserver`
-- [x] **URL-Synced Type Filters** — Study Materials `?type=book/note/pdf` query param preserved on navigation
-- [x] **Multi-image Question Upload** — Upload multiple pages per question paper (up to 10 images, parallel upload with `Promise.all`)
+- [x] **Infinite Scroll Pagination** — Question Bank and Study Materials pages load content in batches of 9 using `IntersectionObserver` with request deduplication via `useRef`
+- [x] **URL-Synced Type Filters** — Study Materials `?type=book/note/pdf` query param preserved on navigation and updated in real-time when dropdown selection changes
+- [x] **Multi-image Question Upload** — Upload multiple pages per question paper (up to 2 images with drag-and-drop, paste support, and instant preview; backend supports up to 10 for future scalability)
 - [x] **Global Faculty Architecture** — Context-aware AI tutor with dynamic system prompt generation for 3 faculties (Agricultural Economics, Agriculture, ASVM) supporting up to 5 levels each
 - [x] **Performance Optimizations** — Asynchronous contributor fetching with in-memory Map caching (~60% API call reduction), request deduplication via `useRef`, single state update pattern
 - [x] **Premium Animations** — Unified Framer Motion scroll reveals, canvas-based hero particles, interactive floating badges, smooth page transitions
@@ -456,13 +456,13 @@ This project follows industry best practices for security, performance, and data
 - **Graceful Degradation**: Returns 429 with informative message when at capacity
 - **Impact**: Prevents memory exhaustion attacks while maintaining service availability
 
-#### 4. AI Prompt Injection Prevention ([`backend/src/routes/ai.ts`](file://d:\Projects\question-bank-app\backend\src\routes\ai.ts#L7-L34))
-- **Whitelist Validation**: Faculty names validated against 3-element const array (`Agricultural Economics`, `Agriculture`, `ASVM`)
+#### 4. AI Prompt Injection Prevention ([`backend/src/routes/ai.ts`](file://d:\Projects\question-bank-app\backend\src\routes\ai.ts#L7-L34), [`frontend/src/context/FacultyContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx#L5-L5))
+- **Whitelist Validation**: Faculty names validated against dynamic whitelist from [`courseData`](file://d:\Projects\question-bank-app\frontend\src\data.ts) (currently: `Agricultural Economics`, `Agriculture`, `ASVM`)
+- **Dual-Layer Protection**: Both client-side context and server-side AI route validate independently
 - **Input Sanitization**: Message trimmed, length-checked (1-2000 chars), empty strings rejected
 - **URL Validation**: Image URLs must start with `https://res.cloudinary.com/` (max 5)
-- **Logging**: Invalid faculty attempts logged with attempted value for monitoring
-- **Dual Validation**: Both client ([`FloatingAITutor.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\FloatingAITutor.tsx#L78-L84)) and server validate independently
-- **Impact**: Prevents attackers from manipulating AI behavior via crafted faculty names
+- **Graceful Degradation**: Invalid faculty attempts logged with attempted value, defaulted to "Agricultural Economics"
+- **Impact**: Prevents attackers from manipulating AI behavior via crafted faculty names in localStorage or API requests
 
 #### 5. Atomic Resource Operations
 - **Profile Updates** ([`auth.ts`](file://d:\Projects\question-bank-app\backend\src\routes\auth.ts#L26-L79)): Upload new avatar → Update DB → Delete old avatar; rollback deletes new upload if DB fails
@@ -479,11 +479,11 @@ This project follows industry best practices for security, performance, and data
 - **Invalidation**: Cache cleared on component unmount (automatic via React lifecycle)
 - **Impact**: Faster page loads, reduced server load, better user experience
 
-#### 2. Request Deduplication ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L271-L332))
-- **Mechanism**: Monotonically increasing `requestIdRef` tracks latest request
+#### 2. Request Deduplication ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L162-L162), [`QuestionList.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\QuestionList.tsx#L168-L168))
+- **Mechanism**: Monotonically increasing `requestIdRef` tracks latest request in both Question Bank and Study Materials components
 - **Dual Check**: Before and after async operations to prevent stale state updates
-- **Race Condition Prevention**: Old requests silently discarded if newer request exists
-- **Impact**: Eliminates UI flickering, state corruption during fast scrolling
+- **Race Condition Prevention**: Old requests silently discarded if newer request exists (e.g., during rapid filter changes)
+- **Impact**: Eliminates UI flickering, state corruption, and incorrect data display during fast scrolling or filter switching
 
 #### 3. Single State Update Pattern ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L217-L260))
 - **Before**: Two separate `setMaterials()` calls causing double renders
@@ -499,19 +499,23 @@ This project follows industry best practices for security, performance, and data
 
 ### Stability Enhancements
 
-#### 1. Race Condition Elimination ([`AuthContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\AuthContext.tsx#L56-L77))
-- **Problem**: Rapid login/logout caused stale role fetches to overwrite current state
-- **Solution**: Compare `userId` parameter with current `user.id` before updating role
+#### 1. Race Condition Elimination ([`AuthContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\AuthContext.tsx#L18-L65)): Uses `useRef` to track latest user ID, preventing stale async responses from overwriting current role during rapid login/logout cycles. Only updates state when response matches current user.
 - **Edge Cases**: Handles null user, concurrent sessions, slow network conditions
 - **Impact**: Consistent authentication state, no intermittent "role not loaded" errors
 
-#### 2. Graceful Degradation ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L249-L256))
+#### 2. Faculty Context Validation ([`FacultyContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx#L5-L5))
+- **Whitelist Validation**: Validates faculty names against actual faculties defined in [`courseData`](file://d:\Projects\question-bank-app\frontend\src\data.ts).
+- **Security**: Prevents localStorage injection attacks using invalid or malicious faculty names.
+- **Fallback**: Invalid values are logged and defaulted to "Agricultural Economics".
+- **Impact**: Ensures application state integrity and prevents potential UI/logic errors caused by tampered local storage.
+
+#### 3. Graceful Degradation ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L249-L256))
 - **Fallback**: If contributor fetch fails, display materials with cached data or "Unknown"
 - **Error Boundaries**: Try-catch blocks prevent complete UI failure
 - **User Experience**: Partial functionality maintained during backend issues
 - **Impact**: Improved resilience, better UX during transient failures
 
-#### 3. Input Validation (Client + Server)
+#### 4. Input Validation (Client + Server)
 - **Frontend**: Real-time validation with immediate feedback
 - **Backend**: Re-validation with strict type checking (defense in depth)
 - **Sanitization**: Trim whitespace, reject empty strings, enforce length limits

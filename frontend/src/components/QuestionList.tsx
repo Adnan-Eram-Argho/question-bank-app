@@ -165,6 +165,9 @@ const QuestionList = () => {
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
+    
+    // 🛡️ Add requestIdRef to prevent race conditions during rapid filter changes
+    const requestIdRef = useRef(0);
 
     const [filterLevel, setFilterLevel] = useState('');
     const [filterSemester, setFilterSemester] = useState('');
@@ -208,6 +211,8 @@ const QuestionList = () => {
     const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
     const fetchQuestions = useCallback(async (pageNum: number, isReset = false) => {
+        const currentRequestId = ++requestIdRef.current;
+
         if (isReset) {
             setLoading(true);
             setQuestions([]);
@@ -232,6 +237,11 @@ const QuestionList = () => {
             const { data, error } = await query;
             if (error) throw error;
 
+            // 🛡️ Check if this is still the latest request before updating state
+            if (currentRequestId !== requestIdRef.current) {
+                return;
+            }
+
             const newQuestions = data || [];
 
             if (isReset) {
@@ -244,10 +254,16 @@ const QuestionList = () => {
                 setHasMore(false);
             }
         } catch (error) {
-            console.error('Error fetching questions:', error);
+            // Only log error if this is still the latest request
+            if (currentRequestId === requestIdRef.current) {
+                console.error('[QuestionList] Error fetching questions:', error);
+            }
         } finally {
-            setLoading(false);
-            setLoadingMore(false);
+            // Only update loading state if this is still the latest request
+            if (currentRequestId === requestIdRef.current) {
+                setLoading(false);
+                setLoadingMore(false);
+            }
         }
     }, [activeFaculty, filterLevel, filterSemester, filterCourse, filterType]);
 

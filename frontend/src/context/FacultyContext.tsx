@@ -1,5 +1,9 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { courseData } from '../data';
+
+// 🛡️ Whitelist of valid faculties to prevent injection attacks
+const VALID_FACULTIES = Object.keys(courseData);
 
 interface FacultyContextType {
   activeFaculty: string;
@@ -11,24 +15,33 @@ const FacultyContext = createContext<FacultyContextType | undefined>(undefined);
 export const FacultyProvider = ({ children }: { children: ReactNode }) => {
   const [activeFaculty, setActiveFaculty] = useState<string>(() => {
     const saved = localStorage.getItem('activeFaculty');
-    // Fallback to Agri-Econ if the saved value is invalid, "null", or missing
+    // Validate saved faculty against whitelist, fallback to default if invalid
     if (saved && saved !== 'null' && saved !== 'undefined' && saved.trim() !== '') {
-      return saved.trim();
+      const trimmed = saved.trim();
+      if (VALID_FACULTIES.includes(trimmed)) {
+        return trimmed;
+      }
+      console.warn(`[FacultyContext] Invalid faculty in localStorage: "${trimmed}". Defaulting to Agricultural Economics.`);
     }
     return 'Agricultural Economics';
   });
 
   useEffect(() => {
-    // Only save to localStorage if it's a real faculty to prevent poisoning
-    if (activeFaculty && activeFaculty !== 'undefined') {
+    // Only save to localStorage if it's a validated faculty
+    if (VALID_FACULTIES.includes(activeFaculty)) {
       localStorage.setItem('activeFaculty', activeFaculty);
     }
   }, [activeFaculty]);
 
-  // Sanitize incoming faculty strings to prevent crashes in data.ts lookups
+  // 🛡️ Sanitize and validate incoming faculty strings against whitelist
   const handleSetFaculty = (faculty: string) => {
-    if (typeof faculty === 'string' && faculty.trim() !== '' && faculty !== 'undefined') {
-      setActiveFaculty(faculty.trim());
+    if (typeof faculty === 'string') {
+      const trimmed = faculty.trim();
+      if (VALID_FACULTIES.includes(trimmed)) {
+        setActiveFaculty(trimmed);
+      } else {
+        console.error(`[FacultyContext] Invalid faculty attempted: "${trimmed}". Must be one of: ${VALID_FACULTIES.join(', ')}`);
+      }
     }
   };
 

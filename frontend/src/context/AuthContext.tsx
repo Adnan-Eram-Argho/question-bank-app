@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
@@ -26,12 +26,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [role, setRole] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    
+    // 🛡️ Add useRef to track the latest user ID for race condition prevention
+    const latestUserIdRef = useRef<string | null>(null);
 
     useEffect(() => {
         // onAuthStateChange fires immediately with the current session on mount,
         // which eliminates the need for a separate getSession() call and prevents double-fetching the role.
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
+            latestUserIdRef.current = session?.user?.id ?? null; // Update ref immediately
             if (session?.user) {
                 fetchRole(session.user.id);
             } else {
@@ -59,17 +63,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             if (error) throw error;
 
-            // Prevent stale slow requests from overwriting a newer role
-            if (userId === user?.id || !user) {
+            // 🛡️ Prevent stale slow requests from overwriting a newer role
+            // Compare against the latest user ID from ref, not the stale closure state
+            if (userId === latestUserIdRef.current) {
                 setRole(data.role);
             }
         } catch (error) {
             console.error('[AuthContext] Role retrieval failed:', error);
-            if (userId === user?.id || !user) {
+            // 🛡️ Only update role if this is still the latest user
+            if (userId === latestUserIdRef.current) {
                 setRole(null);
             }
         } finally {
-            setLoading(false);
+            // 🛡️ Only stop loading if this is still the latest user
+            if (userId === latestUserIdRef.current) {
+                setLoading(false);
+            }
         }
     };
 

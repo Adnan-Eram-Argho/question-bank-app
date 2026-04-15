@@ -462,7 +462,15 @@ const StudyMaterials = () => {
                             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
                             <select
                                 value={filterType}
-                                onChange={(e) => setFilterType(e.target.value)}
+                                onChange={(e) => {
+                                    const newVal = e.target.value;
+                                    setFilterType(newVal);
+                                    if (newVal) {
+                                        setSearchParams({ type: newVal });
+                                    } else {
+                                        setSearchParams({});
+                                    }
+                                }}
                                 className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
