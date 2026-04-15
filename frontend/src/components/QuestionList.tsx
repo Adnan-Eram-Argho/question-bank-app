@@ -357,7 +357,7 @@ const QuestionList = () => {
                     >
                         <StatCounter to={385} label="Questions" />
                         <StatCounter to={58} label="Courses" />
-                        <StatCounter to={3} label="Contributors" />
+                        <StatCounter to={6} label="Contributors" />
                     </motion.div>
                 </div>
             </div>
