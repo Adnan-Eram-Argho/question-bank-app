@@ -28,23 +28,27 @@ const PORT = process.env.PORT || 5000;
 // Required for Render reverse proxy to expose real client IP
 app.set('trust proxy', 1);
 
-// CORS — empty CORS_ORIGIN means allow all origins (safe for initial deployment)
-const allowedOrigins = (process.env.CORS_ORIGIN || '')
-  .split(',')
-  .map((o) => o.trim())
-  .filter(Boolean);
+// 🛡️ Issue #4 Fix: Strict CORS Configuration
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
+  : ['http://localhost:5173']; // .env না থাকলে ডিফল্টভাবে শুধু তোমার লোকাল পিসি অ্যালাও করবে, পুরো দুনিয়া নয়!
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      // !origin মানে হলো সার্ভার-টু-সার্ভার বা মোবাইল অ্যাপের রিকোয়েস্ট (যেগুলো ব্রাউজার থেকে আসে না)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(null, false);
+        // অন্য কোনো ওয়েবসাইট (যেমন হ্যাকারদের সাইট) রিকোয়েস্ট করলে ব্লক করে দেবে!
+        console.warn(`[CORS Blocked] Unauthorized origin attempted access: ${origin}`);
+        callback(new Error('Blocked by CORS policy')); 
       }
     },
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-    credentials: false,
+    credentials: true,
   })
 );
 
