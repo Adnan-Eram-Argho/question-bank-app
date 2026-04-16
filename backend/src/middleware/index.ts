@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 export type AuthenticatedRequest = Request & {
   userId: string;
   userRole: string;
+  userEmail?: string;
 };
 
 // ── Multer instances ──────────────────────────────────────────────────────────
@@ -137,6 +138,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     const typedReq = req as AuthenticatedRequest;
     typedReq.userId = profile.id;
     typedReq.userRole = profile.role || 'user';
+    typedReq.userEmail = authUser.user.email;
     next();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Authentication middleware failed.';

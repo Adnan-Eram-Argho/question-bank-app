@@ -12,7 +12,7 @@ router.post('/upload', requireAuth, uploadQuestions.array('images', 10), async (
     return;
   }
 
-  const { userId } = req as AuthenticatedRequest;
+  const { userId, userEmail } = req as AuthenticatedRequest;
   const { level, semester, course_name, question_type, faculty } = req.body;
   if (!level || !semester || !course_name || !question_type) {
     res.status(400).json({ error: 'Required fields are missing for question upload.' });
@@ -34,7 +34,7 @@ router.post('/upload', requireAuth, uploadQuestions.array('images', 10), async (
         semester,
         course_name,
         question_type,
-        uploaded_by: userId,
+        uploaded_by: userEmail || userId,
       }])
       .select();
 
