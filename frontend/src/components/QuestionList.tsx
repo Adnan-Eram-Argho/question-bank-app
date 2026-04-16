@@ -44,10 +44,12 @@ interface Question {
     question_type: string;
     uploaded_by: string;
     created_at: string;
+    users?: { full_name: string; email: string } | null;
 }
 
 const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
     const images = q.image_urls && q.image_urls.length > 0 ? q.image_urls : (q.image_url ? [q.image_url] : []);
+    const uploaderName = q.users?.full_name || q.users?.email || q.uploaded_by || 'Unknown';
 
     return (
         <motion.div
@@ -143,7 +145,7 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                 <div className="flex items-center justify-between pt-3 border-t border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.06)]">
                     <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
                         <UserIcon />
-                        <span className="truncate max-w-[120px]">{q.uploaded_by || 'Unknown'}</span>
+                        <span className="truncate max-w-[120px]">{uploaderName}</span>
                     </div>
                     <div className="text-[11px] text-gray-400 dark:text-gray-500">
                         {new Date(q.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
@@ -165,6 +167,7 @@ const QuestionList = () => {
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
+    const contributorsCache = useRef<Map<string, { full_name: string; email: string }>>(new Map());
     
     // 🛡️ Add requestIdRef to prevent race conditions during rapid filter changes
     const requestIdRef = useRef(0);
@@ -210,6 +213,60 @@ const QuestionList = () => {
 
     const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
+    const enrichWithContributors = useCallback(async (fetchedQuestions: Question[]) => {
+        const uploaderIds = Array.from(new Set(
+            fetchedQuestions
+                .map(q => q.uploaded_by)
+                .filter((id): id is string => !!id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
+        ));
+
+        if (uploaderIds.length === 0) {
+            return fetchedQuestions;
+        }
+
+        try {
+            const cachedContributors = new Map(contributorsCache.current);
+            const uncachedIds = uploaderIds.filter(id => !cachedContributors.has(id));
+
+            if (uncachedIds.length > 0) {
+                const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`);
+                if (!response.ok) throw new Error('Network response not ok');
+                
+                const usersData = await response.json();
+                const userMap = usersData.reduce((acc: Record<string, { full_name: string; email: string }>, user: { id: string; full_name: string; email: string }) => {
+                    if (user.id) {
+                        acc[user.id] = user;
+                        contributorsCache.current.set(user.id, user);
+                    }
+                    return acc;
+                }, {});
+
+                uncachedIds.forEach(id => {
+                    if (userMap[id]) {
+                        cachedContributors.set(id, userMap[id]);
+                    }
+                });
+            }
+
+            return fetchedQuestions.map(q => {
+                const isId = q.uploaded_by && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q.uploaded_by);
+                return {
+                    ...q,
+                    users: isId ? cachedContributors.get(q.uploaded_by) || null : null
+                };
+            });
+        } catch (err) {
+            console.error('[QuestionList] Failed to fetch contributors:', err);
+            return fetchedQuestions.map(q => {
+                const isId = q.uploaded_by && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q.uploaded_by);
+                return {
+                    ...q,
+                    users: isId ? contributorsCache.current.get(q.uploaded_by) || null : null
+                };
+            });
+        }
+    }, []);
+
     const fetchQuestions = useCallback(async (pageNum: number, isReset = false) => {
         const currentRequestId = ++requestIdRef.current;
 
@@ -242,7 +299,12 @@ const QuestionList = () => {
                 return;
             }
 
-            const newQuestions = data || [];
+            const rawQuestions = data || [];
+            const newQuestions = await enrichWithContributors(rawQuestions);
+
+            if (currentRequestId !== requestIdRef.current) {
+                return;
+            }
 
             if (isReset) {
                 setQuestions(newQuestions);
@@ -250,7 +312,7 @@ const QuestionList = () => {
                 setQuestions(prev => [...prev, ...newQuestions]);
             }
 
-            if (newQuestions.length < BATCH_SIZE) {
+            if (rawQuestions.length < BATCH_SIZE) {
                 setHasMore(false);
             }
         } catch (error) {
