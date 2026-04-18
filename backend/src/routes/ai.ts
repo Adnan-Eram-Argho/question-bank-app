@@ -90,11 +90,13 @@ router.post('/chat-tutor', async (req: Request, res: Response): Promise<void> =>
     return;
   }
   
-  // Validate and sanitize image URLs (basic check for Cloudinary URLs)
-  const validImages = (images ?? []).filter((url: string) => {
-    if (typeof url !== 'string') return false;
-    return url.startsWith('https://res.cloudinary.com/');
-  });
+// Validate and sanitize image URLs (Allow both Supabase and legacy Cloudinary URLs for backward compatibility)
+const validImages = (images ?? []).filter((url: string) => {
+  if (typeof url !== 'string') return false;
+  const isSupabase = url.includes('supabase.co/storage/v1/object/public/');
+  const isCloudinary = url.startsWith('https://res.cloudinary.com/');
+  return isSupabase || isCloudinary;
+});
 
   // Sanitize faculty to prevent prompt injection
   const currentFaculty = sanitizeFaculty(faculty);

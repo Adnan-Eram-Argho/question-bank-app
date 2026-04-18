@@ -78,9 +78,9 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 | **Routing** | React Router | v7.13.2 |
 | **Backend** | Node.js, Express, TypeScript | Express 5.2.1, Node v18+ |
 | **Database & Auth** | Supabase (PostgreSQL + Auth) | supabase-js 2.100.1 |
-| **Image Storage** | Cloudinary | cloudinary 2.9.0 |
+| **Image Storage** | Supabase Storage | Integrated with supabase-js |
 | **AI Tutor** | Groq SDK | groq-sdk 1.1.2 (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) |
-| **File Upload** | Multer | multer 2.1.1 (memory storage) |
+| **File Upload** | Multer | multer 2.1.1 (memory storage, uploads to Supabase Storage) |
 | **Analytics** | Vercel Analytics | @vercel/analytics 2.0.1 |
 | **SEO** | react-helmet-async | v3.0.0 |
 | **Notifications** | react-hot-toast | v2.6.0 |
@@ -92,12 +92,12 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 ## ✨ Key Features
 
 - **🌐 Multi-Faculty Architecture** — Seamlessly switch across 3 faculties (Agricultural Economics, Agriculture, ASVM) to access domain-specific study environments with up to 5 academic levels per faculty.
-- **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads (up to 2 images per question, 5MB each) with drag-and-drop, paste (Ctrl+V), and instant preview.
+- **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads (up to 2 images per question, 5MB each) stored in Supabase Storage, with drag-and-drop, paste (Ctrl+V), and instant preview.
 - **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs. Supports URL-synced type filters (`?type=book`), infinite scroll pagination (batches of 9), real-time type counts, and asynchronous contributor profile resolution with intelligent in-memory caching (~60% API call reduction).
-- **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 Cloudinary URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
+- **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 image URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
 - **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, smooth page transitions, and micro-interaction hover effects throughout.
 - **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Optimized auth flow with race condition prevention using `useRef` to track latest user ID, redundant DB queries removed for instant logins, and secure profile updates with atomic operations.
-- **🛠️ Admin Dashboard** — Full moderation panel: create users with rollback on failure, delete questions/materials/users with cascading Cloudinary cleanup, manage study materials, with master admin protection via environment variable configuration.
+- **🛠️ Admin Dashboard** — Full moderation panel: create users with rollback on failure, delete questions/materials/users with cascading storage cleanup (Supabase Storage), manage study materials, with master admin protection via environment variable configuration.
 - **🧩 Centralised SVG Icons** — All reusable icons extracted into `src/components/icons.tsx` with typed props and optional className overrides, eliminating repeated inline SVG markup across components (12 icons total).
 - **🔒 Strict TypeScript** — Replaced all `as any` casts with proper interfaces (`CourseData`, `GroqMessage`, `ContentPart`); all `catch` blocks use `unknown` with `instanceof Error` narrowing; zero compilation errors.
 - **📊 Vercel Analytics** — First-party, privacy-friendly page-view and event tracking integrated via `@vercel/analytics/react`.
@@ -113,8 +113,7 @@ question-bank-app/
 ├── backend/                        # Express REST API server
 │   ├── src/
 │   │   ├── lib/
-│   │   │   ├── supabase.ts         # Supabase admin client singleton
-│   │   │   └── cloudinary.ts       # Cloudinary config, streamUpload, deleteFromCloudinary
+│   │   │   └── supabase.ts         # Supabase admin client singleton & storage helpers
 │   │   ├── middleware/
 │   │   │   └── index.ts            # requireAuth, requireAdmin, rate limiter, multer instances
 │   │   ├── routes/
@@ -179,7 +178,7 @@ Ensure you have the following installed before proceeding:
 - **Node.js** `v18` or higher ([Download](https://nodejs.org/))
 - **npm** `v9` or higher (bundled with Node.js)
 - A **Supabase** project with the `questions` and `study_materials` tables created
-- A **Cloudinary** account for image hosting
+- A **Supabase Storage bucket** named `agri-resources` created and configured for public access (for storing question images)
 - A **Groq** API key for the AI Tutor feature
 
 ---
@@ -226,9 +225,6 @@ cp frontend/.env.example frontend/.env
 | `PORT` | Port for the Express server | No (default: `5000`) |
 | `SUPABASE_URL` | Your Supabase project URL | ✅ Yes |
 | `SUPABASE_SERVICE_KEY` | Supabase **service role** key (bypasses RLS) | ✅ Yes |
-| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name | ✅ Yes |
-| `CLOUDINARY_API_KEY` | Cloudinary API key | ✅ Yes |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret | ✅ Yes |
 | `GROQ_API_KEY` | Groq API key for the AI Tutor | ✅ Yes |
 | `CORS_ORIGIN` | Comma-separated list of allowed origins (e.g., `https://your-app.vercel.app`) | ✅ Yes (Production) |
 | `MASTER_ADMIN_ID` | UUID of the master admin account (protected from deletion) | Recommended |
@@ -237,6 +233,7 @@ cp frontend/.env.example frontend/.env
 > - Never commit your `.env` files. Both are listed in their respective `.gitignore` files.
 > - In production, `CORS_ORIGIN` must be configured to restrict API access to trusted domains only.
 > - Set `MASTER_ADMIN_ID` to protect the primary administrator account from accidental deletion.
+> - **Supabase Storage**: Ensure you have created a public bucket named `agri-resources` in your Supabase project for image storage.
 
 #### Frontend (`frontend/.env`)
 
@@ -286,7 +283,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 |---|---|---|---|
 | `GET` | `/` | None | Health check — returns "API is operational." |
 | `GET` | `/api/contributors` | None | Fetch all contributor profiles (admins & collectors) with avatar URLs |
-| `POST` | `/api/chat-tutor` | None | Send message + optional images (≤5 Cloudinary URLs, max 2000 chars) to the faculty-aware AI Tutor |
+| `POST` | `/api/chat-tutor` | None | Send message + optional images (≤5 image URLs, max 2000 chars) to the faculty-aware AI Tutor |
 
 ### User Endpoints
 
@@ -299,7 +296,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `POST` | `/api/upload` | Collector | Upload question paper images (1-2 files, max 5MB each) to Cloudinary + Supabase |
+| `POST` | `/api/upload` | Collector | Upload question paper images (1-2 files, max 5MB each) to Supabase Storage + database |
 | `POST` | `/api/upload-material` | Collector | Add a book, note, or PDF record with Google Drive link |
 
 ### Admin Endpoints
@@ -308,8 +305,8 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 |---|---|---|---|
 | `GET` | `/api/admin/users` | Admin | List all registered users with roles |
 | `POST` | `/api/admin/create-user` | Admin | Create new admin/collector account with automatic rollback on DB failure |
-| `DELETE` | `/api/admin/users/:id` | Admin | Delete user + auth account + Cloudinary avatar (master admin protected via env var) |
-| `DELETE` | `/api/admin/questions/:id` | Admin | Delete question + all associated Cloudinary images (atomic operation) |
+| `DELETE` | `/api/admin/users/:id` | Admin | Delete user + auth account + Supabase avatar (master admin protected via env var) |
+| `DELETE` | `/api/admin/questions/:id` | Admin | Delete question + all associated Supabase images (atomic operation) |
 | `DELETE` | `/api/admin/materials/:id` | Admin | Delete study material record |
 
 ### Request Examples
@@ -332,7 +329,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - `message`: Required string, 1-2000 characters after trim
 - `faculty`: Optional string, validated against whitelist (`Agricultural Economics`, `Agriculture`, `ASVM`), defaults to `Agricultural Economics` if invalid
 - `history`: Optional array of `{role: 'user' | 'assistant', text: string}`
-- `images`: Optional array of Cloudinary URLs (max 5, must start with `https://res.cloudinary.com/`)
+- `images`: Optional array of image URLs (max 5, must be from Supabase Storage or Cloudinary for backward compatibility)
 
 **Response:**
 ```json
@@ -355,7 +352,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 ```json
 {
   "message": "Resource stored successfully",
-  "data": [{ /* inserted question record */ }]
+  "data": [{ /* inserted question record with Supabase Storage URLs */ }]
 }
 ```
 
@@ -366,7 +363,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - `fullName`: Optional string
 - `bio`: Optional string
 
-**Atomic Operation:** New avatar uploaded → DB updated → Old avatar deleted from Cloudinary. If any step fails, newly uploaded avatar is cleaned up automatically.
+**Atomic Operation:** New avatar uploaded → DB updated → Old avatar deleted from Supabase Storage. If any step fails, newly uploaded avatar is cleaned up automatically.
 
 ---
 
@@ -389,9 +386,12 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 
 **Backend Routes** (`backend/src/routes/`):
 - [`auth.ts`](file://d:\Projects\question-bank-app\backend\src\routes\auth.ts) — User profile CRUD with atomic avatar operations
-- [`uploads.ts`](file://d:\Projects\question-bank-app\backend\src\routes\uploads.ts) — Question images (parallel Cloudinary uploads) and study materials
+- [`uploads.ts`](file://d:\Projects\question-bank-app\backend\src\routes\uploads.ts) — Question images (parallel Supabase uploads) and study materials
 - [`ai.ts`](file://d:\Projects\question-bank-app\backend\src\routes\ai.ts) — Faculty-aware AI tutor with prompt injection protection
 - [`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts) — User/content management with master admin protection
+
+**Storage Utilities** (`backend/src/lib/`):
+- [`cloudinary.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\lib\cloudinary.ts) — Supabase Storage integration (uploadToSupabase, deleteFromStorage)
 
 **Context Providers** (`frontend/src/context/`):
 - [`AuthContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\AuthContext.tsx) — Supabase session management with race condition prevention
@@ -416,18 +416,18 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - [x] **Vercel Analytics** — First-party, privacy-friendly page-view tracking via `@vercel/analytics`
 - [x] **Infinite Scroll Pagination** — Question Bank and Study Materials pages load content in batches of 9 using `IntersectionObserver` with request deduplication via `useRef`
 - [x] **URL-Synced Type Filters** — Study Materials `?type=book/note/pdf` query param preserved on navigation and updated in real-time when dropdown selection changes
-- [x] **Multi-image Question Upload** — Upload multiple pages per question paper (up to 2 images with drag-and-drop, paste support, and instant preview; backend supports up to 10 for future scalability)
+- [x] **Multi-image Question Upload** — Upload multiple pages per question paper (up to 2 images with drag-and-drop, paste support, and instant preview; stored in Supabase Storage)
 - [x] **Global Faculty Architecture** — Context-aware AI tutor with dynamic system prompt generation for 3 faculties (Agricultural Economics, Agriculture, ASVM) supporting up to 5 levels each
 - [x] **Performance Optimizations** — Asynchronous contributor fetching with in-memory Map caching (~60% API call reduction), request deduplication via `useRef`, single state update pattern
 - [x] **Premium Animations** — Unified Framer Motion scroll reveals, canvas-based hero particles, interactive floating badges, smooth page transitions
 - [x] **Study Materials (Books, Notes, PDFs)** — Unified upload and browse system with real-time type counts, cascading filters (Level → Semester → Course)
-- [x] **Backend Modularisation** — `index.ts` split into `lib/` (supabase, cloudinary), `middleware/` (auth, rate limiter, multer), and `routes/` (auth, uploads, ai, admin) layers
+- [x] **Backend Modularisation** — `index.ts` split into `lib/` (supabase, cloudinary/storage), `middleware/` (auth, rate limiter, multer), and `routes/` (auth, uploads, ai, admin) layers
 - [x] **SVG Icon System** — All inline SVGs extracted into a single typed `icons.tsx` component file (12 icons: Moon, Sun, Hamburger, X, ChevronDown, Reset, Expand, ExternalLink, User, EmptyState, Sparkle, Send, Close)
 - [x] **TypeScript Strictness** — Eliminated all `as any` casts with proper interfaces (`CourseData`, `GroqMessage`, `ContentPart`, `AuthenticatedRequest`); all `catch` blocks use `unknown` with `instanceof Error` narrowing; zero compilation errors
 - [x] **Security Hardening** — CORS restrictions (explicit origin whitelist, no fallback to allow-all), environment-based master admin ID, rate limiting with memory protection (max 10k entries, LRU eviction), AI prompt injection prevention (faculty whitelist + input sanitization), atomic resource operations (profile updates, user deletion, question deletion)
 - [x] **Race Condition Prevention** — AuthContext uses `useRef` to track latest user ID, preventing stale async responses from overwriting current role during rapid login/logout cycles
-- [x] **Data Loss Prevention** — Profile updates use try-catch-rollback pattern: upload new avatar → update DB → delete old avatar; if DB fails, newly uploaded avatar is immediately deleted from Cloudinary
-- [x] **Error Handling & Rollbacks** — User creation rolls back auth account if DB insert fails; question/material uploads clean up orphaned Cloudinary files on DB failure
+- [x] **Data Loss Prevention** — Profile updates use try-catch-rollback pattern: upload new avatar → update DB → delete old avatar; if DB fails, newly uploaded avatar is immediately deleted from Supabase Storage
+- [x] **Error Handling & Rollbacks** — User creation rolls back auth account if DB insert fails; question/material uploads clean up orphaned Supabase files on DB failure
 
 ---
 ## 🔒 Security & Performance Improvements
@@ -460,16 +460,16 @@ This project follows industry best practices for security, performance, and data
 - **Whitelist Validation**: Faculty names validated against dynamic whitelist from [`courseData`](file://d:\Projects\question-bank-app\frontend\src\data.ts) (currently: `Agricultural Economics`, `Agriculture`, `ASVM`)
 - **Dual-Layer Protection**: Both client-side context and server-side AI route validate independently
 - **Input Sanitization**: Message trimmed, length-checked (1-2000 chars), empty strings rejected
-- **URL Validation**: Image URLs must start with `https://res.cloudinary.com/` (max 5)
+- **URL Validation**: Image URLs must be from Supabase Storage (`supabase.co/storage/v1/object/public/`) or Cloudinary for backward compatibility (max 5)
 - **Graceful Degradation**: Invalid faculty attempts logged with attempted value, defaulted to "Agricultural Economics"
 - **Impact**: Prevents attackers from manipulating AI behavior via crafted faculty names in localStorage or API requests
 
 #### 5. Atomic Resource Operations
 - **Profile Updates** ([`auth.ts`](file://d:\Projects\question-bank-app\backend\src\routes\auth.ts#L26-L79)): Upload new avatar → Update DB → Delete old avatar; rollback deletes new upload if DB fails
 - **User Deletion** ([`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L84-L119)): Delete auth + DB record → Delete avatar; avatar only deleted after DB confirms
-- **Question Deletion** ([`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L121-L147)): Delete DB record → Delete all Cloudinary images; images only deleted after DB confirms
+- **Question Deletion** ([`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L121-L147)): Delete DB record → Delete all Supabase images; images only deleted after DB confirms
 - **User Creation** ([`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L44-L77)): Create auth account → Insert DB record; rollback deletes auth account if DB fails
-- **Impact**: Zero data loss on failures, no orphaned Cloudinary files
+- **Impact**: Zero data loss on failures, no orphaned storage files
 
 ### Performance Optimizations
 
@@ -552,7 +552,7 @@ This project follows industry best practices for security, performance, and data
 - **Check 2**: Ensure faculty is set to one of: `Agricultural Economics`, `Agriculture`, or `ASVM`
 - **Check 3**: Inspect backend console for `[AI]` error logs
 - **Check 4**: Verify message length is under 2000 characters
-- **Check 5**: Ensure image URLs (if any) start with `https://res.cloudinary.com/`
+- **Check 5**: Ensure image URLs (if any) are from Supabase Storage or Cloudinary (for backward compatibility)
 
 #### Study Materials Showing "Unknown" Contributors
 **Symptoms**: All materials show "Unknown" instead of uploader names
@@ -564,10 +564,10 @@ This project follows industry best practices for security, performance, and data
 
 #### Profile Avatar Not Updating
 **Symptoms**: Upload succeeds but old avatar persists
-- **Cause**: Cloudinary deletion failed or CDN caching
+- **Cause**: Supabase Storage deletion failed or CDN caching
 - **Solution 1**: Hard refresh browser (Ctrl+Shift+R / Cmd+Shift+R)
 - **Solution 2**: Check backend logs for `[Rollback]` messages indicating DB failure
-- **Solution 3**: Verify Cloudinary API credentials are correct
+- **Solution 3**: Verify Supabase credentials and bucket permissions are correct
 - **Prevention**: Atomic operation ensures either both succeed or both fail cleanly
 
 #### Rate Limiting Triggered Unexpectedly
@@ -646,8 +646,7 @@ SOFTWARE.
 
 ## 🙏 Acknowledgments
 
-- [Supabase](https://supabase.com/) — Open-source Firebase alternative powering auth and the database
-- [Cloudinary](https://cloudinary.com/) — Cloud-based image management for question paper uploads
+- [Supabase](https://supabase.com/) — Open-source Firebase alternative powering auth, database, and image storage
 - [Groq](https://groq.com/) — Ultra-fast LLM inference powering the AI Tutor (Llama 4 Scout)
 - [Vercel](https://vercel.com/) — Seamless frontend hosting, deployment, and analytics
 - [Render](https://render.com/) — Reliable backend hosting for the Express API

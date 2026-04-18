@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../lib/supabase';
-import { deleteFromCloudinary, streamUpload } from '../lib/cloudinary';
+import { deleteFromStorage, uploadToSupabase } from '../lib/cloudinary';
 import { requireAuth, uploadAvatar, AuthenticatedRequest } from '../middleware';
 
 const router = Router();
@@ -27,7 +27,7 @@ router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: 
   const { fullName, bio } = req.body;
   const { userId } = req as AuthenticatedRequest;
   
-  // 🛡️ Rollback এর জন্য ভেরিয়েবলটি try ব্লকের বাইরে রাখা হলো
+  // 🛡️ Rollback এর জন্য ভেরিয়েবলটি try ব্লকের বাইরে রাখা হলো
   let avatarUrl: string | null = null; 
 
   try {
@@ -38,8 +38,8 @@ router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: 
       .single();
 
     if (req.file) {
-      const result = await streamUpload(req.file.buffer, 'user_avatars');
-      avatarUrl = result.secure_url;
+      const fileName = `user_avatars/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      avatarUrl = await uploadToSupabase(req.file.buffer, fileName, 'image/jpeg');
     }
 
     const updateData: Record<string, string | null> = {};
@@ -53,22 +53,22 @@ router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: 
       .eq('id', userId)
       .select();
 
-    // ডাটাবেস আপডেট ফেইল করলে সাথে সাথে catch ব্লকে পাঠিয়ে দেবে
+    // ডাটাবেস আপডেট ফেইল করলে সাথে সাথে catch ব্লকে পাঠিয়ে দেবে
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('User profile not found for update.');
 
     // 🛡️ Issue #8 Fix: ডাটাবেস ১০০% সাকসেসফুল হলে তবেই ইউজারের "পুরনো" ছবি ডিলিট হবে
     if (avatarUrl && existingUser?.avatar_url) {
-      await deleteFromCloudinary(existingUser.avatar_url, 'user_avatars').catch(() => {});
+      await deleteFromStorage(existingUser.avatar_url).catch(() => {});
     }
 
     res.status(200).json({ message: 'Profile updated', user: data[0] });
   } catch (err: unknown) {
-    // 🛡️ ROLLBACK: ডাটাবেস ফেইল করেছে, কিন্তু ছবি Cloudinary তে উঠে গেছে! 
-    // তাই "নতুন আপলোড হওয়া" ছবিটা সাথে সাথে ক্লাউডিনারি থেকে মুছে দাও, যাতে স্টোরেজ ফুল না হয়।
+    // 🛡️ ROLLBACK: ডাটাবেস ফেইল করেছে, কিন্তু ছবি Supabase Storage-এ উঠে গেছে! 
+    // তাই "নতুন আপলোড হওয়া" ছবিটা সাথে সাথে মুছে দাও, যাতে স্টোরেজ ফুল না হয়।
     if (avatarUrl) {
-      console.warn(`[Rollback] DB update failed. Deleting orphaned avatar from Cloudinary: ${avatarUrl}`);
-      await deleteFromCloudinary(avatarUrl, 'user_avatars').catch(() => {});
+      console.warn(`[Rollback] DB update failed. Deleting orphaned avatar from Supabase: ${avatarUrl}`);
+      await deleteFromStorage(avatarUrl).catch(() => {});
     }
 
     const msg = err instanceof Error ? err.message : 'Profile update failed';

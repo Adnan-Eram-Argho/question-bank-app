@@ -9,9 +9,6 @@ dotenv.config();
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
   throw new Error('Missing required Supabase environment variables.');
 }
-if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-  throw new Error('Missing required Cloudinary environment variables.');
-}
 if (!process.env.GROQ_API_KEY) {
   throw new Error('Missing required GROQ_API_KEY.');
 }
@@ -38,24 +35,19 @@ console.log(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // !origin মানে হলো সার্ভার-টু-সার্ভার বা মোবাইল অ্যাপের রিকোয়েস্ট (যেগুলো ব্রাউজার থেকে আসে না)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        // অন্য কোনো ওয়েবসাইট (যেমন হ্যাকারদের সাইট) রিকোয়েস্ট করলে ব্লক করে দেবে!
-        console.warn(`[CORS Blocked] Unauthorized origin attempted access: ${origin}`);
-        callback(new Error('Blocked by CORS policy')); 
-      }
-    },
-    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log(`[Request] ${req.method} ${req.path} from ${req.headers.origin || 'no-origin'}`);
+  next();
+});
 
 // Minimal security headers
 app.use((_req, res, next) => {
@@ -83,6 +75,7 @@ app.use('/api', adminRouter);
 // ── Global error handler ──────────────────────────────────────────────────────
 
 app.use((err: unknown, _req: Request, res: Response, _next: express.NextFunction) => {
+  console.error('[Unhandled Error]', err);
   if (err instanceof multer.MulterError) {
     res.status(400).json({ error: `Upload rejected: ${err.message}` });
     return;
@@ -91,7 +84,6 @@ app.use((err: unknown, _req: Request, res: Response, _next: express.NextFunction
     res.status(400).json({ error: err.message });
     return;
   }
-  console.error('[Unhandled Error]', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../lib/supabase';
-import { deleteFromCloudinary } from '../lib/cloudinary';
+import { deleteFromStorage } from '../lib/cloudinary';
 import { requireAuth, requireAdmin, AuthenticatedRequest } from '../middleware';
 
 const router = Router();
@@ -111,7 +111,7 @@ router.delete('/users/:id', requireAuth, requireAdmin, async (req: Request, res:
 
     // Delete avatar only AFTER DB confirms deletion
     if (user?.avatar_url) {
-      await deleteFromCloudinary(user.avatar_url, 'user_avatars').catch(() => {});
+      await deleteFromStorage(user.avatar_url).catch(() => {});
     }
 
     res.status(200).json({ message: 'User deleted' });
@@ -139,9 +139,9 @@ router.delete('/questions/:id', requireAuth, requireAdmin, async (req: Request, 
 
     // Delete images only AFTER DB confirms deletion
     if (question?.image_urls?.length > 0) {
-      await Promise.all(question.image_urls.map((url: string) => deleteFromCloudinary(url, 'question_bank').catch(() => {})));
+      await Promise.all(question.image_urls.map((url: string) => deleteFromStorage(url).catch(() => {})));
     } else if (question?.image_url) {
-      await deleteFromCloudinary(question.image_url, 'question_bank').catch(() => {});
+      await deleteFromStorage(question.image_url).catch(() => {});
     }
 
     res.status(200).json({ message: 'Question deleted' });

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../lib/supabase';
-import { deleteFromCloudinary, streamUpload } from '../lib/cloudinary';
+import { deleteFromStorage, uploadToSupabase } from '../lib/cloudinary';
 import { requireAuth, uploadQuestions, AuthenticatedRequest } from '../middleware';
 
 const router = Router();
@@ -21,8 +21,10 @@ router.post('/upload', requireAuth, uploadQuestions.array('images', 10), async (
 
   try {
     // Upload all pages in parallel; order is preserved by Promise.all
-    const results = await Promise.all(files.map((f) => streamUpload(f.buffer, 'question_bank')));
-    const imageUrls = results.map((r) => r.secure_url);
+    const imageUrls = await Promise.all(files.map((f) => {
+      const fileName = `question_bank/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      return uploadToSupabase(f.buffer, fileName, 'image/jpeg');
+    }));
 
     const { data, error } = await supabase
       .from('questions')
@@ -39,9 +41,9 @@ router.post('/upload', requireAuth, uploadQuestions.array('images', 10), async (
       .select();
 
     if (error) {
-      // Clean up orphaned Cloudinary images if DB insert fails
+      // Clean up orphaned Supabase images if DB insert fails
       for (const url of imageUrls) {
-        await deleteFromCloudinary(url, 'question_bank').catch(() => {});
+        await deleteFromStorage(url).catch(() => {});
       }
       throw error;
     }

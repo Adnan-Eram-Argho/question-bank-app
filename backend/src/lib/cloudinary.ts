@@ -1,39 +1,61 @@
-import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import streamifier from 'streamifier';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+import path from 'path';
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-  api_key: process.env.CLOUDINARY_API_KEY!,
-  api_secret: process.env.CLOUDINARY_API_SECRET!,
-});
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-export { cloudinary };
-
-/** Wraps Cloudinary's callback-based upload_stream in a Promise. */
-export const streamUpload = (fileBuffer: Buffer, folder: string): Promise<UploadApiResponse> =>
-  new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream({ folder }, (error, result) => {
-      if (result) resolve(result);
-      else reject(error);
-    });
-    streamifier.createReadStream(fileBuffer).pipe(stream);
-  });
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
+const BUCKET_NAME = 'agri-resources';
 
 /**
- * Extracts the Cloudinary public_id from a secure URL and calls destroy().
- * Silently logs on failure so a bad URL never crashes a delete route.
+ * Upload file to Supabase Storage and return public URL
+ * @param fileBuffer - The file buffer to upload
+ * @param fileName - The destination path in the bucket (e.g., 'folder/file.jpg')
+ * @param contentType - MIME type of the file
+ * @returns Public URL of the uploaded file
  */
-export const deleteFromCloudinary = async (imageUrl: string | null, folder: string): Promise<void> => {
-  if (!imageUrl) return;
+export const uploadToSupabase = async (
+  fileBuffer: Buffer,
+  fileName: string,
+  contentType: string = 'image/jpeg'
+): Promise<string> => {
+  const { data, error } = await supabase.storage
+    .from(BUCKET_NAME)
+    .upload(fileName, fileBuffer, {
+      contentType,
+      upsert: true,
+    });
+
+  if (error) throw new Error(`Upload failed: ${error.message}`);
+
+  const { data: publicUrlData } = supabase.storage
+    .from(BUCKET_NAME)
+    .getPublicUrl(data.path);
+
+  return publicUrlData.publicUrl;
+};
+
+/**
+ * Delete file from Supabase Storage by URL
+ * @param imageUrl - The full public URL of the file to delete
+ */
+export const deleteFromStorage = async (imageUrl: string | null): Promise<void> => {
+  if (!imageUrl || !imageUrl.includes('supabase.co')) return;
+  
   try {
-    const parts = imageUrl.split('/');
-    const folderIndex = parts.findIndex((p) => p === folder);
-    if (folderIndex === -1) return;
-    const withExt = parts.slice(folderIndex).join('/');
-    const lastDot = withExt.lastIndexOf('.');
-    const publicId = lastDot !== -1 ? withExt.substring(0, lastDot) : withExt;
-    await cloudinary.uploader.destroy(publicId);
+    const pathParts = imageUrl.split(`/${BUCKET_NAME}/`);
+    if (pathParts.length < 2) return;
+    
+    const filePath = decodeURIComponent(pathParts[1]);
+    
+    const { error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .remove([filePath]); 
+
+    if (error) console.error('[Storage] Delete failed:', error.message);
+    else console.log(`🗑️ [Storage] Successfully deleted: ${filePath}`);
+    
   } catch (err) {
-    console.error(`[Cloudinary] Deletion failed for URL: ${imageUrl}`, err);
+    console.error('[Storage] Delete error:', err);
   }
 };
