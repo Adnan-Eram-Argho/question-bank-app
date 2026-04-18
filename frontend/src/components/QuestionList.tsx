@@ -172,6 +172,10 @@ const QuestionList = () => {
     // 🛡️ Add requestIdRef to prevent race conditions during rapid filter changes
     const requestIdRef = useRef(0);
 
+    // Stats states
+    const [stats, setStats] = useState({ questions: 0, courses: 0, contributors: 0 });
+    const [statsLoading, setStatsLoading] = useState(true);
+
     const [filterLevel, setFilterLevel] = useState('');
     const [filterSemester, setFilterSemester] = useState('');
     const [filterCourse, setFilterCourse] = useState('');
@@ -179,6 +183,63 @@ const QuestionList = () => {
 
     const [availableSemesters, setAvailableSemesters] = useState<string[]>([]);
     const [availableCourses, setAvailableCourses] = useState<string[]>([]);
+
+    // Calculate total unique courses from data.ts
+    const calculateTotalCourses = useCallback(() => {
+        const allCourses = new Set<string>();
+        Object.values(courseData).forEach((facultyData) => {
+            Object.values(facultyData).forEach((levelData) => {
+                Object.values(levelData).forEach((courses: string[]) => {
+                    courses.forEach(course => allCourses.add(course));
+                });
+            });
+        });
+        return allCourses.size;
+    }, []);
+
+    // Fetch stats on component mount
+    useEffect(() => {
+        const fetchStats = async () => {
+            setStatsLoading(true);
+            try {
+                const API_URL = import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com';
+                
+                // Calculate courses from data.ts (static but comprehensive)
+                const totalCourses = calculateTotalCourses();
+                
+                // Fetch questions count from database
+                const { count: questionsCount } = await supabase
+                    .from('questions')
+                    .select('*', { count: 'exact', head: true });
+
+                // Fetch contributors count from API
+                const contributorsResponse = await fetch(`${API_URL}/api/contributors`);
+                let contributorsCount = 0;
+                if (contributorsResponse.ok) {
+                    const contributorsData = await contributorsResponse.json();
+                    contributorsCount = contributorsData.length;
+                }
+
+                setStats({
+                    questions: questionsCount || 0,
+                    courses: totalCourses,
+                    contributors: contributorsCount
+                });
+            } catch (err) {
+                console.error('[QuestionList] Failed to fetch stats:', err);
+                // Fallback to calculated courses even if API fails
+                setStats({
+                    questions: 0,
+                    courses: calculateTotalCourses(),
+                    contributors: 0
+                });
+            } finally {
+                setStatsLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, [calculateTotalCourses]);
 
     useEffect(() => {
         setFilterLevel('');
@@ -210,7 +271,6 @@ const QuestionList = () => {
         }
         setFilterCourse('');
     }, [filterLevel, filterSemester]);
-
     const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
     const enrichWithContributors = useCallback(async (fetchedQuestions: Question[]) => {
@@ -433,9 +493,28 @@ const QuestionList = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.45, ease: 'easeOut' }}
                     >
-                        <StatCounter to={385} label="Questions" />
-                        <StatCounter to={58} label="Courses" />
-                        <StatCounter to={6} label="Contributors" />
+                        {statsLoading ? (
+                            <>
+                                <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500 mb-2"></div>
+                                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">Loading...</span>
+                                </div>
+                                <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500 mb-2"></div>
+                                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">Loading...</span>
+                                </div>
+                                <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500 mb-2"></div>
+                                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">Loading...</span>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <StatCounter to={stats.questions} label="Questions" />
+                                <StatCounter to={stats.courses} label="Courses" />
+                                <StatCounter to={stats.contributors} label="Contributors" />
+                            </>
+                        )}
                     </motion.div>
                 </div>
             </div>

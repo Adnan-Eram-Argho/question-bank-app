@@ -53,7 +53,6 @@ export const deleteFromStorage = async (imageUrl: string | null): Promise<void> 
       .remove([filePath]); 
 
     if (error) console.error('[Storage] Delete failed:', error.message);
-    else console.log(`🗑️ [Storage] Successfully deleted: ${filePath}`);
     
   } catch (err) {
     console.error('[Storage] Delete error:', err);

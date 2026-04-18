@@ -28,10 +28,7 @@ app.set('trust proxy', 1);
 // 🛡️ Issue #4 Fix: Strict CORS Configuration
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
-  : ['http://localhost:5173']; // .env না থাকলে ডিফল্টভাবে শুধু তোমার লোকাল পিসি অ্যালাও করবে, পুরো দুনিয়া নয়!
-
-// Log allowed origins on startup for debugging
-console.log(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
+  : ['http://localhost:5173']; // Default to localhost if .env not set - restricts access for security
 
 app.use(
   cors({
@@ -43,11 +40,6 @@ app.use(
 );
 
 app.use(express.json());
-
-app.use((req, res, next) => {
-  console.log(`[Request] ${req.method} ${req.path} from ${req.headers.origin || 'no-origin'}`);
-  next();
-});
 
 // Minimal security headers
 app.use((_req, res, next) => {

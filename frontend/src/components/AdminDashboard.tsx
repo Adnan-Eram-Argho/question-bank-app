@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { courseData } from '../data';
 import { supabase } from '../lib/supabaseClient';
 import { useFaculty } from '../context/FacultyContext';
+import toast from 'react-hot-toast';
 
 export interface UserProfile {
     id: string;
@@ -58,6 +59,10 @@ const AdminDashboard: React.FC = () => {
     const [mType, setMType] = useState('');
     const [mAvailableSemesters, setMAvailableSemesters] = useState<string[]>([]);
     const [mAvailableCourses, setMAvailableCourses] = useState<string[]>([]);
+    
+    // Loading states
+    const [questionsLoading, setQuestionsLoading] = useState(false);
+    const [materialsLoading, setMaterialsLoading] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -145,6 +150,7 @@ const AdminDashboard: React.FC = () => {
     };
 
     const fetchQuestions = async () => {
+        setQuestionsLoading(true);
         try {
             let query = supabase.from('questions').select('*').order('created_at', { ascending: false });
             if (qLevel) query = query.eq('level', qLevel);
@@ -153,10 +159,16 @@ const AdminDashboard: React.FC = () => {
             const { data, error } = await query;
             if (error) throw error;
             setQuestions(data || []);
-        } catch (err) { console.error('[AdminDashboard] Failed to load questions:', err); }
+        } catch (err) { 
+            console.error('[AdminDashboard] Failed to load questions:', err); 
+            toast.error('Failed to load questions');
+        } finally {
+            setQuestionsLoading(false);
+        }
     };
 
     const fetchMaterials = async () => {
+        setMaterialsLoading(true);
         try {
             let query = supabase.from('study_materials').select('*').order('created_at', { ascending: false });
             if (mLevel) query = query.eq('level', mLevel);
@@ -166,7 +178,12 @@ const AdminDashboard: React.FC = () => {
             const { data, error } = await query;
             if (error) throw error;
             setMaterials(data || []);
-        } catch (err) { console.error('[AdminDashboard] Failed to load materials:', err); }
+        } catch (err) { 
+            console.error('[AdminDashboard] Failed to load materials:', err); 
+            toast.error('Failed to load materials');
+        } finally {
+            setMaterialsLoading(false);
+        }
     };
 
     // ── Delete handlers ──
@@ -202,11 +219,14 @@ const AdminDashboard: React.FC = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
             fetchUsers();
-        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Failed to delete user'); }
+            toast.success('User deleted successfully');
+        } catch (err: unknown) { 
+            toast.error(err instanceof Error ? err.message : 'Failed to delete user'); 
+        }
     };
 
     const handleDeleteQuestion = async (questionId: number) => {
-        if (!window.confirm('Delete this question? The image will also be removed from Cloudinary.')) return;
+        if (!window.confirm('Delete this question? The image will also be removed from storage.')) return;
         try {
             const accessToken = await getAccessToken();
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/admin/questions/${questionId}`, {
@@ -216,7 +236,10 @@ const AdminDashboard: React.FC = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error);
             fetchQuestions();
-        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Failed to delete question'); }
+            toast.success('Question deleted successfully');
+        } catch (err: unknown) { 
+            toast.error(err instanceof Error ? err.message : 'Failed to delete question'); 
+        }
     };
 
     const handleDeleteMaterial = async (materialId: string, title: string) => {
@@ -230,7 +253,10 @@ const AdminDashboard: React.FC = () => {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Failed to delete material');
             fetchMaterials();
-        } catch (err: unknown) { alert(err instanceof Error ? err.message : 'Failed to delete material'); }
+            toast.success('Material deleted successfully');
+        } catch (err: unknown) { 
+            toast.error(err instanceof Error ? err.message : 'Failed to delete material'); 
+        }
     };
 
     if (!user) return null;
@@ -240,6 +266,50 @@ const AdminDashboard: React.FC = () => {
         { id: 'questions' as const, label: 'Questions' },
         { id: 'materials' as const, label: 'Materials' },
     ];
+
+    // Loading Skeleton Component
+    const LoadingSkeleton = () => (
+        <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm animate-pulse">
+                    <div className="flex gap-4">
+                        <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg flex-shrink-0"></div>
+                        <div className="flex-1 space-y-3">
+                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                            <div className="flex gap-2 mt-4">
+                                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
+                                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
+    // Materials Loading Skeleton
+    const MaterialsLoadingSkeleton = () => (
+        <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm animate-pulse">
+                    <div className="flex items-center justify-between">
+                        <div className="flex-1 space-y-3">
+                            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                            <div className="flex gap-2 mt-3">
+                                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16"></div>
+                                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16"></div>
+                                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16"></div>
+                            </div>
+                        </div>
+                        <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
 
     return (
         <div className="p-4 sm:p-6 space-y-8 animate-fade-in max-w-7xl mx-auto">
@@ -405,47 +475,53 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-center mb-2 px-1">
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}
-                        </p>
-                    </div>
+                    {/* Results Header */}
+                    {!questionsLoading && questions.length > 0 && (
+                        <div className="flex justify-between items-center mb-2 px-1">
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}
+                            </p>
+                        </div>
+                    )}
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                        {questions.map(q => (
-                            <div key={q.id} className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden relative group hover:shadow-lg transition-all duration-300 flex flex-col">
-                                <div className="relative h-40 bg-gray-100 dark:bg-gray-900">
-                                    <img src={q.image_url || (q.image_urls && q.image_urls[0]) || ''} alt="Q" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                    {q.image_urls && q.image_urls.length > 1 && (
-                                        <div className="absolute top-2 right-2 bg-gray-900/70 backdrop-blur-md text-white px-2 py-1 text-[10px] font-bold rounded shadow-sm z-10 flex items-center gap-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                            {q.image_urls.length} Pages
+                    {/* Content Area */}
+                    {questionsLoading ? (
+                        <LoadingSkeleton />
+                    ) : questions.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                            {questions.map(q => (
+                                <div key={q.id} className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden relative group hover:shadow-lg transition-all duration-300 flex flex-col">
+                                    <div className="relative h-40 bg-gray-100 dark:bg-gray-900">
+                                        <img src={q.image_url || (q.image_urls && q.image_urls[0]) || ''} alt="Q" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        {q.image_urls && q.image_urls.length > 1 && (
+                                            <div className="absolute top-2 right-2 bg-gray-900/70 backdrop-blur-md text-white px-2 py-1 text-[10px] font-bold rounded shadow-sm z-10 flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                {q.image_urls.length} Pages
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
+                                            <button onClick={() => handleDeleteQuestion(q.id)} className="bg-red-600 hover:bg-red-700 text-white p-2.5 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-300" title="Delete Question">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
                                         </div>
-                                    )}
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
-                                        <button onClick={() => handleDeleteQuestion(q.id)} className="bg-red-600 hover:bg-red-700 text-white p-2.5 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-300" title="Delete Question">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                        </button>
+                                    </div>
+                                    <div className="p-4 flex-grow flex flex-col">
+                                        <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 mb-2 leading-tight">{q.course_name}</p>
+                                        <div className="mt-auto flex justify-between items-center">
+                                            <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${q.question_type === 'Theory' ? 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50' : 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/50'}`}>
+                                                {q.question_type}
+                                            </span>
+                                            <span className="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">{q.level} • {q.semester}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="p-4 flex-grow flex flex-col">
-                                    <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-2 mb-2 leading-tight">{q.course_name}</p>
-                                    <div className="mt-auto flex justify-between items-center">
-                                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${q.question_type === 'Theory' ? 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800/50' : 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/50'}`}>
-                                            {q.question_type}
-                                        </span>
-                                        <span className="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">{q.level} • {q.semester}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {questions.length === 0 && (
+                            ))}
+                        </div>
+                    ) : (
                         <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Content Found</h3>
-                            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">There are no questions matching the current filter criteria.</p>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Questions Found</h3>
+                            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">There are no questions matching the current filter criteria. Try adjusting your filters.</p>
                         </div>
                     )}
                 </div>
@@ -505,11 +581,13 @@ const AdminDashboard: React.FC = () => {
                     </div>
 
                     {/* Materials list — table layout for easy admin scanning */}
-                    {materials.length === 0 ? (
+                    {materialsLoading ? (
+                        <MaterialsLoadingSkeleton />
+                    ) : materials.length === 0 ? (
                         <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
                             <div className="text-4xl mb-4">📚</div>
                             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Materials Found</h3>
-                            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">No books or notes match the current filter criteria.</p>
+                            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">No books or notes match the current filter criteria. Try adjusting your filters.</p>
                         </div>
                     ) : (
                         <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">

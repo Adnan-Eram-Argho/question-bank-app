@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../lib/supabase';
-import { deleteFromStorage, uploadToSupabase } from '../lib/cloudinary';
+import { deleteFromStorage, uploadToSupabase } from '../lib/storage';
 import { requireAuth, uploadAvatar, AuthenticatedRequest } from '../middleware';
 
 const router = Router();
@@ -27,7 +27,7 @@ router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: 
   const { fullName, bio } = req.body;
   const { userId } = req as AuthenticatedRequest;
   
-  // 🛡️ Rollback এর জন্য ভেরিয়েবলটি try ব্লকের বাইরে রাখা হলো
+  // 🛡️ Variable declared outside try block for rollback support
   let avatarUrl: string | null = null; 
 
   try {
@@ -53,19 +53,19 @@ router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: 
       .eq('id', userId)
       .select();
 
-    // ডাটাবেস আপডেট ফেইল করলে সাথে সাথে catch ব্লকে পাঠিয়ে দেবে
+    // Immediately throw to catch block if database update fails
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('User profile not found for update.');
 
-    // 🛡️ Issue #8 Fix: ডাটাবেস ১০০% সাকসেসফুল হলে তবেই ইউজারের "পুরনো" ছবি ডিলিট হবে
+    // 🛡️ Issue #8 Fix: Only delete old avatar after 100% successful database update
     if (avatarUrl && existingUser?.avatar_url) {
       await deleteFromStorage(existingUser.avatar_url).catch(() => {});
     }
 
     res.status(200).json({ message: 'Profile updated', user: data[0] });
   } catch (err: unknown) {
-    // 🛡️ ROLLBACK: ডাটাবেস ফেইল করেছে, কিন্তু ছবি Supabase Storage-এ উঠে গেছে! 
-    // তাই "নতুন আপলোড হওয়া" ছবিটা সাথে সাথে মুছে দাও, যাতে স্টোরেজ ফুল না হয়।
+    // 🛡️ ROLLBACK: Database failed but image was uploaded to Supabase Storage!
+    // Delete the newly uploaded avatar immediately to prevent storage bloat.
     if (avatarUrl) {
       console.warn(`[Rollback] DB update failed. Deleting orphaned avatar from Supabase: ${avatarUrl}`);
       await deleteFromStorage(avatarUrl).catch(() => {});

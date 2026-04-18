@@ -15,8 +15,8 @@ import Profile from './components/Profile';
 import AnimatedBackground from './components/AnimatedBackground';
 import PageTransition from './components/PageTransition';
 
-// ১. এই লাইনটি নতুন যোগ করা হয়েছে
-import { Analytics } from '@vercel/analytics/react'; 
+// New addition: Analytics for production monitoring
+import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from 'react-hot-toast';
 
 const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode, allowedRoles: string[] }) => {

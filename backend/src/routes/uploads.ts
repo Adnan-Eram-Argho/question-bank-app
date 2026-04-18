@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { supabase } from '../lib/supabase';
-import { deleteFromStorage, uploadToSupabase } from '../lib/cloudinary';
+import { deleteFromStorage, uploadToSupabase } from '../lib/storage';
 import { requireAuth, uploadQuestions, AuthenticatedRequest } from '../middleware';
 
 const router = Router();
