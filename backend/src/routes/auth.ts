@@ -38,7 +38,7 @@ router.post('/profile', requireAuth, uploadAvatar.single('avatar'), async (req: 
       .single();
 
     if (req.file) {
-      const fileName = `user_avatars/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      const fileName = `avatars/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
       avatarUrl = await uploadToSupabase(req.file.buffer, fileName, 'image/jpeg');
     }
 

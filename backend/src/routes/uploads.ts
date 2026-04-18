@@ -22,7 +22,7 @@ router.post('/upload', requireAuth, uploadQuestions.array('images', 10), async (
   try {
     // Upload all pages in parallel; order is preserved by Promise.all
     const imageUrls = await Promise.all(files.map((f) => {
-      const fileName = `question_bank/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      const fileName = `questions/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
       return uploadToSupabase(f.buffer, fileName, 'image/jpeg');
     }));
 
