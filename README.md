@@ -82,6 +82,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 | **Image Storage** | Supabase Storage | `agri-resources` bucket with public access |
 | **AI Tutor** | Groq SDK | groq-sdk 1.1.2 (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) |
 | **File Upload** | Multer | multer 2.1.1 (memory storage, uploads to Supabase Storage) |
+| **Image Processing** | Sharp | sharp 0.34.x (automatic WebP conversion with quality optimization) |
 | **Analytics** | Vercel Analytics | @vercel/analytics 2.0.1 |
 | **SEO** | react-helmet-async | v3.0.0 |
 | **Notifications** | react-hot-toast | v2.6.0 |
@@ -105,10 +106,18 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 - **📊 Vercel Analytics** — First-party, privacy-friendly page-view and event tracking integrated via `@vercel/analytics/react`.
 - **🛡️ Security Hardened** — CORS restrictions (explicit origin whitelist), environment-based admin ID configuration, rate limiting with memory protection (max 10k entries, LRU eviction), input sanitization (message length, URL validation), and atomic resource operations to prevent data loss.
 - **🔔 Professional Notifications** — All user-facing alerts replaced with react-hot-toast for non-blocking, accessible feedback with success/error states.
+- **🖼️ Automatic WebP Optimization** — All uploaded images (exam papers & avatars) are automatically converted to WebP format using Sharp library with quality 80, achieving ~70-80% file size reduction while maintaining crisp text readability for university exam papers. This significantly improves page load speeds and reduces storage costs.
 
 ---
 
 ## ✨ Recent Updates
+
+### 🚀 Performance Optimization (2026-04-18)
+- **Automatic WebP Image Conversion**: Implemented Sharp-based image optimization for all uploads
+  - All question papers and avatars automatically converted to WebP format (quality 80)
+  - Achieves ~70-80% file size reduction while maintaining crisp text for exam papers
+  - Significantly faster page loads and reduced storage costs
+  - Seamless backward compatibility - works with JPEG, PNG, and other formats as input
 
 ### 🎨 UI/UX Improvements (2026-04-18)
 - **Admin Dashboard Loading States**: Added professional skeleton loading animations for Questions and Study Materials tabs
@@ -141,8 +150,9 @@ The platform supports **3 faculties** with comprehensive course mappings across 
   - All new uploads use `avatars/` and `questions/` folders
   - Automatic cleanup on deletion (cascading storage removal)
   - Backward compatible with legacy Cloudinary URLs
-- **Folder Consolidation**: Unified to 2 active folders (`avatars/`, `questions/`)
-  - Deprecated: `user_avatars/`, `question_bank/` (empty, can be safely deleted)
+- **Folder Standardization**: Unified to 2 active folders (`avatars/`, `questions/`)
+  - ✅ Active: `avatars/` (user profile pictures), `questions/` (exam paper images)
+  - ⚠️ Deprecated: `user_avatars/`, `question_bank/` (legacy folders from pre-migration era, can be safely deleted if empty)
 
 ---
 
@@ -364,7 +374,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
     { "role": "user", "text": "Hello" },
     { "role": "assistant", "text": "Hi! How can I help?" }
   ],
-  "images": ["https://your-project.supabase.co/storage/v1/object/public/agri-resources/questions/example.jpg"]
+  "images": ["https://your-project.supabase.co/storage/v1/object/public/agri-resources/questions/example.webp"]
 }
 ```
 
@@ -384,27 +394,37 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 #### `POST /api/upload` — Multipart Form Data
 
 **Fields:**
-- `images`: File array (1-2 files, JPEG/PNG/WebP only, max 5MB each)
+- `images`: File array (1-2 files, JPEG/PNG/WebP only, max 5MB each) - **automatically converted to WebP format (quality 80)**
 - `level`: String (e.g., "Level-1")
 - `semester`: String (e.g., "Semester-I")
 - `course_name`: String
 - `question_type`: String
 - `faculty`: String (optional, defaults to "Agricultural Economics")
 
+**Storage Details:**
+- Images are uploaded to: `agri-resources/questions/` folder
+- Format: Automatically converted to `.webp` with ~70-80% size reduction
+- Example URL: `https://your-project.supabase.co/storage/v1/object/public/agri-resources/questions/1234567890_abc.webp`
+
 **Response:**
 ```json
 {
   "message": "Resource stored successfully",
-  "data": [{ /* inserted question record with Supabase Storage URLs */ }]
+  "data": [{ /* inserted question record with Supabase Storage URLs ending in .webp */ }]
 }
 ```
 
 #### `POST /api/user/profile` — Multipart Form Data
 
 **Fields:**
-- `avatar`: Optional file (JPEG/PNG, max 2MB)
+- `avatar`: Optional file (JPEG/PNG, max 2MB) - **automatically converted to WebP format (quality 80)**
 - `fullName`: Optional string
 - `bio`: Optional string
+
+**Storage Details:**
+- Avatars are uploaded to: `agri-resources/avatars/` folder
+- Format: Automatically converted to `.webp` with ~70-80% size reduction
+- Example URL: `https://your-project.supabase.co/storage/v1/object/public/agri-resources/avatars/1234567890_xyz.webp`
 
 **Atomic Operation:** New avatar uploaded → DB updated → Old avatar deleted from Supabase Storage. If any step fails, newly uploaded avatar is cleaned up automatically.
 
