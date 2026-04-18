@@ -22,6 +22,7 @@
 - [About The Project](#about-the-project)
 - [Tech Stack](#tech-stack)
 - [Key Features](#key-features)
+- [Recent Updates](#recent-updates) ✨
 - [Folder Structure](#folder-structure)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -78,7 +79,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 | **Routing** | React Router | v7.13.2 |
 | **Backend** | Node.js, Express, TypeScript | Express 5.2.1, Node v18+ |
 | **Database & Auth** | Supabase (PostgreSQL + Auth) | supabase-js 2.100.1 |
-| **Image Storage** | Supabase Storage | Integrated with supabase-js |
+| **Image Storage** | Supabase Storage | `agri-resources` bucket with public access |
 | **AI Tutor** | Groq SDK | groq-sdk 1.1.2 (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) |
 | **File Upload** | Multer | multer 2.1.1 (memory storage, uploads to Supabase Storage) |
 | **Analytics** | Vercel Analytics | @vercel/analytics 2.0.1 |
@@ -97,11 +98,51 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 - **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 image URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
 - **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, smooth page transitions, and micro-interaction hover effects throughout.
 - **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Optimized auth flow with race condition prevention using `useRef` to track latest user ID, redundant DB queries removed for instant logins, and secure profile updates with atomic operations.
-- **🛠️ Admin Dashboard** — Full moderation panel: create users with rollback on failure, delete questions/materials/users with cascading storage cleanup (Supabase Storage), manage study materials, with master admin protection via environment variable configuration.
+- **🛠️ Admin Dashboard** — Full moderation panel with skeleton loading states: create users with rollback on failure, delete questions/materials/users with cascading storage cleanup (Supabase Storage), manage study materials, master admin protection via environment variable, and professional toast notifications for all operations.
+- **📊 Dynamic Home Stats** — Real-time counters for questions (from Supabase), courses (calculated from data.ts), and contributors (from API) with smooth loading animations and automatic updates.
 - **🧩 Centralised SVG Icons** — All reusable icons extracted into `src/components/icons.tsx` with typed props and optional className overrides, eliminating repeated inline SVG markup across components (12 icons total).
 - **🔒 Strict TypeScript** — Replaced all `as any` casts with proper interfaces (`CourseData`, `GroqMessage`, `ContentPart`); all `catch` blocks use `unknown` with `instanceof Error` narrowing; zero compilation errors.
 - **📊 Vercel Analytics** — First-party, privacy-friendly page-view and event tracking integrated via `@vercel/analytics/react`.
 - **🛡️ Security Hardened** — CORS restrictions (explicit origin whitelist), environment-based admin ID configuration, rate limiting with memory protection (max 10k entries, LRU eviction), input sanitization (message length, URL validation), and atomic resource operations to prevent data loss.
+- **🔔 Professional Notifications** — All user-facing alerts replaced with react-hot-toast for non-blocking, accessible feedback with success/error states.
+
+---
+
+## ✨ Recent Updates
+
+### 🎨 UI/UX Improvements (2026-04-18)
+- **Admin Dashboard Loading States**: Added professional skeleton loading animations for Questions and Study Materials tabs
+  - Shows animated placeholders instead of "No data found" during API calls
+  - Distinct visual feedback for loading vs. empty states
+  - Smooth pulsing animations with dark mode support
+- **Toast Notifications**: Replaced all `alert()` calls with react-hot-toast
+  - Non-blocking user feedback for delete operations
+  - Success/error states for all admin actions
+- **Dynamic Home Statistics**: Real-time counters with loading states
+  - Questions: Fetched from Supabase with exact count
+  - Courses: Calculated from `data.ts` (static but comprehensive)
+  - Contributors: Fetched from `/api/contributors` endpoint
+
+### 🧹 Codebase Cleanup & Professionalization (2026-04-18)
+- **Removed One-Time Scripts**: Deleted migration scripts (`migrate.ts`, `migrate-avatars.ts`)
+- **File Renaming**: `cloudinary.ts` → `storage.ts` for accurate naming
+- **Comment Standardization**: All Bengali comments translated to English
+- **Debug Log Cleanup**: Removed development console.log statements
+  - Kept only essential error logging and security monitoring
+  - Reduced I/O operations for better production performance
+- **Cloudinary Legacy Support**: Maintained backward compatibility for old Cloudinary URLs in AI tutor
+- **Professional Code Quality**: 
+  - Zero TypeScript errors across entire codebase
+  - ESLint compliant throughout
+  - Consistent English documentation
+
+### 🗄️ Storage Migration (Completed)
+- **Cloudinary → Supabase Storage**: Fully migrated all image storage
+  - All new uploads use `avatars/` and `questions/` folders
+  - Automatic cleanup on deletion (cascading storage removal)
+  - Backward compatible with legacy Cloudinary URLs
+- **Folder Consolidation**: Unified to 2 active folders (`avatars/`, `questions/`)
+  - Deprecated: `user_avatars/`, `question_bank/` (empty, can be safely deleted)
 
 ---
 
@@ -113,7 +154,8 @@ question-bank-app/
 ├── backend/                        # Express REST API server
 │   ├── src/
 │   │   ├── lib/
-│   │   │   └── supabase.ts         # Supabase admin client singleton & storage helpers
+│   │   │   ├── storage.ts          # Supabase Storage helpers (uploadToSupabase, deleteFromStorage)
+│   │   │   └── supabase.ts         # Supabase admin client singleton
 │   │   ├── middleware/
 │   │   │   └── index.ts            # requireAuth, requireAdmin, rate limiter, multer instances
 │   │   ├── routes/
@@ -131,7 +173,7 @@ question-bank-app/
 │   ├── src/
 │   │   ├── assets/                 # Images and static media
 │   │   ├── components/             # All React page & UI components
-│   │   │   ├── AdminDashboard.tsx  # Admin control panel (users, questions, materials)
+│   │   │   ├── AdminDashboard.tsx  # Admin control panel with skeleton loading states
 │   │   │   ├── AnimatedBackground.tsx # Global particle background elements
 │   │   │   ├── Contributors.tsx    # Public contributors showcase page
 │   │   │   ├── Developer.tsx       # Developer profile page
@@ -143,7 +185,7 @@ question-bank-app/
 │   │   │   ├── Login.tsx           # Supabase Auth login form
 │   │   │   ├── PageTransition.tsx  # Framer Motion page transitions and routing wrapper
 │   │   │   ├── Profile.tsx         # User profile editor with avatar upload
-│   │   │   ├── QuestionList.tsx    # Filterable question paper grid
+│   │   │   ├── QuestionList.tsx    # Filterable question paper grid with dynamic stats
 │   │   │   ├── ScrollReveal.tsx    # Unified smooth scroll-reveal wrapper
 │   │   │   ├── StudyMaterials.tsx  # Books, Notes & PDFs page — infinite scroll, URL-synced filters
 │   │   │   └── UploadQuestion.tsx  # Unified upload form (4-tab: Question/Book/Note/PDF)
@@ -164,6 +206,7 @@ question-bank-app/
 │   ├── vite.config.ts
 │   └── package.json
 │
+├── CLEANUP_REPORT.md               # Comprehensive codebase cleanup documentation
 └── README.md
 ```
 
@@ -313,7 +356,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 
 #### `POST /api/chat-tutor` — Request Body
 
-```json
+``json
 {
   "message": "Explain the law of demand.",
   "faculty": "Agricultural Economics",
@@ -321,7 +364,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
     { "role": "user", "text": "Hello" },
     { "role": "assistant", "text": "Hi! How can I help?" }
   ],
-  "images": ["https://res.cloudinary.com/.../question.jpg"]
+  "images": ["https://your-project.supabase.co/storage/v1/object/public/agri-resources/questions/example.jpg"]
 }
 ```
 
@@ -332,7 +375,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - `images`: Optional array of image URLs (max 5, must be from Supabase Storage or Cloudinary for backward compatibility)
 
 **Response:**
-```json
+```
 {
   "reply": "The law of demand states that..."
 }
@@ -370,33 +413,33 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 ### Component Architecture
 
 **Frontend Components** (`frontend/src/components/`):
-- **Layout & Navigation**: [`Layout.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\Layout.tsx) (navbar, sidebar, footer), [`PageTransition.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\PageTransition.tsx) (Framer Motion route transitions)
+- **Layout & Navigation**: [`Layout.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\Layout.tsx) (navbar, sidebar, footer), [`PageTransition.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\PageTransition.tsx) (Framer Motion route transitions)
 - **Core Features**: 
-  - [`QuestionList.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\QuestionList.tsx) — Filterable question paper grid with multi-image support
-  - [`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx) — Infinite scroll library with contributor caching and URL-synced filters
-  - [`FloatingAITutor.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\FloatingAITutor.tsx) — Groq-powered chat widget with faculty validation
-  - [`UploadQuestion.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\UploadQuestion.tsx) — Unified 4-tab upload form (Question/Book/Note/PDF)
-  - [`AdminDashboard.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\AdminDashboard.tsx) — User management, content moderation, analytics
-- **User Management**: [`Login.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\Login.tsx) (Supabase Auth), [`Profile.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\Profile.tsx) (avatar upload with rollback)
+  - [`QuestionList.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\QuestionList.tsx) — Filterable question paper grid with multi-image support and dynamic stats
+  - [`StudyMaterials.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx) — Infinite scroll library with contributor caching and URL-synced filters
+  - [`FloatingAITutor.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\FloatingAITutor.tsx) — Groq-powered chat widget with faculty validation
+  - [`UploadQuestion.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\UploadQuestion.tsx) — Unified 4-tab upload form (Question/Book/Note/PDF)
+  - [`AdminDashboard.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\AdminDashboard.tsx) — User management, content moderation with skeleton loading states and toast notifications
+- **User Management**: [`Login.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\Login.tsx) (Supabase Auth), [`Profile.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\Profile.tsx) (avatar upload with rollback)
 - **UI/UX Enhancements**: 
-  - [`HeroParticles.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\HeroParticles.tsx) — Canvas-based particle animation
-  - [`ScrollReveal.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\ScrollReveal.tsx) — Unified scroll-triggered animations
-  - [`DeveloperBadge.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\DeveloperBadge.tsx) — Interactive floating badge
-  - [`icons.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\icons.tsx) — 12 typed SVG icon components with optional className overrides
+  - [`HeroParticles.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\HeroParticles.tsx) — Canvas-based particle animation
+  - [`ScrollReveal.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\ScrollReveal.tsx) — Unified scroll-triggered animations
+  - [`DeveloperBadge.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\DeveloperBadge.tsx) — Interactive floating badge
+  - [`icons.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\icons.tsx) — 12 typed SVG icon components with optional className overrides
 
 **Backend Routes** (`backend/src/routes/`):
-- [`auth.ts`](file://d:\Projects\question-bank-app\backend\src\routes\auth.ts) — User profile CRUD with atomic avatar operations
-- [`uploads.ts`](file://d:\Projects\question-bank-app\backend\src\routes\uploads.ts) — Question images (parallel Supabase uploads) and study materials
-- [`ai.ts`](file://d:\Projects\question-bank-app\backend\src\routes\ai.ts) — Faculty-aware AI tutor with prompt injection protection
-- [`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts) — User/content management with master admin protection
+- [`auth.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\auth.ts) — User profile CRUD with atomic avatar operations
+- [`uploads.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\uploads.ts) — Question images (parallel Supabase uploads) and study materials
+- [`ai.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\ai.ts) — Faculty-aware AI tutor with prompt injection protection
+- [`admin.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\admin.ts) — User/content management with master admin protection
 
 **Storage Utilities** (`backend/src/lib/`):
-- [`cloudinary.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\lib\cloudinary.ts) — Supabase Storage integration (uploadToSupabase, deleteFromStorage)
+- [`storage.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\lib\storage.ts) — Supabase Storage integration (uploadToSupabase, deleteFromStorage)
 
 **Context Providers** (`frontend/src/context/`):
-- [`AuthContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\AuthContext.tsx) — Supabase session management with race condition prevention
-- [`FacultyContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx) — Global faculty state for AI tutor context
-- [`ThemeContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\ThemeContext.tsx) — Light/dark mode toggle
+- [`AuthContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\AuthContext.tsx) — Supabase session management with race condition prevention
+- [`FacultyContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx) — Global faculty state for AI tutor context
+- [`ThemeContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\ThemeContext.tsx) — Light/dark mode toggle
 
 ---
 
@@ -436,19 +479,19 @@ This project follows industry best practices for security, performance, and data
 
 ### Security Hardening
 
-#### 1. CORS Protection ([`backend/src/index.ts`](file://d:\Projects\question-bank-app\backend\src\index.ts#L30-L48))
+#### 1. CORS Protection ([`backend/src/index.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\index.ts#L30-L48))
 - **Production**: Requires explicit `CORS_ORIGIN` environment variable with comma-separated whitelist
 - **Development**: Defaults to `http://localhost:5173` only (no allow-all fallback)
 - **Blocking**: Unauthorized origins rejected with console warning and error callback
 - **Impact**: Prevents CSRF attacks from malicious websites
 
-#### 2. Environment-Based Configuration ([`backend/src/routes/admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L8-L13))
+#### 2. Environment-Based Configuration ([`backend/src/routes/admin.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\admin.ts#L8-L13))
 - Master admin ID stored in `MASTER_ADMIN_ID` environment variable (never hardcoded)
 - Graceful degradation: logs warning if not set in production instead of crashing
 - Audit logging: all deletion attempts on master admin logged with requesting user ID
 - **Impact**: Protects primary admin account across different deployments
 
-#### 3. Rate Limiting with Memory Protection ([`backend/src/middleware/index.ts`](file://d:\Projects\question-bank-app\backend\src\middleware\index.ts#L38-L103))
+#### 3. Rate Limiting with Memory Protection ([`backend/src/middleware/index.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\middleware\index.ts#L38-L103))
 - **Limits**: 120 requests per IP per 60-second window
 - **Memory Cap**: Maximum 10,000 entries in rate limit Map (prevents DDoS-induced OOM)
 - **Eviction Strategy**: LRU-like removal of oldest entries when cap reached
@@ -456,8 +499,8 @@ This project follows industry best practices for security, performance, and data
 - **Graceful Degradation**: Returns 429 with informative message when at capacity
 - **Impact**: Prevents memory exhaustion attacks while maintaining service availability
 
-#### 4. AI Prompt Injection Prevention ([`backend/src/routes/ai.ts`](file://d:\Projects\question-bank-app\backend\src\routes\ai.ts#L7-L34), [`frontend/src/context/FacultyContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx#L5-L5))
-- **Whitelist Validation**: Faculty names validated against dynamic whitelist from [`courseData`](file://d:\Projects\question-bank-app\frontend\src\data.ts) (currently: `Agricultural Economics`, `Agriculture`, `ASVM`)
+#### 4. AI Prompt Injection Prevention ([`backend/src/routes/ai.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\ai.ts#L7-L34), [`frontend/src/context/FacultyContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx#L5-L5))
+- **Whitelist Validation**: Faculty names validated against dynamic whitelist from [`courseData`](file://e:\Argho\Projects\question-bank-app\frontend\src\data.ts) (currently: `Agricultural Economics`, `Agriculture`, `ASVM`)
 - **Dual-Layer Protection**: Both client-side context and server-side AI route validate independently
 - **Input Sanitization**: Message trimmed, length-checked (1-2000 chars), empty strings rejected
 - **URL Validation**: Image URLs must be from Supabase Storage (`supabase.co/storage/v1/object/public/`) or Cloudinary for backward compatibility (max 5)
@@ -473,25 +516,25 @@ This project follows industry best practices for security, performance, and data
 
 ### Performance Optimizations
 
-#### 1. Intelligent Caching ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L164-L164))
+#### 1. Intelligent Caching ([`StudyMaterials.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L164-L164))
 - **Contributor Cache**: In-memory `Map<string, User>` persists during component lifecycle
 - **Cache Hit Rate**: ~60% reduction in `/api/contributors` API calls during pagination
 - **Invalidation**: Cache cleared on component unmount (automatic via React lifecycle)
 - **Impact**: Faster page loads, reduced server load, better user experience
 
-#### 2. Request Deduplication ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L162-L162), [`QuestionList.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\QuestionList.tsx#L168-L168))
+#### 2. Request Deduplication ([`StudyMaterials.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L162-L162), [`QuestionList.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\QuestionList.tsx#L168-L168))
 - **Mechanism**: Monotonically increasing `requestIdRef` tracks latest request in both Question Bank and Study Materials components
 - **Dual Check**: Before and after async operations to prevent stale state updates
 - **Race Condition Prevention**: Old requests silently discarded if newer request exists (e.g., during rapid filter changes)
 - **Impact**: Eliminates UI flickering, state corruption, and incorrect data display during fast scrolling or filter switching
 
-#### 3. Single State Update Pattern ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L217-L260))
+#### 3. Single State Update Pattern ([`StudyMaterials.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L217-L260))
 - **Before**: Two separate `setMaterials()` calls causing double renders
 - **After**: Single `enrichWithContributors()` returns fully enriched array
 - **Enrichment**: Contributor data merged in memory before state update
 - **Impact**: 50% fewer re-renders, smoother animations, better FPS
 
-#### 4. Aggressive Cleanup ([`middleware/index.ts`](file://d:\Projects\question-bank-app\backend\src\middleware\index.ts#L70-L73))
+#### 4. Aggressive Cleanup ([`middleware/index.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\middleware\index.ts#L70-L73))
 - **Interval**: 60 seconds (reduced from 300 seconds)
 - **Strategy**: Two-pass pruning (expired entries → size enforcement)
 - **Process Safety**: `unref()` prevents interval from keeping Node.js alive
@@ -499,17 +542,17 @@ This project follows industry best practices for security, performance, and data
 
 ### Stability Enhancements
 
-#### 1. Race Condition Elimination ([`AuthContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\AuthContext.tsx#L18-L65)): Uses `useRef` to track latest user ID, preventing stale async responses from overwriting current role during rapid login/logout cycles. Only updates state when response matches current user.
+#### 1. Race Condition Elimination ([`AuthContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\AuthContext.tsx#L18-L65)): Uses `useRef` to track latest user ID, preventing stale async responses from overwriting current role during rapid login/logout cycles. Only updates state when response matches current user.
 - **Edge Cases**: Handles null user, concurrent sessions, slow network conditions
 - **Impact**: Consistent authentication state, no intermittent "role not loaded" errors
 
-#### 2. Faculty Context Validation ([`FacultyContext.tsx`](file://d:\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx#L5-L5))
-- **Whitelist Validation**: Validates faculty names against actual faculties defined in [`courseData`](file://d:\Projects\question-bank-app\frontend\src\data.ts).
+#### 2. Faculty Context Validation ([`FacultyContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx#L5-L5))
+- **Whitelist Validation**: Validates faculty names against actual faculties defined in [`courseData`](file://e:\Argho\Projects\question-bank-app\frontend\src\data.ts).
 - **Security**: Prevents localStorage injection attacks using invalid or malicious faculty names.
 - **Fallback**: Invalid values are logged and defaulted to "Agricultural Economics".
 - **Impact**: Ensures application state integrity and prevents potential UI/logic errors caused by tampered local storage.
 
-#### 3. Graceful Degradation ([`StudyMaterials.tsx`](file://d:\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L249-L256))
+#### 3. Graceful Degradation ([`StudyMaterials.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx#L249-L256))
 - **Fallback**: If contributor fetch fails, display materials with cached data or "Unknown"
 - **Error Boundaries**: Try-catch blocks prevent complete UI failure
 - **User Experience**: Partial functionality maintained during backend issues
