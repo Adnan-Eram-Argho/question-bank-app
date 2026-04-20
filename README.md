@@ -112,6 +112,14 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 
 ## ✨ Recent Updates
 
+### 🗜️ Legacy Image Library Optimization (2026-04-20)
+- **Bulk WebP Migration**: Entire legacy image library (446 images) optimized from JPG/PNG to WebP
+  - All 397 question records (445 image files) and 1 user avatar bulk-converted using Sharp (quality 80)
+  - Significant storage reclamation in the `agri-resources` Supabase bucket
+  - Zero data loss — atomic per-image migration with rollback safety and idempotent re-run support
+  - Both `image_url` and `image_urls[]` columns updated atomically per question
+  - The entire `agri-resources` bucket now exclusively contains optimized `.webp` files
+
 ### 🚀 Performance Optimization (2026-04-18)
 - **Automatic WebP Image Conversion**: Implemented Sharp-based image optimization for all uploads
   - All question papers and avatars automatically converted to WebP format (quality 80)
@@ -150,6 +158,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
   - All new uploads use `avatars/` and `questions/` folders
   - Automatic cleanup on deletion (cascading storage removal)
   - Backward compatible with legacy Cloudinary URLs
+- **Legacy Image Optimization**: All 446 pre-existing JPG/PNG images bulk-converted to WebP format, reclaiming significant storage space. Combined with automatic WebP conversion on upload, the entire `agri-resources` bucket now exclusively contains optimized `.webp` files.
 - **Folder Standardization**: Unified to 2 active folders (`avatars/`, `questions/`)
   - ✅ Active: `avatars/` (user profile pictures), `questions/` (exam paper images)
   - ⚠️ Deprecated: `user_avatars/`, `question_bank/` (legacy folders from pre-migration era, can be safely deleted if empty)
