@@ -169,6 +169,10 @@ const StudyMaterials = () => {
 
     useEffect(() => {
         setFilterLevel('');
+        setFilterSemester('');
+        setFilterCourse('');
+        setAvailableSemesters([]);
+        setAvailableCourses([]);
     }, [activeFaculty]);
 
     useEffect(() => {
@@ -345,6 +349,15 @@ const StudyMaterials = () => {
             fetchMaterials(page, false);
         }
     }, [page, fetchMaterials]);
+
+    // ✅ Cleanup IntersectionObserver on unmount to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, []);
 
     const lastMaterialElementRef = useCallback((node: HTMLDivElement | null) => {
         if (loadingMore || !hasMore) return;
