@@ -22,6 +22,11 @@ router.get('/contributors', async (_req: Request, res: Response): Promise<void> 
       .order('full_name', { ascending: true });
 
     if (error) throw error;
+    
+    // ✅ Add cache control headers for better client-side caching
+    res.set('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
+    res.set('ETag', `"${Buffer.from(JSON.stringify(data)).toString('base64').slice(0, 20)}"`);
+    
     res.status(200).json(data);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Failed to fetch contributors';

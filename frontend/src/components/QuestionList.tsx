@@ -47,9 +47,12 @@ interface Question {
     users?: { full_name: string; email: string } | null;
 }
 
-const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
+const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; isFirstBatch?: boolean }) => {
     const images = q.image_urls && q.image_urls.length > 0 ? q.image_urls : (q.image_url ? [q.image_url] : []);
     const uploaderName = q.users?.full_name || q.users?.email || q.uploaded_by || 'Unknown';
+    
+    // ✅ First 6 images (first 2 rows) load eagerly for better LCP
+    const shouldLoadEagerly = isFirstBatch && index < 6;
 
     return (
         <motion.div
@@ -73,7 +76,8 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                             src={images[0]}
                             alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover/full:scale-105"
-                            loading="lazy"
+                            loading={shouldLoadEagerly ? "eager" : "lazy"}
+                            fetchPriority={shouldLoadEagerly ? "high" : "auto"}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/full:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/full:opacity-100 translate-y-2 group-hover/full:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Full Image">
@@ -88,7 +92,8 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                                 src={images[0]}
                                 alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 1) | SAU`}
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover/half:scale-105"
-                                loading="lazy"
+                                loading={shouldLoadEagerly ? "eager" : "lazy"}
+                                fetchPriority={shouldLoadEagerly ? "high" : "auto"}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                             <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/half:opacity-100 translate-y-2 group-hover/half:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Page 1">
@@ -100,7 +105,8 @@ const QuestionCard = ({ q, index }: { q: Question; index: number }) => {
                                 src={images[1]}
                                 alt={`${q.course_name} Question Paper - ${q.level} ${q.semester} - ${q.question_type} (Page 2) | SAU`}
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover/half:scale-[1.02]"
-                                loading="lazy"
+                                loading={shouldLoadEagerly ? "eager" : "lazy"}
+                                fetchPriority={shouldLoadEagerly ? "high" : "auto"}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                             <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/half:opacity-100 translate-y-2 group-hover/half:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Page 2">
@@ -184,8 +190,12 @@ const QuestionList = () => {
     const [availableSemesters, setAvailableSemesters] = useState<string[]>([]);
     const [availableCourses, setAvailableCourses] = useState<string[]>([]);
 
-    // Calculate total unique courses from data.ts
-    const calculateTotalCourses = useCallback(() => {
+    // ✅ Cache for all contributors to avoid repeated API calls
+    const allContributorsCache = useRef<{ data: Array<{ id: string; full_name: string; email: string }>; timestamp: number } | null>(null);
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
+    // Calculate total unique courses from data.ts (static data, no need for useCallback)
+    const calculateTotalCourses = () => {
         const allCourses = new Set<string>();
         Object.values(courseData).forEach((facultyData) => {
             Object.values(facultyData).forEach((levelData) => {
@@ -195,33 +205,66 @@ const QuestionList = () => {
             });
         });
         return allCourses.size;
+    };
+
+    // ✅ Optimized: Fetch all contributors once with caching
+    const fetchAllContributors = useCallback(async (): Promise<Array<{ id: string; full_name: string; email: string }>> => {
+        const now = Date.now();
+        
+        // Return cached data if still valid
+        if (allContributorsCache.current && (now - allContributorsCache.current.timestamp) < CACHE_DURATION) {
+            return allContributorsCache.current.data;
+        }
+
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com';
+            const response = await fetch(`${API_URL}/api/contributors`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            // Cache the result
+            allContributorsCache.current = {
+                data,
+                timestamp: now
+            };
+            
+            // Also populate the individual cache
+            data.forEach((user: { id: string; full_name: string; email: string }) => {
+                if (user.id) {
+                    contributorsCache.current.set(user.id, user);
+                }
+            });
+            
+            return data;
+        } catch (err) {
+            console.error('[QuestionList] Failed to fetch contributors:', err);
+            return [];
+        }
     }, []);
 
-    // Fetch stats on component mount
+    // ✅ Optimized: Fetch stats in parallel with caching
     useEffect(() => {
         const fetchStats = async () => {
             setStatsLoading(true);
             try {
-                const API_URL = import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com';
-                
                 // Calculate courses from data.ts (static but comprehensive)
                 const totalCourses = calculateTotalCourses();
                 
-                // Fetch questions count from database
-                const { count: questionsCount } = await supabase
-                    .from('questions')
-                    .select('*', { count: 'exact', head: true });
+                // Fetch questions count from database and contributors in parallel
+                const [questionsResult, contributors] = await Promise.all([
+                    supabase.from('questions').select('*', { count: 'exact', head: true }),
+                    fetchAllContributors()
+                ]);
 
-                // Fetch contributors count from API
-                const contributorsResponse = await fetch(`${API_URL}/api/contributors`);
-                let contributorsCount = 0;
-                if (contributorsResponse.ok) {
-                    const contributorsData = await contributorsResponse.json();
-                    contributorsCount = contributorsData.length;
-                }
+                const questionsCount = questionsResult.count || 0;
+                const contributorsCount = contributors.length;
 
                 setStats({
-                    questions: questionsCount || 0,
+                    questions: questionsCount,
                     courses: totalCourses,
                     contributors: contributorsCount
                 });
@@ -239,10 +282,14 @@ const QuestionList = () => {
         };
 
         fetchStats();
-    }, [calculateTotalCourses]);
+    }, []); // Empty deps - only run once on mount
 
     useEffect(() => {
         setFilterLevel('');
+        setFilterSemester('');
+        setFilterCourse('');
+        setAvailableSemesters([]);
+        setAvailableCourses([]);
     }, [activeFaculty]);
 
     useEffect(() => {
@@ -271,6 +318,24 @@ const QuestionList = () => {
         }
         setFilterCourse('');
     }, [filterLevel, filterSemester]);
+
+    // ✅ Preload contributors data on component mount to avoid delays during question fetching
+    useEffect(() => {
+        let isMounted = true;
+        
+        const preloadContributors = async () => {
+            if (contributorsCache.current.size === 0 && isMounted) {
+                await fetchAllContributors();
+            }
+        };
+        
+        preloadContributors();
+        
+        return () => {
+            isMounted = false;
+        };
+    }, []); // Empty deps - only preload once
+
     const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
     const enrichWithContributors = useCallback(async (fetchedQuestions: Question[]) => {
@@ -285,9 +350,11 @@ const QuestionList = () => {
         }
 
         try {
+            // ✅ Use cached contributors (already preloaded on mount)
             const cachedContributors = new Map(contributorsCache.current);
             const uncachedIds = uploaderIds.filter(id => !cachedContributors.has(id));
 
+            // ✅ Only fetch if there are truly uncached IDs (should be rare after initial preload)
             if (uncachedIds.length > 0) {
                 const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`);
                 if (!response.ok) throw new Error('Network response not ok');
@@ -325,9 +392,22 @@ const QuestionList = () => {
                 };
             });
         }
-    }, []);
+    }, []); // No dependencies - uses refs which don't trigger re-renders
 
     const fetchQuestions = useCallback(async (pageNum: number, isReset = false) => {
+        // ✅ Load all questions if no filters are selected
+        // ✅ Require all three filters (level, semester, course) if any filter is partially selected
+        const hasSomeFilters = filterLevel || filterSemester || filterCourse;
+        const hasAllRequiredFilters = filterLevel && filterSemester && filterCourse;
+        
+        if (hasSomeFilters && !hasAllRequiredFilters) {
+            setQuestions([]);
+            setLoading(false);
+            setLoadingMore(false);
+            setHasMore(true);
+            return;
+        }
+
         const currentRequestId = ++requestIdRef.current;
 
         if (isReset) {
@@ -387,8 +467,9 @@ const QuestionList = () => {
                 setLoadingMore(false);
             }
         }
-    }, [activeFaculty, filterLevel, filterSemester, filterCourse, filterType]);
+    }, [activeFaculty, filterLevel, filterSemester, filterCourse, filterType, enrichWithContributors]);
 
+    // ✅ Only trigger fetch when all required filters are set
     useEffect(() => {
         setPage(0);
         fetchQuestions(0, true);
@@ -399,6 +480,15 @@ const QuestionList = () => {
             fetchQuestions(page, false);
         }
     }, [page, fetchQuestions]);
+
+    // ✅ Cleanup IntersectionObserver on unmount
+    useEffect(() => {
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, []);
 
     const lastQuestionElementRef = useCallback((node: HTMLDivElement | null) => {
         if (loadingMore || !hasMore) return;
@@ -626,38 +716,79 @@ const QuestionList = () => {
                 {questions.length === 0 ? (
                     <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
                         <div className="bg-gray-50 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <EmptyStateIcon className="h-8 w-8 text-gray-400" />
+                            {!filterLevel && !filterSemester && !filterCourse ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
+                            ) : (
+                                <EmptyStateIcon className="h-8 w-8 text-gray-400" />
+                            )}
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No questions found</h3>
-                        <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
-                            Try adjusting your filters or check back later for new uploads.
-                        </p>
-                        {isFiltered && (
-                            <button
-                                onClick={() => {
-                                    setFilterLevel('');
-                                    setFilterSemester('');
-                                    setFilterCourse('');
-                                    setFilterType('');
-                                }}
-                                className="mt-6 text-primary-600 dark:text-primary-400 font-medium hover:underline"
-                            >
-                                Clear all filters
-                            </button>
+                        {!filterLevel && !filterSemester && !filterCourse ? (
+                            <>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Questions Available</h3>
+                                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                                    There are currently no questions in the database for <span className="font-semibold">{activeFaculty}</span>. 
+                                    Check back later or contact an administrator to add content.
+                                </p>
+                            </>
+                        ) : !filterLevel || !filterSemester || !filterCourse ? (
+                            <>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Complete Your Selection</h3>
+                                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                                    Please select a <span className="font-semibold text-primary-600 dark:text-primary-400">Level</span>,{' '}
+                                    <span className="font-semibold text-primary-600 dark:text-primary-400">Semester</span>, and{' '}
+                                    <span className="font-semibold text-primary-600 dark:text-primary-400">Course</span> to view related question papers.
+                                </p>
+                                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-500">
+                                    <span className={`px-3 py-1 rounded-full ${filterLevel ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                                        {filterLevel ? '✓ Level' : '1. Level'}
+                                    </span>
+                                    <span>→</span>
+                                    <span className={`px-3 py-1 rounded-full ${filterSemester ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                                        {filterSemester ? '✓ Semester' : '2. Semester'}
+                                    </span>
+                                    <span>→</span>
+                                    <span className={`px-3 py-1 rounded-full ${filterCourse ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                                        {filterCourse ? '✓ Course' : '3. Course'}
+                                    </span>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No questions found</h3>
+                                <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                                    Try adjusting your filters or check back later for new uploads.
+                                </p>
+                                {isFiltered && (
+                                    <button
+                                        onClick={() => {
+                                            setFilterLevel('');
+                                            setFilterSemester('');
+                                            setFilterCourse('');
+                                            setFilterType('');
+                                        }}
+                                        className="mt-6 text-primary-600 dark:text-primary-400 font-medium hover:underline"
+                                    >
+                                        Clear all filters
+                                    </button>
+                                )}
+                            </>
                         )}
                     </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                             {questions.map((q, index) => {
+                                const isFirstBatch = page === 0;
                                 if (questions.length === index + 1) {
                                     return (
                                         <div ref={lastQuestionElementRef} key={q.id}>
-                                            <QuestionCard q={q} index={index} />
+                                            <QuestionCard q={q} index={index} isFirstBatch={isFirstBatch} />
                                         </div>
                                     );
                                 } else {
-                                    return <QuestionCard key={q.id} q={q} index={index} />;
+                                    return <QuestionCard key={q.id} q={q} index={index} isFirstBatch={isFirstBatch} />;
                                 }
                             })}
                         </div>
