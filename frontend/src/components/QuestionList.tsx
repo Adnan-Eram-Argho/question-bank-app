@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
 import { motion, animate } from 'framer-motion';
@@ -7,6 +7,7 @@ import HeroParticles from './HeroParticles';
 import ScrollReveal from './ScrollReveal';
 import { useFaculty } from '../context/FacultyContext';
 import { ExpandIcon, UserIcon, EmptyStateIcon } from './icons';
+import SEO from './SEO';
 
 const StatCounter = ({ to, label }: { to: number, label: string }) => {
     const nodeRef = useRef<HTMLSpanElement>(null);
@@ -163,6 +164,7 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
 };
 
 const QuestionList = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const { activeFaculty } = useFaculty();
     const facultyData = courseData[activeFaculty] || {};
 
@@ -177,11 +179,15 @@ const QuestionList = () => {
     
     // 🛡️ Add requestIdRef to prevent race conditions during rapid filter changes
     const requestIdRef = useRef(0);
+    
+    // Track initial mount to preserve URL params on first navigation
+    const isInitialMount = useRef(true);
 
     // Stats states
     const [stats, setStats] = useState({ questions: 0, courses: 0, contributors: 0 });
     const [statsLoading, setStatsLoading] = useState(true);
 
+    // Filter states (user-driven via dropdowns)
     const [filterLevel, setFilterLevel] = useState('');
     const [filterSemester, setFilterSemester] = useState('');
     const [filterCourse, setFilterCourse] = useState('');
@@ -193,6 +199,38 @@ const QuestionList = () => {
     // ✅ Cache for all contributors to avoid repeated API calls
     const allContributorsCache = useRef<{ data: Array<{ id: string; full_name: string; email: string }>; timestamp: number } | null>(null);
     const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+
+    // ✅ Read URL params on mount to support deep-linking from landing pages
+    useEffect(() => {
+        const urlLevel = searchParams.get('level');
+        const urlSemester = searchParams.get('semester');
+        const urlCourse = searchParams.get('course');
+        const urlType = searchParams.get('type');
+        
+        if (urlLevel) setFilterLevel(urlLevel);
+        if (urlSemester) setFilterSemester(urlSemester);
+        if (urlCourse) setFilterCourse(urlCourse);
+        if (urlType) setFilterType(urlType);
+    }, []); // Only on mount
+
+    // Sync filter changes to URL parameters (only when user manually changes filters)
+    useEffect(() => {
+        // Skip the first render to avoid wiping URL params before they're read
+        if (isInitialMount.current) return;
+
+        const currentParams = new URLSearchParams(searchParams);
+        const newParams = new URLSearchParams();
+        
+        if (filterLevel) newParams.set('level', filterLevel);
+        if (filterSemester) newParams.set('semester', filterSemester);
+        if (filterCourse) newParams.set('course', filterCourse);
+        if (filterType) newParams.set('type', filterType);
+        
+        // Only update if params actually changed
+        if (currentParams.toString() !== newParams.toString()) {
+            setSearchParams(newParams, { replace: true });
+        }
+    }, [filterLevel, filterSemester, filterCourse, filterType]);
 
     // Calculate total unique courses from data.ts (static data, no need for useCallback)
     const calculateTotalCourses = () => {
@@ -285,6 +323,11 @@ const QuestionList = () => {
     }, []); // Empty deps - only run once on mount
 
     useEffect(() => {
+        // On initial mount, preserve URL params (e.g. from landing page level cards)
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            if (searchParams.get('level')) return;
+        }
         setFilterLevel('');
         setFilterSemester('');
         setFilterCourse('');
@@ -535,17 +578,17 @@ const QuestionList = () => {
         return `Browse past exam questions for the ${activeFaculty} faculty of Sher-e-Bangla Agricultural University (SAU). Search by level, semester, course, and question type.`;
     };
 
+    const pageTitle = buildPageTitle();
+    const pageDescription = buildMetaDescription();
+
     return (
         <div className="space-y-8 animate-fade-in">
-            <Helmet>
-                <title>{buildPageTitle()}</title>
-                <meta name="description" content={buildMetaDescription()} />
-                <link rel="canonical" href="https://sau-agri-econ.vercel.app/" />
-                <meta property="og:title" content={buildPageTitle()} />
-                <meta property="og:description" content={buildMetaDescription()} />
-                <meta property="og:url" content="https://sau-agri-econ.vercel.app/" />
-                <meta property="og:type" content="website" />
-            </Helmet>
+            <SEO
+                title={pageTitle}
+                description={pageDescription}
+                keywords={`SAU ${activeFaculty} questions, SAU ${filterLevel || ''} ${filterSemester || ''} ${filterCourse || ''} ${filterType || ''}, Sher-e-Bangla Agricultural University ${activeFaculty}, SAU previous year questions ${activeFaculty}`.trim()}
+                canonicalPath="/questions"
+            />
 
             <div className="relative overflow-hidden flex flex-col items-center text-center max-w-4xl mx-auto py-8 lg:py-12 px-4 rounded-3xl">
                 <HeroParticles />

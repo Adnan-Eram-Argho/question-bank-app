@@ -280,21 +280,118 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {children}
             </main>
 
-            <footer className="w-full bg-white dark:bg-[#0B1120] text-center py-6 text-sm text-gray-500 dark:text-gray-500 border-t border-gray-200 dark:border-gray-800/60 mt-auto transition-colors duration-300">
-                <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-center items-center gap-2">
-                    <p>
-                        Developed by{' '}
-                        <Link to="/developer" className="text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                            Argho
-                        </Link>
-                    </p>
-                    <span className="hidden sm:inline text-gray-300 dark:text-gray-700">&bull;</span>
-                    <p>
-                        Questions Collected by{' '}
-                        <Link to="/contributors" className="text-gray-700 dark:text-gray-300 font-medium hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors">
-                            Contributors
-                        </Link>
-                    </p>
+            <footer className="w-full bg-white dark:bg-[#0B1120] border-t border-gray-200 dark:border-gray-800/60 mt-auto transition-colors duration-300">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    {/* Footer Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                        {/* Brand Column */}
+                        <div className="col-span-2 md:col-span-1">
+                            <Link to="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity inline-block mb-4">
+                                SAU Q-Bank
+                            </Link>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                                Built by SAU students, for SAU students. Access previous year questions, study materials, and AI-powered tutoring.
+                            </p>
+                        </div>
+
+                        {/* Tools Column */}
+                        <div>
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                                Tools
+                            </h3>
+                            <ul className="space-y-3">
+                                <li>
+                                    <Link to="/questions" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Browse Questions
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/study-materials" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Study Materials
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/?ai-tutor=open" className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors">
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                        </svg>
+                                        Ask AI Tutor
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Faculties Column */}
+                        <div>
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                                Faculties
+                            </h3>
+                            <ul className="space-y-3">
+                                <li>
+                                    <Link to="/sau-economics-question" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Agricultural Economics
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/sau-agriculture-question" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Agriculture
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/sau-asvm-question" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Animal Science & Vet Med
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Resources Column */}
+                        <div>
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                                Resources
+                            </h3>
+                            <ul className="space-y-3">
+                                <li>
+                                    <Link to="/sau-question-bank-pdf" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Question Bank PDF
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/sau-notes" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Lecture Notes
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/sau-admission-preparation" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Admission Prep
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Bottom Bar */}
+                    <div className="pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+                            <p>
+                                Developed by{' '}
+                                <Link to="/developer" className="text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                                    Argho
+                                </Link>
+                            </p>
+                            <span className="hidden sm:inline text-gray-300 dark:text-gray-700">&bull;</span>
+                            <p>
+                                Questions by{' '}
+                                <Link to="/contributors" className="text-gray-700 dark:text-gray-300 font-medium hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors">
+                                    Contributors
+                                </Link>
+                            </p>
+                        </div>
+
+                        <p className="text-xs text-gray-400 dark:text-gray-600">
+                            © {new Date().getFullYear()} SAU Question Bank. All rights reserved.
+                        </p>
+                    </div>
                 </div>
             </footer>
             <DeveloperBadge />

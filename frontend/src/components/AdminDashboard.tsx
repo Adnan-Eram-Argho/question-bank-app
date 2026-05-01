@@ -26,7 +26,7 @@ export interface Question {
 interface StudyMaterial {
     id: string;
     title: string;
-    type: 'book' | 'note';
+    type: 'book' | 'note' | 'pdf';
     level: string;
     semester: string;
     course_name: string;
@@ -615,9 +615,11 @@ const AdminDashboard: React.FC = () => {
                                                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold border ${
                                                         m.type === 'book'
                                                             ? 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800/50'
+                                                            : m.type === 'pdf'
+                                                            ? 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800/50'
                                                             : 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/50'
                                                     }`}>
-                                                        {m.type === 'book' ? '📘' : '📝'} {m.type.charAt(0).toUpperCase() + m.type.slice(1)}
+                                                        {m.type === 'book' ? '📘' : m.type === 'pdf' ? '📄' : '📝'} {m.type === 'pdf' ? 'Gen. PDF' : m.type.charAt(0).toUpperCase() + m.type.slice(1)}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">

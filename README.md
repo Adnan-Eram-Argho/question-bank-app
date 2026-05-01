@@ -1,8 +1,8 @@
 <div align="center">
 
-# 📚 SAU Agricultural Economics Question Bank
+# 📚 SAU Study Platform - Question Bank & AI Tutor
 
-**A full-stack academic resource platform for Sher-e-Bangla Agricultural University**
+**A comprehensive academic resource platform for Sher-e-Bangla Agricultural University students**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Frontend: React](https://img.shields.io/badge/Frontend-React%2019-61DAFB?logo=react)](https://react.dev/)
@@ -22,7 +22,8 @@
 - [About The Project](#about-the-project)
 - [Tech Stack](#tech-stack)
 - [Key Features](#key-features)
-- [Recent Updates](#recent-updates) ✨
+- [SEO Landing Pages](#seo-landing-pages) ✨
+- [Recent Updates](#recent-updates)
 - [Folder Structure](#folder-structure)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -39,9 +40,9 @@
 
 ## 🎯 About The Project
 
-The **SAU Question Bank & Study Hub** is a scalable, multi-faculty academic resource platform built for students and teachers at Sher-e-Bangla Agricultural University. It solves the problem of scattered, hard-to-find past exam papers and study materials by providing a single, searchable, and filterable repository that supports multiple academic domains.
+The **SAU Study Platform** is a scalable, multi-faculty academic ecosystem built for students and teachers at Sher-e-Bangla Agricultural University. It solves the problem of scattered, hard-to-find past exam papers, lecture notes, textbooks, and study materials by providing a single, searchable, and SEO-optimized repository that supports multiple academic domains.
 
-Contributors (collectors and admins) can upload previous-year question papers directly via image uploads, and link external resources such as textbooks, lecture notes, or general PDFs. Students can browse, filter by faculty/level/semester/course, and instantly access everything they need — all powered by a context-aware AI tutor assistant that dynamically adapts its domain knowledge based on the selected faculty for robust on-demand academic support.
+The platform combines a comprehensive question bank, study materials library, context-aware AI tutor, and faculty-specific landing pages to create an all-in-one study hub. Students can browse resources by faculty/level/semester/course, access instant AI-powered academic assistance, and find exactly what they need through optimized search and filtering — all powered by intelligent routing and structured data for better discoverability.
 
 ---
 
@@ -110,7 +111,47 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 
 ---
 
+## ✨ SEO Landing Pages & Internal Linking
+
+The platform now includes **7 optimized landing pages** with structured data, breadcrumbs, and intelligent internal linking to improve discoverability and user navigation:
+
+### Faculty-Specific Landing Pages
+- **`/sau-economics-question`** — Agricultural Economics question bank with course breakdowns, level-wise filtering, and AI tutor integration
+- **`/sau-agriculture-question`** — Agriculture faculty resources covering agronomy, entomology, soil science, and plant pathology
+- **`/sau-asvm-question`** — Animal Science & Veterinary Medicine materials spanning 5 academic levels
+
+### Resource Landing Pages
+- **`/sau-question-bank-pdf`** — Complete PDF download guide with organized links to all faculty resources
+- **`/sau-notes`** — Lecture notes repository with semester-wise organization and quick access links
+- **`/sau-admission-preparation`** — Admission preparation guide with study tips, resource recommendations, and practice materials
+
+### Key Features of Landing Pages
+- **🔍 SEO-Optimized Meta Tags** — Each page uses centralized `SEO.tsx` component with route-specific titles, descriptions, keywords, and Open Graph tags via `react-helmet-async`
+- **📊 Structured Data (JSON-LD)** — FAQ schema on homepage, BreadcrumbList schema on all landing pages for enhanced search engine visibility
+- **🧭 Breadcrumb Navigation** — Reusable `Breadcrumb.tsx` component with JSON-LD markup showing clear page hierarchy
+- **🔗 Related Resources** — Smart `RelatedPages.tsx` component suggesting next logical steps (Questions → AI Tutor → Study Materials)
+- **🎯 Single Dominant CTA** — Every page features one primary call-to-action above the fold with gradient styling
+- **🤖 Always-Visible AI Tutor** — Floating AI tutor widget accessible from every page, visually distinct in footer and related resources
+- **📱 Responsive Design** — All components support dark mode, mobile layouts, and Framer Motion animations
+
+### New Components Added
+- **`SEO.tsx`** — Centralized SEO component managing all meta tags, canonical URLs, and Open Graph data
+- **`seoConfig.ts`** — Route-specific SEO configurations for all 10+ pages with SAU-focused keywords
+- **`FAQ.tsx`** — Homepage FAQ component with JSON-LD FAQPage schema for rich search results
+- **`faqData.ts`** — Structured FAQ content addressing common student questions
+- **`Breadcrumb.tsx`** — Accessible breadcrumb navigation with structured data markup
+- **`RelatedPages.tsx`** — Intelligent resource recommendation grid with AI Tutor prominence
+
+---
+
 ## ✨ Recent Updates
+
+### 🤖 AI Tutor & Landing Page Navigation Fixes (2026-05-01)
+- **AI Embodiment & Navigation**: Overrode the AI's default "text-only chatbot" persona with a strict system prompt. The AI now knows it is integrated directly into the SAU website UI and acts as a specialized tour guide. It provides exact navigation instructions (e.g., "Click the 'Questions' link in the top navigation bar") instead of generic advice.
+- **Landing Page Deep Links**: Fixed broken internal links on the faculty landing pages (`?level=Level-1`). `QuestionList` now properly consumes URL parameters on initial mount, bypassing the faculty-reset race condition.
+- **Dynamic Tailwind Fixes**: Replaced dynamic string interpolation (`bg-${color}-100`) with explicit utility classes across landing pages to prevent aggressive Tailwind build-time purging.
+- **Admin Dashboard UI**: Corrected study material badge styling to accurately differentiate `book`, `note`, and `pdf` types with distinct colors and icons.
+- **TypeScript Fix**: Fixed role mapping between frontend (`'model'`) and backend (`'assistant'`) chat history arrays to satisfy rigorous TypeScript `TS2367` checks for the Groq API.
 
 ### 🗜️ Legacy Image Library Optimization (2026-04-20)
 - **Bulk WebP Migration**: Entire legacy image library (446 images) optimized from JPG/PNG to WebP
@@ -229,6 +270,8 @@ question-bank-app/
 │   │   │   ├── uploads.ts          # POST /api/upload, POST /api/upload-material
 │   │   │   ├── ai.ts               # POST /api/chat-tutor — faculty-aware Groq (Llama 4 Scout)
 │   │   │   └── admin.ts            # /api/contributors + all /api/admin/* routes
+│   │   ├── scripts/
+│   │   │   └── bulk-webp-optimizer.ts # Legacy image optimization script
 │   │   └── index.ts                # App bootstrap: env validation, middleware, route mounting
 │   ├── .env.example                # Backend environment variable template
 │   ├── package.json
@@ -241,18 +284,23 @@ question-bank-app/
 │   │   ├── components/             # All React page & UI components
 │   │   │   ├── AdminDashboard.tsx  # Admin control panel with skeleton loading states
 │   │   │   ├── AnimatedBackground.tsx # Global particle background elements
+│   │   │   ├── Breadcrumb.tsx      # Accessible breadcrumb navigation with JSON-LD schema
 │   │   │   ├── Contributors.tsx    # Public contributors showcase page
 │   │   │   ├── Developer.tsx       # Developer profile page
 │   │   │   ├── DeveloperBadge.tsx  # Interactive "Developed By" floating badge
+│   │   │   ├── FAQ.tsx             # Homepage FAQ component with JSON-LD FAQPage schema
 │   │   │   ├── FloatingAITutor.tsx # Groq-powered AI chat widget (image-aware)
 │   │   │   ├── HeroParticles.tsx   # Canvas-based Framer Motion hero animation
+│   │   │   ├── Homepage.tsx        # Main application landing page
 │   │   │   ├── icons.tsx           # Centralised typed SVG icon components (12 icons)
-│   │   │   ├── Layout.tsx          # Global navbar, sidebar, and footer wrapper
+│   │   │   ├── Layout.tsx          # Global navbar, sidebar, and footer wrapper with multi-column layout
 │   │   │   ├── Login.tsx           # Supabase Auth login form
 │   │   │   ├── PageTransition.tsx  # Framer Motion page transitions and routing wrapper
 │   │   │   ├── Profile.tsx         # User profile editor with avatar upload
 │   │   │   ├── QuestionList.tsx    # Filterable question paper grid with dynamic stats
+│   │   │   ├── RelatedPages.tsx    # Intelligent resource recommendation grid with AI Tutor prominence
 │   │   │   ├── ScrollReveal.tsx    # Unified smooth scroll-reveal wrapper
+│   │   │   ├── SEO.tsx             # Centralized SEO component with react-helmet-async
 │   │   │   ├── StudyMaterials.tsx  # Books, Notes & PDFs page — infinite scroll, URL-synced filters
 │   │   │   └── UploadQuestion.tsx  # Unified upload form (4-tab: Question/Book/Note/PDF)
 │   │   ├── context/
@@ -260,7 +308,16 @@ question-bank-app/
 │   │   │   ├── FacultyContext.tsx  # Global faculty state scaling provider
 │   │   │   └── ThemeContext.tsx    # Light/Dark mode context provider
 │   │   ├── lib/
+│   │   │   ├── faqData.ts          # Structured FAQ content for homepage
+│   │   │   ├── seoConfig.ts        # Route-specific SEO configurations for all pages
 │   │   │   └── supabaseClient.ts   # Supabase client initialisation
+│   │   ├── pages/                  # Landing page components
+│   │   │   ├── SAUAdmissionPreparation.tsx # Admission preparation guide landing page
+│   │   │   ├── SAUAgricultureQuestion.tsx  # Agriculture faculty landing page
+│   │   │   ├── SAUASVMQuestion.tsx         # ASVM faculty landing page
+│   │   │   ├── SAUEconomicsQuestion.tsx    # Agricultural Economics landing page
+│   │   │   ├── SAUNotes.tsx                # Lecture notes landing page
+│   │   │   └── SAUQuestionBankPDF.tsx      # PDF download guide landing page
 │   │   ├── App.css                 # Global base styles
 │   │   ├── App.tsx                 # Root component: router, providers, Vercel Analytics & Toaster
 │   │   ├── data.ts                 # Typed CourseData (Level → Semester → Course mapping)
@@ -272,7 +329,6 @@ question-bank-app/
 │   ├── vite.config.ts
 │   └── package.json
 │
-├── CLEANUP_REPORT.md               # Comprehensive codebase cleanup documentation
 └── README.md
 ```
 
@@ -489,33 +545,34 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 ### Component Architecture
 
 **Frontend Components** (`frontend/src/components/`):
-- **Layout & Navigation**: [`Layout.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\Layout.tsx) (navbar, sidebar, footer), [`PageTransition.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\PageTransition.tsx) (Framer Motion route transitions)
+- **Layout & Navigation**: `Layout.tsx` (navbar, sidebar, footer), `PageTransition.tsx` (Framer Motion route transitions)
 - **Core Features**: 
-  - [`QuestionList.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\QuestionList.tsx) — Filterable question paper grid with multi-image support, dynamic stats, and smart loading logic (browse all vs. filtered mode with contributor caching)
-  - [`StudyMaterials.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\StudyMaterials.tsx) — Infinite scroll library with contributor caching and URL-synced filters
-  - [`FloatingAITutor.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\FloatingAITutor.tsx) — Groq-powered chat widget with faculty validation
-  - [`UploadQuestion.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\UploadQuestion.tsx) — Unified 4-tab upload form (Question/Book/Note/PDF)
-  - [`AdminDashboard.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\AdminDashboard.tsx) — User management, content moderation with skeleton loading states and toast notifications
-- **User Management**: [`Login.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\Login.tsx) (Supabase Auth), [`Profile.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\Profile.tsx) (avatar upload with rollback)
+  - `Homepage.tsx` — Main application landing page and entry point
+  - `QuestionList.tsx` — Filterable question paper grid with multi-image support, dynamic stats, and smart loading logic
+  - `StudyMaterials.tsx` — Infinite scroll library with contributor caching and URL-synced filters
+  - `FloatingAITutor.tsx` — Groq-powered chat widget with faculty validation and website integration
+  - `UploadQuestion.tsx` — Unified 4-tab upload form (Question/Book/Note/PDF)
+  - `AdminDashboard.tsx` — User management, content moderation with skeleton loading states and toast notifications
+- **User Management**: `Login.tsx` (Supabase Auth), `Profile.tsx` (avatar upload with rollback)
 - **UI/UX Enhancements**: 
-  - [`HeroParticles.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\HeroParticles.tsx) — Canvas-based particle animation
-  - [`ScrollReveal.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\ScrollReveal.tsx) — Unified scroll-triggered animations
-  - [`DeveloperBadge.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\DeveloperBadge.tsx) — Interactive floating badge
-  - [`icons.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\components\icons.tsx) — 12 typed SVG icon components with optional className overrides
+  - `HeroParticles.tsx` — Canvas-based particle animation
+  - `ScrollReveal.tsx` — Unified scroll-triggered animations
+  - `DeveloperBadge.tsx` — Interactive floating badge
+  - `icons.tsx` — 12 typed SVG icon components with optional className overrides
 
 **Backend Routes** (`backend/src/routes/`):
-- [`auth.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\auth.ts) — User profile CRUD with atomic avatar operations
-- [`uploads.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\uploads.ts) — Question images (parallel Supabase uploads) and study materials
-- [`ai.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\ai.ts) — Faculty-aware AI tutor with prompt injection protection
-- [`admin.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\routes\admin.ts) — User/content management with master admin protection
+- `auth.ts` — User profile CRUD with atomic avatar operations
+- `uploads.ts` — Question images (parallel Supabase uploads) and study materials
+- `ai.ts` — Faculty-aware AI tutor with prompt injection protection
+- `admin.ts` — User/content management with master admin protection
 
 **Storage Utilities** (`backend/src/lib/`):
-- [`storage.ts`](file://e:\Argho\Projects\question-bank-app\backend\src\lib\storage.ts) — Supabase Storage integration (uploadToSupabase, deleteFromStorage)
+- `storage.ts` — Supabase Storage integration (uploadToSupabase, deleteFromStorage)
 
 **Context Providers** (`frontend/src/context/`):
-- [`AuthContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\AuthContext.tsx) — Supabase session management with race condition prevention
-- [`FacultyContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\FacultyContext.tsx) — Global faculty state for AI tutor context
-- [`ThemeContext.tsx`](file://e:\Argho\Projects\question-bank-app\frontend\src\context\ThemeContext.tsx) — Light/dark mode toggle
+- `AuthContext.tsx` — Supabase session management with race condition prevention
+- `FacultyContext.tsx` — Global faculty state for AI tutor context
+- `ThemeContext.tsx` — Light/dark mode toggle
 
 ---
 
@@ -584,10 +641,10 @@ This project follows industry best practices for security, performance, and data
 - **Impact**: Prevents attackers from manipulating AI behavior via crafted faculty names in localStorage or API requests
 
 #### 5. Atomic Resource Operations
-- **Profile Updates** ([`auth.ts`](file://d:\Projects\question-bank-app\backend\src\routes\auth.ts#L26-L79)): Upload new avatar → Update DB → Delete old avatar; rollback deletes new upload if DB fails
-- **User Deletion** ([`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L84-L119)): Delete auth + DB record → Delete avatar; avatar only deleted after DB confirms
-- **Question Deletion** ([`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L121-L147)): Delete DB record → Delete all Supabase images; images only deleted after DB confirms
-- **User Creation** ([`admin.ts`](file://d:\Projects\question-bank-app\backend\src\routes\admin.ts#L44-L77)): Create auth account → Insert DB record; rollback deletes auth account if DB fails
+- **Profile Updates** (`auth.ts`): Upload new avatar → Update DB → Delete old avatar; rollback deletes new upload if DB fails
+- **User Deletion** (`admin.ts`): Delete auth + DB record → Delete avatar; avatar only deleted after DB confirms
+- **Question Deletion** (`admin.ts`): Delete DB record → Delete all Supabase images; images only deleted after DB confirms
+- **User Creation** (`admin.ts`): Create auth account → Insert DB record; rollback deletes auth account if DB fails
 - **Impact**: Zero data loss on failures, no orphaned storage files
 
 ### Performance Optimizations
@@ -679,13 +736,14 @@ This project follows industry best practices for security, performance, and data
 - **Production**: Set `CORS_ORIGIN=https://your-app.vercel.app,https://another-domain.com`
 - **Note**: Multiple origins separated by commas, no spaces after commas
 
-#### AI Tutor Not Responding
-**Symptoms**: Chat sends but no response, or error message appears
+#### AI Tutor Not Responding or Giving Incorrect Answers
+**Symptoms**: Chat sends but no response, error message appears, or the AI acts like a generic chatbot instead of a website guide.
 - **Check 1**: Verify `GROQ_API_KEY` is valid and not expired
 - **Check 2**: Ensure faculty is set to one of: `Agricultural Economics`, `Agriculture`, or `ASVM`
 - **Check 3**: Inspect backend console for `[AI]` error logs
-- **Check 4**: Verify message length is under 2000 characters
-- **Check 5**: Ensure image URLs (if any) are from Supabase Storage or Cloudinary (for backward compatibility)
+- **Check 4**: If the AI is giving outdated or incorrect persona responses, **refresh the browser**. Language models are heavily influenced by their past outputs in the active chat session. Refreshing clears the frontend chat history and forces it to strictly follow its current system prompt.
+- **Check 5**: Verify message length is under 2000 characters
+- **Check 6**: Ensure image URLs (if any) are from Supabase Storage or Cloudinary (for backward compatibility)
 
 #### Study Materials Showing "Unknown" Contributors
 **Symptoms**: All materials show "Unknown" instead of uploader names

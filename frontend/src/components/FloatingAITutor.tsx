@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useFaculty } from '../context/FacultyContext';
 import { SparkleIcon, SendIcon, CloseIcon } from './icons';
@@ -42,6 +43,7 @@ const WELCOME_MESSAGE: Message = {
 };
 
 const FloatingAITutor = () => {
+    const location = useLocation();
     const { activeFaculty } = useFaculty();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
@@ -50,6 +52,16 @@ const FloatingAITutor = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const messageIdRef = useRef(1);
+
+    // Auto-open AI Tutor when URL has ?ai-tutor=open query parameter
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        if (searchParams.get('ai-tutor') === 'open') {
+            setIsOpen(true);
+            // Clean up the URL after opening
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, [location.search]);
 
     // Auto-scroll to bottom on new messages
     useEffect(() => {

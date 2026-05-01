@@ -8,7 +8,7 @@ const DEV = {
   title: 'Full-Stack Developer',
   subtitle: 'Building tools for Agricultural Education',
 
-  avatarUrl: 'profile.png',
+  avatarUrl: '/profile.png',
   avatarInitials: 'A',
 
   bio: `I'm a passionate full-stack developer and student at Sher-e-Bangla Agricultural University. 

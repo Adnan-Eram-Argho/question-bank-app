@@ -14,6 +14,13 @@ import Contributors from './components/Contributors';
 import Profile from './components/Profile';
 import AnimatedBackground from './components/AnimatedBackground';
 import PageTransition from './components/PageTransition';
+import Homepage from './components/Homepage';
+import SAUQuestionBankPDF from './pages/SAUQuestionBankPDF';
+import SAUEconomicsQuestion from './pages/SAUEconomicsQuestion';
+import SAUAgricultureQuestion from './pages/SAUAgricultureQuestion';
+import SAUASVMQuestion from './pages/SAUASVMQuestion';
+import SAUNotes from './pages/SAUNotes';
+import SAUAdmissionPreparation from './pages/SAUAdmissionPreparation';
 
 // New addition: Analytics for production monitoring
 import { Analytics } from '@vercel/analytics/react';
@@ -32,78 +39,88 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode, allow
 function App() {
   return (
     <ThemeProvider>
-      <FacultyProvider>
-        <AuthProvider>
+      <AuthProvider>
         <Router>
-          <AnimatedBackground />
-          <Layout>
-            <PageTransition>
-              <Routes>
-                <Route path="/" element={<QuestionList />} />
-                <Route path="/login" element={<Login />} />
+          <FacultyProvider>
+            <AnimatedBackground />
+            <Layout>
+              <PageTransition>
+                <Routes>
+                  <Route path="/" element={<Homepage />} />
+                  <Route path="/questions" element={<QuestionList />} />
+                  <Route path="/ai-tutor" element={<Navigate to="/?ai-tutor=open" replace />} />
+                  <Route path="/login" element={<Login />} />
 
-                {/* Protected Routes */}
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute allowedRoles={['admin']}>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/upload"
-                  element={
-                    <ProtectedRoute allowedRoles={['admin', 'collector']}>
-                      <UploadQuestion />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute allowedRoles={['admin', 'collector']}>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Protected Routes */}
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute allowedRoles={['admin']}>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/upload"
+                    element={
+                      <ProtectedRoute allowedRoles={['admin', 'collector']}>
+                        <UploadQuestion />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute allowedRoles={['admin', 'collector']}>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Public Info Routes */}
-                <Route path="/study-materials" element={<StudyMaterials />} />
-                <Route path="/developer" element={<Developer />} />
-                <Route path="/contributors" element={<Contributors />} />
-              </Routes>
-            </PageTransition>
-          </Layout>
+                  {/* Public Info Routes */}
+                  <Route path="/study-materials" element={<StudyMaterials />} />
+                
+                  {/* Landing Pages - All 6 Complete */}
+                  <Route path="/sau-question-bank-pdf" element={<SAUQuestionBankPDF />} />
+                  <Route path="/sau-economics-question" element={<SAUEconomicsQuestion />} />
+                  <Route path="/sau-agriculture-question" element={<SAUAgricultureQuestion />} />
+                  <Route path="/sau-asvm-question" element={<SAUASVMQuestion />} />
+                  <Route path="/sau-notes" element={<SAUNotes />} />
+                  <Route path="/sau-admission-preparation" element={<SAUAdmissionPreparation />} />
+                
+                  <Route path="/developer" element={<Developer />} />
+                  <Route path="/contributors" element={<Contributors />} />
+                </Routes>
+              </PageTransition>
+            </Layout>
+
+            <Analytics />
+            <Toaster
+              position="bottom-center"
+              toastOptions={{
+                style: {
+                  background: '#333',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                },
+                success: {
+                  iconTheme: {
+                    primary: '#10B981',
+                    secondary: '#fff',
+                  },
+                },
+                error: {
+                  iconTheme: {
+                    primary: '#EF4444',
+                    secondary: '#fff',
+                  },
+                },
+              }}
+            />
+          </FacultyProvider>
         </Router>
-
-        
-        <Analytics /> 
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            style: {
-              background: '#333',
-              color: '#fff',
-              borderRadius: '8px',
-              padding: '12px 16px',
-            },
-            success: {
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
-              },
-            },
-          }}
-        />
-        </AuthProvider>
-      </FacultyProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
