@@ -95,7 +95,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 ## ✨ Key Features
 
 - **🌐 Multi-Faculty Architecture** — Seamlessly switch across 3 faculties (Agricultural Economics, Agriculture, ASVM) to access domain-specific study environments with up to 5 academic levels per faculty.
-- **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads (up to 2 images per question, 5MB each) stored in Supabase Storage, with drag-and-drop, paste (Ctrl+V), and instant preview. **Smart loading logic**: loads all questions when no filters are selected for browsing, requires complete filter selection (Level + Semester + Course) for targeted searches, with helpful guidance messages during partial selection.
+- **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads (up to 2 images per question, 5MB each) stored in Supabase Storage, with drag-and-drop, paste (Ctrl+V), and instant preview. **Smart loading logic**: loads only the 10 latest questions when no filters are selected to save server egress, requires complete filter selection (Level + Semester + Course) for targeted searches, with helpful guidance messages during partial selection.
 - **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs. Supports URL-synced type filters (`?type=book`), infinite scroll pagination (batches of 9), real-time type counts, and asynchronous contributor profile resolution with intelligent in-memory caching (~60% API call reduction).
 - **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 image URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
 - **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, smooth page transitions, and micro-interaction hover effects throughout.
@@ -170,7 +170,7 @@ The platform now includes **7 optimized landing pages** with structured data, br
 
 ### ⚡ Smart Filtering & Data Loading (2026-04-22)
 - **Intelligent Question Loading Logic**: Questions now load based on filter state
-  - **No filters selected** → Loads ALL questions for current faculty (browse mode)
+  - **No filters selected** → Loads only the 10 latest uploaded questions to save server egress (browse mode)
   - **Partial filters** (e.g., only Level or Level + Semester) → Shows guidance message with visual progress indicator
   - **Complete filters** (Level + Semester + Course) → Loads filtered questions for specific course
   - Prevents overwhelming users with too much data while maintaining flexibility

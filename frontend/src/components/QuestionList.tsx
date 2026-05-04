@@ -438,7 +438,7 @@ const QuestionList = () => {
     }, []); // No dependencies - uses refs which don't trigger re-renders
 
     const fetchQuestions = useCallback(async (pageNum: number, isReset = false) => {
-        // ✅ Load all questions if no filters are selected
+        // ✅ Load only 10 latest questions if no filters are selected to save egress
         // ✅ Require all three filters (level, semester, course) if any filter is partially selected
         const hasSomeFilters = filterLevel || filterSemester || filterCourse;
         const hasAllRequiredFilters = filterLevel && filterSemester && filterCourse;
@@ -470,9 +470,16 @@ const QuestionList = () => {
             if (filterCourse) query = query.eq('course_name', filterCourse);
             if (filterType) query = query.eq('question_type', filterType);
 
-            const from = pageNum * BATCH_SIZE;
-            const to = from + BATCH_SIZE - 1;
-            query = query.range(from, to);
+            const noFiltersSelected = !filterLevel && !filterSemester && !filterCourse && !filterType;
+
+            if (noFiltersSelected) {
+                // To save server cached egress, only load the 10 latest questions when no filters are selected
+                query = query.range(0, 9);
+            } else {
+                const from = pageNum * BATCH_SIZE;
+                const to = from + BATCH_SIZE - 1;
+                query = query.range(from, to);
+            }
 
             const { data, error } = await query;
             if (error) throw error;
@@ -495,7 +502,9 @@ const QuestionList = () => {
                 setQuestions(prev => [...prev, ...newQuestions]);
             }
 
-            if (rawQuestions.length < BATCH_SIZE) {
+            if (noFiltersSelected) {
+                setHasMore(false); // Disallow pagination if no filters are selected
+            } else if (rawQuestions.length < BATCH_SIZE) {
                 setHasMore(false);
             }
         } catch (error) {
