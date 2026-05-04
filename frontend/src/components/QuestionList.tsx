@@ -438,16 +438,14 @@ const QuestionList = () => {
     }, []); // No dependencies - uses refs which don't trigger re-renders
 
     const fetchQuestions = useCallback(async (pageNum: number, isReset = false) => {
-        // ✅ Load only 10 latest questions if no filters are selected to save egress
-        // ✅ Require all three filters (level, semester, course) if any filter is partially selected
-        const hasSomeFilters = filterLevel || filterSemester || filterCourse;
+        // ✅ Require complete filter selection (level, semester, course) to load any questions
         const hasAllRequiredFilters = filterLevel && filterSemester && filterCourse;
         
-        if (hasSomeFilters && !hasAllRequiredFilters) {
+        if (!hasAllRequiredFilters) {
             setQuestions([]);
             setLoading(false);
             setLoadingMore(false);
-            setHasMore(true);
+            setHasMore(false);
             return;
         }
 
@@ -470,16 +468,9 @@ const QuestionList = () => {
             if (filterCourse) query = query.eq('course_name', filterCourse);
             if (filterType) query = query.eq('question_type', filterType);
 
-            const noFiltersSelected = !filterLevel && !filterSemester && !filterCourse && !filterType;
-
-            if (noFiltersSelected) {
-                // To save server cached egress, only load the 10 latest questions when no filters are selected
-                query = query.range(0, 9);
-            } else {
-                const from = pageNum * BATCH_SIZE;
-                const to = from + BATCH_SIZE - 1;
-                query = query.range(from, to);
-            }
+            const from = pageNum * BATCH_SIZE;
+            const to = from + BATCH_SIZE - 1;
+            query = query.range(from, to);
 
             const { data, error } = await query;
             if (error) throw error;
@@ -502,9 +493,7 @@ const QuestionList = () => {
                 setQuestions(prev => [...prev, ...newQuestions]);
             }
 
-            if (noFiltersSelected) {
-                setHasMore(false); // Disallow pagination if no filters are selected
-            } else if (rawQuestions.length < BATCH_SIZE) {
+            if (rawQuestions.length < BATCH_SIZE) {
                 setHasMore(false);
             }
         } catch (error) {
@@ -770,7 +759,7 @@ const QuestionList = () => {
                         <div className="bg-gray-50 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                             {!filterLevel && !filterSemester && !filterCourse ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             ) : (
                                 <EmptyStateIcon className="h-8 w-8 text-gray-400" />
@@ -778,10 +767,9 @@ const QuestionList = () => {
                         </div>
                         {!filterLevel && !filterSemester && !filterCourse ? (
                             <>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Questions Available</h3>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Search for Questions</h3>
                                 <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                                    There are currently no questions in the database for <span className="font-semibold">{activeFaculty}</span>. 
-                                    Check back later or contact an administrator to add content.
+                                    Use the filters above to find specific question papers. You must select a <span className="font-semibold text-primary-600 dark:text-primary-400">Level</span>, <span className="font-semibold text-primary-600 dark:text-primary-400">Semester</span>, and <span className="font-semibold text-primary-600 dark:text-primary-400">Course</span> to load results.
                                 </p>
                             </>
                         ) : !filterLevel || !filterSemester || !filterCourse ? (
