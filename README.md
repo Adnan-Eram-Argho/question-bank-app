@@ -11,7 +11,7 @@
 [![Deployed on Vercel](https://img.shields.io/badge/Frontend-Vercel-black?logo=vercel)](https://vercel.com/)
 [![API on Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render)](https://render.com/)
 
-[Live Demo](https://sau-agri-econ.vercel.app/) · [Report Bug](https://github.com/Adnan-Eram-Argho/question-bank-app/issues) · [Request Feature](https://github.com/Adnan-Eram-Argho/question-bank-app/issues)
+[Live Demo](https://sau-eco-qstns.vercel.app/) · [Report Bug](https://github.com/Adnan-Eram-Argho/question-bank-app/issues) · [Request Feature](https://github.com/Adnan-Eram-Argho/question-bank-app/issues)
 
 </div>
 
