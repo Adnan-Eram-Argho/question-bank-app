@@ -8,6 +8,7 @@ export interface SEOProps {
     canonicalPath?: string; // Optional override for custom canonical URLs
     ogImage?: string;
     ogType?: string;
+    schema?: string | object; // Optional JSON-LD schema
 }
 
 const BASE_URL = 'https://sau-eco-qstns.vercel.app';
@@ -34,6 +35,7 @@ const SEO: React.FC<SEOProps> = ({
     canonicalPath,
     ogImage = DEFAULT_OG_IMAGE,
     ogType = 'website',
+    schema,
 }) => {
     const location = useLocation();
     
@@ -66,6 +68,13 @@ const SEO: React.FC<SEOProps> = ({
             <meta name="twitter:title" content={title} />
             <meta name="twitter:description" content={description} />
             <meta name="twitter:image" content={fullOgImage} />
+
+            {/* Structured Data (JSON-LD) */}
+            {schema && (
+                <script type="application/ld+json">
+                    {typeof schema === 'string' ? schema : JSON.stringify(schema)}
+                </script>
+            )}
         </Helmet>
     );
 };

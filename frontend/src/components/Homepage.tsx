@@ -10,9 +10,22 @@ import { homepageFAQs } from '../lib/faqData';
 const Homepage = () => {
     const { activeFaculty } = useFaculty();
 
+    const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": homepageFAQs.map(faq => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+            }
+        }))
+    };
+
     return (
         <>
-            <SEO {...seoConfig.homepage} />
+            <SEO {...seoConfig.homepage} schema={faqSchema} />
             
             <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 lg:py-16">
                 <div className="relative w-full max-w-5xl mx-auto">
