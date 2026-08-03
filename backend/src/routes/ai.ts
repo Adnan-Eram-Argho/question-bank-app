@@ -21,14 +21,14 @@ const sanitizeFaculty = (faculty: unknown): ValidFaculty => {
   if (typeof faculty !== 'string') {
     return 'Agricultural Economics';
   }
-  
+
   const trimmed = faculty.trim();
-  
+
   // Check against whitelist
   if (VALID_FACULTIES.includes(trimmed as ValidFaculty)) {
     return trimmed as ValidFaculty;
   }
-  
+
   // Log suspicious input for monitoring
   console.warn(`[AI] Invalid faculty attempted: "${trimmed}". Defaulting to Agricultural Economics.`);
   return 'Agricultural Economics';
@@ -84,31 +84,31 @@ router.post('/chat-tutor', async (req: Request, res: Response): Promise<void> =>
     res.status(400).json({ error: 'A valid message string is required.' });
     return;
   }
-  
+
   // Additional message sanitization to prevent prompt injection
   const sanitizedMessage = message.trim();
   if (sanitizedMessage.length === 0) {
     res.status(400).json({ error: 'Message cannot be empty or whitespace only.' });
     return;
   }
-  
+
   if (sanitizedMessage.length > 2000) {
     res.status(400).json({ error: 'Message is too long. Max 2000 characters.' });
     return;
   }
-  
+
   if ((images ?? []).length > 5) {
     res.status(400).json({ error: 'Maximum 5 images allowed per message.' });
     return;
   }
-  
-// Validate and sanitize image URLs (Allow both Supabase and legacy Cloudinary URLs for backward compatibility)
-const validImages = (images ?? []).filter((url: string) => {
-  if (typeof url !== 'string') return false;
-  const isSupabase = url.includes('supabase.co/storage/v1/object/public/');
-  const isCloudinary = url.startsWith('https://res.cloudinary.com/');
-  return isSupabase || isCloudinary;
-});
+
+  // Validate and sanitize image URLs (Allow both Supabase and legacy Cloudinary URLs for backward compatibility)
+  const validImages = (images ?? []).filter((url: string) => {
+    if (typeof url !== 'string') return false;
+    const isSupabase = url.includes('supabase.co/storage/v1/object/public/');
+    const isCloudinary = url.startsWith('https://res.cloudinary.com/');
+    return isSupabase || isCloudinary;
+  });
 
   // Sanitize faculty to prevent prompt injection
   const currentFaculty = sanitizeFaculty(faculty);
@@ -133,7 +133,7 @@ const validImages = (images ?? []).filter((url: string) => {
     ];
 
     const completion = await groq.chat.completions.create({
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      model: 'llama-3.3-70b-versatile',
       messages: messages as any, // Only safely cast at the final handoff if Groq's internal types clash, but our object is now strictly typed above.
       max_tokens: 1024,
     });

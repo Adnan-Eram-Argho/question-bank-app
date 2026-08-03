@@ -81,7 +81,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 | **Backend** | Node.js, Express, TypeScript | Express 5.2.1, Node v18+ |
 | **Database & Auth** | Supabase (PostgreSQL + Auth) | supabase-js 2.100.1 |
 | **Image Storage** | Supabase Storage | `agri-resources` bucket with public access |
-| **AI Tutor** | Groq SDK | groq-sdk 1.1.2 (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) |
+| **AI Tutor** | Groq SDK | groq-sdk 1.1.2 (Llama 3.3 70B: llama-3.3-70b-versatile) |
 | **File Upload** | Multer | multer 2.1.1 (memory storage, uploads to Supabase Storage) |
 | **Image Processing** | Sharp | sharp 0.34.x (automatic WebP conversion with quality optimization) |
 | **Analytics** | Vercel Analytics | @vercel/analytics 2.0.1 |
@@ -97,7 +97,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 - **🌐 Multi-Faculty Architecture** — Seamlessly switch across 3 faculties (Agricultural Economics, Agriculture, ASVM) to access domain-specific study environments with up to 5 academic levels per faculty.
 - **📖 Question Bank** — Browse and filter previous-year exam papers by Faculty, Level, Semester, Course, and Type. Supports multi-image uploads (up to 2 images per question, 5MB each) stored in Supabase Storage, with drag-and-drop, paste (Ctrl+V), and instant preview. **Smart loading logic**: requires complete filter selection (Level + Semester + Course) to load any questions, preventing database strain and providing helpful guidance messages when filters are empty or partially selected.
 - **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs. Supports URL-synced type filters (`?type=book`), infinite scroll pagination (batches of 9), real-time type counts, and asynchronous contributor profile resolution with intelligent in-memory caching (~60% API call reduction).
-- **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 4 Scout: `meta-llama/llama-4-scout-17b-16e-instruct`) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 image URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
+- **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 3.3 70B: llama-3.3-70b-versatile) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 image URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
 - **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, smooth page transitions, and micro-interaction hover effects throughout.
 - **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Optimized auth flow with race condition prevention using `useRef` to track latest user ID, redundant DB queries removed for instant logins, and secure profile updates with atomic operations.
 - **🛠️ Admin Dashboard** — Full moderation panel with skeleton loading states: create users with rollback on failure, delete questions/materials/users with cascading storage cleanup (Supabase Storage), manage study materials, master admin protection via environment variable, and professional toast notifications for all operations.
@@ -268,7 +268,7 @@ question-bank-app/
 │   │   ├── routes/
 │   │   │   ├── auth.ts             # GET/POST /api/user/profile
 │   │   │   ├── uploads.ts          # POST /api/upload, POST /api/upload-material
-│   │   │   ├── ai.ts               # POST /api/chat-tutor — faculty-aware Groq (Llama 4 Scout)
+│   │   │   ├── ai.ts               # POST /api/chat-tutor — faculty-aware Groq (Llama 3.3 70B)
 │   │   │   └── admin.ts            # /api/contributors + all /api/admin/* routes
 │   │   ├── scripts/
 │   │   │   └── bulk-webp-optimizer.ts # Legacy image optimization script
@@ -838,7 +838,7 @@ SOFTWARE.
 ## 🙏 Acknowledgments
 
 - [Supabase](https://supabase.com/) — Open-source Firebase alternative powering auth, database, and image storage
-- [Groq](https://groq.com/) — Ultra-fast LLM inference powering the AI Tutor (Llama 4 Scout)
+- [Groq](https://groq.com/) — Ultra-fast LLM inference powering the AI Tutor (Llama 3.3 70B)
 - [Vercel](https://vercel.com/) — Seamless frontend hosting, deployment, and analytics
 - [Render](https://render.com/) — Reliable backend hosting for the Express API
 - [React Hot Toast](https://react-hot-toast.com/) — Beautiful toast notifications
