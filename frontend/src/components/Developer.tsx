@@ -5,22 +5,29 @@ import ScrollReveal from './ScrollReveal';
 
 const DEV = {
   name: 'Adnan-Eram Argho',
-  title: 'Full-Stack Developer',
-  subtitle: 'Building tools for Agricultural Education',
+  title: 'Full-Stack Developer & AI Engineer',
+  subtitle: 'Building tools for SAU students and agricultural research',
 
   avatarUrl: '/profile.png',
   avatarInitials: 'A',
 
-  bio: `I'm a passionate full-stack developer and student at Sher-e-Bangla Agricultural University. 
-
-I have gained proficiency in different technologies.My learning journey has been largely self-directed. I have explored and learned some technologies from multiple online sources, allowing me to develop a comprehensive understanding and versatile skill set. This experience has not only honed my technical abilities but also cultivated a strong problem-solving mindset and an eagerness to embrace new challenges.
-
-I am passionate about programming and continuously learning new technologies to stay at the forefront of the ever-evolving tech landscape. I am excited to leverage my skills to contribute to innovative projects and collaborate with like-minded professionals in the field.`,
+  bio: [
+    `I'm a student of Agricultural Economics at Sher-e-Bangla Agricultural University, and the person who built this Question Bank for my fellow SAU students.`,
+    `I'm completely self-taught: 4+ years of coding, no CSE degree, just curiosity and a lot of building. Everything on this page started with a real problem I saw around campus, and I wanted to fix it with code.`,
+    `Right now I'm exploring Data Science and Machine Learning, with a focus on bringing AI into agriculture.`,
+  ],
 
   github: 'https://github.com/Adnan-Eram-Argho',
   linkedin: 'https://www.linkedin.com/in/md-adnan-eram-argho/',
   email: 'adnaneramargho@gmail.com',
   portfolio: 'https://adnan-eram-argho.github.io/portfolio/',
+
+  stats: [
+    { value: '4+', label: 'Years of coding' },
+    { value: '5', label: 'Live projects' },
+    { value: '162', label: 'Courses in this Question Bank' },
+    { value: '25+', label: 'Online certificates' },
+  ],
 
   education: [
     {
@@ -30,17 +37,89 @@ I am passionate about programming and continuously learning new technologies to 
     },
   ],
 
-  skills: [
-    'React', 'TypeScript', 'Node.js', 'Express',
-    'Supabase', 'PostgreSQL', 'Tailwind CSS', 'Vite',
-    'Firebase', 'MongoDB', 'Python', 'C++',
-    'Algorithms & Data Structures',
+  projects: [
+    {
+      name: 'SAU Alumni Network',
+      desc: 'Alumni directory for SAU. Search batchmates by name, batch, department or country. Role-based auth and a secure admin system, built at zero cost.',
+      href: 'https://sau-alumni.vercel.app/',
+    },
+    {
+      name: 'SAU EconHub',
+      desc: 'Academic blog platform for Agricultural Economics students, with AI summaries, AI Bangla translation, math rendering and a rich editor.',
+      href: 'https://sau-blogs.vercel.app',
+    },
+    {
+      name: 'Rice AI Doctor',
+      desc: 'Rice disease detection with a custom-trained model, trained on Bangladeshi field data. Runs offline as a PWA on low-end phones, 94% accuracy.',
+      href: 'https://rice-ai-app.vercel.app/',
+    },
+    {
+      name: 'Bangladesh Monopoly',
+      desc: 'Real-time multiplayer Monopoly with Bangladeshi locations, BDT currency and local Luck and Public Fund cards.',
+      href: 'https://arghor-monopoly.vercel.app/',
+    },
+  ],
+
+  skillGroups: [
+    {
+      title: 'Frontend',
+      skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'shadcn/ui', 'Framer Motion', 'Vite'],
+    },
+    {
+      title: 'Backend & Database',
+      skills: ['Node.js', 'Express', 'Flask', 'REST API', 'Socket.io', 'Supabase', 'PostgreSQL', 'MongoDB', 'Firebase'],
+    },
+    {
+      title: 'Data Science & AI',
+      skills: [
+        'Python', 'NumPy', 'Pandas', 'Matplotlib', 'Seaborn', 'Streamlit',
+        'Statistics & Probability', 'Machine Learning', 'Computer Vision', 'ONNX',
+      ],
+    },
+    {
+      title: 'Core & Tools',
+      skills: ['C++', 'Algorithms & Data Structures', 'OOP', 'Git & GitHub', 'Vercel', 'Google Colab'],
+    },
   ],
 
   highlights: [
-    'Designed and deployed the full-stack SAU Question Bank from scratch',
+    'Designed and deployed this full-stack SAU Question Bank from scratch, covering 162 courses',
     'Implemented role-based auth (admin / collector) with Supabase',
     'Built a multi-image drag-and-drop upload system for question papers',
+    'Trained a custom rice disease detection model and shipped it as an offline PWA',
+    'Ranked in the top 15% among 5000 students in the Programming Hero web development course',
+  ],
+};
+
+const CARD =
+  'bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)]';
+
+const SECTION_TITLE =
+  'text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5';
+
+const ITEM_VARIANTS = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
+};
+
+const creatorJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Adnan Eram Argho',
+  jobTitle: DEV.title,
+  url: DEV.portfolio,
+  alumniOf: {
+    '@type': 'EducationalOrganization',
+    name: 'Sher-e-Bangla Agricultural University',
+  },
+  sameAs: [DEV.github, DEV.linkedin],
+  knowsAbout: [
+    'Full-Stack Development',
+    'React',
+    'Next.js',
+    'Data Science',
+    'Machine Learning',
+    'Agricultural AI',
   ],
 };
 
@@ -88,28 +167,37 @@ const IconCheck = () => (
   </svg>
 );
 
+const IconExternal = () => (
+  <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round"
+      d="M13.5 6H18v4.5M18 6l-7.5 7.5M10 6H6.75A1.75 1.75 0 005 7.75v9.5C5 18.216 5.784 19 6.75 19h9.5c.966 0 1.75-.784 1.75-1.75V14" />
+  </svg>
+);
+
 const Developer = () => {
   return (
     <div className="animate-fade-in py-12 px-4">
       <Helmet>
         <title>Developer | SAU Agricultural Economics Question Bank</title>
         <meta name="description"
-          content="Learn about the developer behind the SAU Agricultural Economics Question Bank — a full-stack web application for Sher-e-Bangla Agricultural University." />
+          content="Meet Adnan-Eram Argho, the SAU student and self-taught full-stack developer behind the SAU Agricultural Economics Question Bank, SAU Alumni Network, SAU EconHub and Rice AI Doctor." />
         <meta property="og:title" content="Developer | SAU Agricultural Economics Question Bank" />
         <meta property="og:description" content="Full-stack developer profile for the SAU Agri-Econ Question Bank application." />
+        <script type="application/ld+json">{JSON.stringify(creatorJsonLd)}</script>
       </Helmet>
 
       <div className="max-w-3xl mx-auto space-y-6">
 
+        {/* Hero */}
         <motion.div
-          className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden"
+          className={`${CARD} overflow-hidden`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
         >
           <div className="h-32 bg-gradient-to-r from-green-500 via-emerald-400 to-amber-500" />
 
-          <div className="px-8 pb-8">
+          <div className="px-6 sm:px-8 pb-8">
             <div className="-mt-16 mb-4 flex items-end justify-between">
               <div className="w-28 h-28 rounded-full ring-4 ring-white dark:ring-[#111827] overflow-hidden bg-white dark:bg-[#0A0F1E] flex items-center justify-center text-slate-800 dark:text-slate-200 text-3xl font-bold shadow-lg">
                 {DEV.avatarUrl
@@ -121,28 +209,28 @@ const Developer = () => {
                 {DEV.github && (
                   <a href={DEV.github} target="_blank" rel="noreferrer"
                     className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors"
-                    title="GitHub">
+                    title="GitHub" aria-label="GitHub">
                     <IconGitHub />
                   </a>
                 )}
                 {DEV.linkedin && (
                   <a href={DEV.linkedin} target="_blank" rel="noreferrer"
                     className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
-                    title="LinkedIn">
+                    title="LinkedIn" aria-label="LinkedIn">
                     <IconLinkedIn />
                   </a>
                 )}
                 {DEV.email && (
                   <a href={`mailto:${DEV.email}`}
                     className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
-                    title="Email">
+                    title="Email" aria-label="Email">
                     <IconMail />
                   </a>
                 )}
                 {DEV.portfolio && (
                   <a href={DEV.portfolio} target="_blank" rel="noreferrer"
                     className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors"
-                    title="Portfolio">
+                    title="Portfolio" aria-label="Portfolio">
                     <IconGlobe />
                   </a>
                 )}
@@ -152,10 +240,64 @@ const Developer = () => {
             <h1 className="text-3xl font-bold text-slate-900 dark:text-[#F1F5F9]">{DEV.name}</h1>
             <p className="text-green-600 dark:text-green-400 font-semibold text-lg mt-1">{DEV.title}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{DEV.subtitle}</p>
-            <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{DEV.bio}</p>
+
+            <div className="space-y-3">
+              {DEV.bio.map((para, i) => (
+                <p key={i} className="text-slate-700 dark:text-slate-300 leading-relaxed">{para}</p>
+              ))}
+            </div>
+
+            <a href={DEV.portfolio} target="_blank" rel="noreferrer"
+              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold shadow-md shadow-green-500/20 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 transition-all">
+              View my full portfolio
+              <IconExternal />
+            </a>
           </div>
         </motion.div>
 
+        {/* Stats */}
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
+        >
+          {DEV.stats.map((s) => (
+            <motion.div key={s.label} className={`${CARD} px-3 py-4 text-center`} variants={ITEM_VARIANTS}>
+              <p className="text-2xl font-bold bg-gradient-to-r from-green-500 to-amber-500 bg-clip-text text-transparent">
+                {s.value}
+              </p>
+              <p className="text-[11px] leading-tight text-slate-500 dark:text-slate-400 mt-1">{s.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Projects */}
+        <ScrollReveal direction="up" delay={0.1}>
+          <div className={`${CARD} p-6`}>
+            <h2 className={SECTION_TITLE}>More Projects for SAU &amp; Beyond</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {DEV.projects.map((p) => (
+                <a key={p.name} href={p.href} target="_blank" rel="noreferrer"
+                  className="group flex flex-col rounded-xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] bg-slate-50/60 dark:bg-[#0A0F1E]/60 p-4 hover:border-green-400/50 hover:bg-green-50/50 dark:hover:bg-green-500/5 hover:-translate-y-0.5 transition-all">
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      {p.name}
+                      <span className="text-slate-400 group-hover:text-green-500 transition-colors"><IconExternal /></span>
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-500/15 text-green-700 dark:text-green-400">
+                      Live
+                    </span>
+                  </span>
+                  <span className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{p.desc}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* Education + Tech Stack */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 gap-6"
           initial="hidden"
@@ -163,13 +305,8 @@ const Developer = () => {
           viewport={{ once: true, margin: '-50px' }}
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
         >
-          <motion.div
-            className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6"
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } } }}
-          >
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
-              Education
-            </h2>
+          <motion.div className={`${CARD} p-6`} variants={ITEM_VARIANTS}>
+            <h2 className={SECTION_TITLE}>Education</h2>
             <ul className="space-y-4">
               {DEV.education.map((edu, i) => (
                 <li key={i}>
@@ -183,30 +320,33 @@ const Developer = () => {
             </ul>
           </motion.div>
 
-          <motion.div
-            className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6"
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } } }}
-          >
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
-              Tech Stack
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {DEV.skills.map((skill) => (
-                <span key={skill}
-                  className="px-3 py-1 text-xs font-semibold rounded-full bg-slate-100 dark:bg-[#0A0F1E] text-slate-700 dark:text-slate-300 border border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] shadow-sm">
-                  {skill}
-                </span>
+          <motion.div className={`${CARD} p-6`} variants={ITEM_VARIANTS}>
+            <h2 className={SECTION_TITLE}>Tech Stack</h2>
+            <div className="space-y-4">
+              {DEV.skillGroups.map((group) => (
+                <div key={group.title}>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-1.5">
+                    {group.title}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.skills.map((skill) => (
+                      <span key={skill}
+                        className="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 dark:bg-[#0A0F1E] text-slate-700 dark:text-slate-300 border border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] shadow-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </motion.div>
         </motion.div>
 
+        {/* Highlights */}
         {DEV.highlights.length > 0 && (
           <ScrollReveal direction="up" delay={0.2}>
-            <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5">
-                Project Highlights
-              </h2>
+            <div className={`${CARD} p-6`}>
+              <h2 className={SECTION_TITLE}>Highlights</h2>
               <ul className="space-y-3">
                 {DEV.highlights.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -218,6 +358,23 @@ const Developer = () => {
             </div>
           </ScrollReveal>
         )}
+
+        {/* Feedback */}
+        <ScrollReveal direction="up" delay={0.2}>
+          <div className="rounded-2xl border border-green-200/60 dark:border-green-500/20 bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-500/5 dark:to-amber-500/5 p-6 text-center">
+            <h2 className="text-base font-bold text-slate-900 dark:text-[#F1F5F9]">
+              Found a missing question or a bug?
+            </h2>
+            <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
+              This Question Bank grows with your help. Tell me what's missing and I'll fix it.
+            </p>
+            <a href={`mailto:${DEV.email}?subject=SAU Question Bank Feedback`}
+              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-[#111827] border border-green-300/60 dark:border-green-500/30 text-sm font-semibold text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors">
+              <IconMail />
+              Send feedback
+            </a>
+          </div>
+        </ScrollReveal>
 
         <div className="text-center pt-4">
           <Link to="/" className="inline-block text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-green-500 dark:hover:text-green-400 transition-colors">
