@@ -1,27 +1,13 @@
 import { useState } from 'react';
 
-const ALUMNI_URL = 'https://sau-alumni.vercel.app/'; // ekhane real link boshao
-const STORAGE_KEY = 'alumni-beta-banner-v1'; // notun message dile v2 koro
+const ALUMNI_URL = 'https://sau-alumni.vercel.app/';
 
 export default function AlumniBetaBanner() {
-  const [visible, setVisible] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) === null;
-    } catch {
-      return true;
-    }
-  });
+  const [visible, setVisible] = useState<boolean>(true);
 
   if (!visible) return null;
 
-  const dismiss = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, 'dismissed');
-    } catch {
-      /* ignore */
-    }
-    setVisible(false);
-  };
+  const dismiss = () => setVisible(false);
 
   return (
     <div
@@ -31,7 +17,7 @@ export default function AlumniBetaBanner() {
     >
       <div className="max-w-7xl mx-auto px-4 py-2.5 sm:py-2 flex items-center justify-between gap-3">
         <p className="flex-1 min-w-0 text-xs sm:text-sm leading-snug sm:leading-normal">
-          🎓 <strong className="font-semibold">SAU Alumni Website এখন Beta Testing-এ!</strong> সাইটটি ভিজিট করুন, আপনার মতামত জানান এবং সবার সাথে শেয়ার করে আমাকে সাহায্য করুন।
+          🎓 <strong className="font-semibold">SAU Alumni Network এখন Beta-তে!</strong> বিনামূল্যে রেজিস্ট্রেশন করে আপনার ব্যাচমেট, সিনিয়র ও অ্যালামনাইদের সাথে যুক্ত হোন। সাইটটি ঘুরে দেখুন, মতামত জানান আর বন্ধুদের সাথে শেয়ার করুন।
         </p>
         <div className="flex items-center gap-2 shrink-0">
           <a
@@ -40,7 +26,7 @@ export default function AlumniBetaBanner() {
             rel="noopener noreferrer"
             className="shrink-0 inline-flex items-center justify-center bg-white text-emerald-800 dark:bg-emerald-100 dark:text-emerald-950 font-semibold px-3 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-emerald-50 dark:hover:bg-white transition-all shadow-sm active:scale-95 whitespace-nowrap min-h-[32px]"
           >
-            ভিজিট করুন
+            রেজিস্ট্রেশন করুন
           </a>
           <button
             type="button"
