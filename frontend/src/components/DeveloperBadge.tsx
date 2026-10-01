@@ -20,7 +20,7 @@ const DeveloperBadge: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.5 }}
-            className="fixed bottom-6 left-6 z-50 flex items-end drop-shadow-2xl"
+            className="fixed bottom-16 sm:bottom-16 left-6 z-50 flex items-end drop-shadow-2xl"
         >
             <Link
                 to="/developer"

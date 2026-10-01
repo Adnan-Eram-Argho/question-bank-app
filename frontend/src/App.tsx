@@ -13,6 +13,7 @@ import Developer from './components/Developer';
 import Contributors from './components/Contributors';
 import Profile from './components/Profile';
 import AnimatedBackground from './components/AnimatedBackground';
+import AlumniBetaBanner from './components/AlumniBetaBanner';
 import PageTransition from './components/PageTransition';
 import Homepage from './components/Homepage';
 import SAUQuestionBankPDF from './pages/SAUQuestionBankPDF';
@@ -43,6 +44,7 @@ function App() {
         <Router>
           <FacultyProvider>
             <AnimatedBackground />
+            <AlumniBetaBanner />
             <Layout>
               <PageTransition>
                 <Routes>

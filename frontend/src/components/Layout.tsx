@@ -42,7 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100 font-sans selection:bg-primary-200 dark:selection:bg-primary-900/50 selection:text-primary-900 dark:selection:text-primary-100">
+        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100 font-sans selection:bg-primary-200 dark:selection:bg-primary-900/50 selection:text-primary-900 dark:selection:text-primary-100 pb-16 sm:pb-14">
             <motion.header
                 className="sticky top-0 z-50 bg-white/70 dark:bg-[#0A0F1E]/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] transition-colors duration-300"
                 initial={{ y: -20, opacity: 0 }}

@@ -285,7 +285,7 @@ const FloatingAITutor = () => {
                 onClick={() => setIsOpen((prev) => !prev)}
                 id="ai-tutor-toggle-btn"
                 aria-label={isOpen ? 'Close AI Tutor' : 'Open AI Tutor'}
-                className={`fixed bottom-5 right-4 sm:right-6 z-50 w-14 h-14 rounded-full shadow-lg shadow-emerald-500/30
+                className={`fixed bottom-16 sm:bottom-16 right-4 sm:right-6 z-50 w-14 h-14 rounded-full shadow-lg shadow-emerald-500/30
                     bg-gradient-to-br from-emerald-500 to-teal-600
                     text-white flex items-center justify-center
                     hover:scale-110 active:scale-95
