@@ -84,6 +84,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 | **AI Tutor** | Groq SDK | groq-sdk 1.1.2 (Llama 3.3 70B: llama-3.3-70b-versatile) |
 | **File Upload** | Multer | multer 2.1.1 (memory storage, uploads to Supabase Storage) |
 | **Image Processing** | Sharp | sharp 0.34.x (automatic WebP conversion with quality optimization) |
+| **Document Export** | docx, file-saver | docx 9.11.0, file-saver 2.x (browser-only DOCX generation + download) |
 | **Analytics** | Vercel Analytics | @vercel/analytics 2.0.1 |
 | **SEO** | react-helmet-async | v3.0.0 |
 | **Notifications** | react-hot-toast | v2.6.0 |
@@ -108,6 +109,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 - **🛡️ Security Hardened** — CORS restrictions (explicit origin whitelist), environment-based admin ID configuration, rate limiting with memory protection (max 10k entries, LRU eviction), input sanitization (message length, URL validation), and atomic resource operations to prevent data loss.
 - **🔔 Professional Notifications** — All user-facing alerts replaced with react-hot-toast for non-blocking, accessible feedback with success/error states.
 - **🖼️ Automatic WebP Optimization** — All uploaded images (exam papers & avatars) are automatically converted to WebP format using Sharp library with quality 80, achieving ~70-80% file size reduction while maintaining crisp text readability for university exam papers. This significantly improves page load speeds and reduces storage costs.
+- **📄 Free Cover Page Generator** — Browser-only tool at `/sau-assignment-cover-page` to generate a professional SAU assignment/note book/lab report cover page with live A4 preview. Exports as DOCX (via `docx` library) or PDF (via browser print). No data leaves the browser.
 
 ---
 
@@ -124,6 +126,7 @@ The platform now includes **7 optimized landing pages** with structured data, br
 - **`/sau-question-bank-pdf`** — Complete PDF download guide with organized links to all faculty resources
 - **`/sau-notes`** — Lecture notes repository with semester-wise organization and quick access links
 - **`/sau-admission-preparation`** — Admission preparation guide with study tips, resource recommendations, and practice materials
+- **`/sau-assignment-cover-page`** — Free browser-only tool to generate a SAU assignment cover page (DOCX/PDF export, live A4 preview, Times New Roman, A4 size, no data sent to server)
 
 ### Key Features of Landing Pages
 - **🔍 SEO-Optimized Meta Tags** — Each page uses centralized `SEO.tsx` component with route-specific titles, descriptions, keywords, and Open Graph tags via `react-helmet-async`
@@ -145,6 +148,14 @@ The platform now includes **7 optimized landing pages** with structured data, br
 ---
 
 ## ✨ Recent Updates
+
+### 🆕 SAU Assignment Cover Page Generator (2026-10-16)
+- **New tool page** at `/sau-assignment-cover-page`: free, browser-only generator for SAU assignment, note book, and lab report cover pages with live A4 preview (always white/black, print-safe), DOCX export via `docx` 9.11.0 + `file-saver`, and PDF via browser print. No data leaves the browser.
+- **SEO setup**: `seoConfig.ts` entry with title, description, keywords (Bangla + English), canonical; `WebApplication` + `FAQPage` + `BreadcrumbList` JSON-LD; added to `sitemap.xml` with `lastmod: 2026-10-16`.
+- **Navigation**: added "Cover Page" link to desktop navbar, mobile menu, footer Resources column, and homepage quick-link strip.
+- **Contextual links**: added natural one-line links to cover page generator from SAUNotes, SAUQuestionBankPDF, SAUEconomicsQuestion, SAUAgricultureQuestion, and SAUASVMQuestion.
+- **AI tutor**: updated RULE 1 in `backend/src/routes/ai.ts` to mention the Cover Page tool in navigation instructions.
+- **Deps**: installed `docx` 9.11.0, `file-saver` + `@types/file-saver` into frontend.
 
 ### 🤖 AI Tutor & Landing Page Navigation Fixes (2026-05-01)
 - **AI Embodiment & Navigation**: Overrode the AI's default "text-only chatbot" persona with a strict system prompt. The AI now knows it is integrated directly into the SAU website UI and acts as a specialized tour guide. It provides exact navigation instructions (e.g., "Click the 'Questions' link in the top navigation bar") instead of generic advice.
@@ -315,6 +326,7 @@ question-bank-app/
 │   │   │   ├── SAUAdmissionPreparation.tsx # Admission preparation guide landing page
 │   │   │   ├── SAUAgricultureQuestion.tsx  # Agriculture faculty landing page
 │   │   │   ├── SAUASVMQuestion.tsx         # ASVM faculty landing page
+│   │   │   ├── SAUCoverPageGenerator.tsx   # Free cover page generator (DOCX/PDF, browser-only)
 │   │   │   ├── SAUEconomicsQuestion.tsx    # Agricultural Economics landing page
 │   │   │   ├── SAUNotes.tsx                # Lecture notes landing page
 │   │   │   └── SAUQuestionBankPDF.tsx      # PDF download guide landing page
@@ -328,6 +340,11 @@ question-bank-app/
 │   ├── tailwind.config.js
 │   ├── vite.config.ts
 │   └── package.json
+│
+│   public/                         # Static assets
+│   │   ├── sau-logo.png            # SAU logo (used in cover page preview & DOCX export)
+│   │   ├── sitemap.xml             # XML sitemap (11 URLs including cover page generator)
+│   │   └── robots.txt             # Search engine crawl rules
 │
 └── README.md
 ```
@@ -589,6 +606,7 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - [ ] **Comment System** — Allow students to ask questions about specific resources
 
 ### Completed Milestones
+- [x] **SAU Assignment Cover Page Generator** — Free browser-only tool at `/sau-assignment-cover-page` with live A4 preview (always white/black), DOCX export (`docx` 9.11.0), and PDF via print; SEO-optimized with JSON-LD, breadcrumbs, sitemap entry, and contextual links from 5 landing pages
 - [x] **Vercel Analytics** — First-party, privacy-friendly page-view tracking via `@vercel/analytics`
 - [x] **Infinite Scroll Pagination** — Question Bank and Study Materials pages load content in batches of 9 using `IntersectionObserver` with request deduplication via `useRef`
 - [x] **URL-Synced Type Filters** — Study Materials `?type=book/note/pdf` query param preserved on navigation and updated in real-time when dropdown selection changes
