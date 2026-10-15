@@ -97,6 +97,14 @@ export const seoConfig: Record<string, SEOConfig> = {
         keywords: 'SAU admission preparation, SAU entrance exam, SAU admission test questions, SAU admission guide 2026, SAU AEC admission, SAU Agriculture admission, SAU ASVM admission, Sher-e-Bangla Agricultural University admission, SAU admission syllabus',
         canonicalPath: '/sau-admission-preparation',
     },
+
+    // SAU Cover Page Generator - Free DOCX/PDF tool
+    sauCoverPageGenerator: {
+        title: 'SAU Assignment Cover Page Generator (Free DOCX/PDF) | SAU Study Platform',
+        description: 'SAU assignment cover page বানান ফ্রিতে। Sher-e-Bangla Agricultural University-র assignment, note book ও lab report cover page generator — DOCX ও PDF ডাউনলোড, লাইভ A4 প্রিভিউ।',
+        keywords: 'SAU assignment cover page, SAU cover page, SAU note book cover page, SAU lab report cover page, Sher-e-Bangla Agricultural University cover page, assignment cover page generator, free cover page maker, সাউ অ্যাসাইনমেন্ট কভার পেজ, কভার পেজ বানানো, ফ্রি কভার পেজ',
+        canonicalPath: '/sau-assignment-cover-page',
+    },
 };
 
 // Helper function to get SEO config by route path
@@ -112,6 +120,7 @@ export const getSEOByPath = (path: string): SEOConfig => {
         '/sau-asvm-question': 'sauAsvmQuestion',
         '/sau-notes': 'sauNotes',
         '/sau-admission-preparation': 'sauAdmissionPreparation',
+        '/sau-assignment-cover-page': 'sauCoverPageGenerator',
     };
 
     const configKey = pathMap[path];

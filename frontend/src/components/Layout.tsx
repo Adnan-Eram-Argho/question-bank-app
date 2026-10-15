@@ -142,6 +142,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             PDF
                             <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
+                        <Link to="/sau-assignment-cover-page" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors whitespace-nowrap">
+                            Cover Page
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                        </Link>
 
                         {user ? (
                             <>
@@ -237,6 +241,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </Link>
                             <Link to="/study-materials?type=pdf" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
                                 PDF
+                            </Link>
+                            <Link to="/sau-assignment-cover-page" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                                Cover Page
                             </Link>
 
                             {user ? (
@@ -364,6 +371,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 <li>
                                     <Link to="/sau-admission-preparation" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Admission Prep
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/sau-assignment-cover-page" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                        Cover Page Generator
                                     </Link>
                                 </li>
                             </ul>

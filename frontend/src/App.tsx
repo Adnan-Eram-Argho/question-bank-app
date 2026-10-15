@@ -22,6 +22,7 @@ import SAUAgricultureQuestion from './pages/SAUAgricultureQuestion';
 import SAUASVMQuestion from './pages/SAUASVMQuestion';
 import SAUNotes from './pages/SAUNotes';
 import SAUAdmissionPreparation from './pages/SAUAdmissionPreparation';
+import SAUCoverPageGenerator from './pages/SAUCoverPageGenerator';
 
 // New addition: Analytics for production monitoring
 import { Analytics } from '@vercel/analytics/react';
@@ -89,6 +90,7 @@ function App() {
                   <Route path="/sau-asvm-question" element={<SAUASVMQuestion />} />
                   <Route path="/sau-notes" element={<SAUNotes />} />
                   <Route path="/sau-admission-preparation" element={<SAUAdmissionPreparation />} />
+                  <Route path="/sau-assignment-cover-page" element={<SAUCoverPageGenerator />} />
                 
                   <Route path="/developer" element={<Developer />} />
                   <Route path="/contributors" element={<Contributors />} />

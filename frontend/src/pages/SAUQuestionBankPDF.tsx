@@ -382,6 +382,14 @@ const SAUQuestionBankPDF = () => {
                     </div>
                 </div>
             </ScrollReveal>
+
+            {/* Contextual link to cover page tool */}
+            <div className="max-w-4xl mx-auto px-4 py-2 pb-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                Need a cover page for your assignment?{' '}
+                <Link to="/sau-assignment-cover-page" className="text-green-600 dark:text-green-400 hover:underline font-medium">
+                    Use our free SAU cover page generator →
+                </Link>
+            </div>
         </>
     );
 };
