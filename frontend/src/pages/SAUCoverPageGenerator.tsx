@@ -108,8 +108,9 @@ export default function SAUCoverPageGenerator() {
         setF((prev) => ({ ...prev, [k]: e.target.value }));
 
   const title = f.title.trim();
-  const levelSem = [f.level, f.semester].filter(Boolean).join(', ');
-  const secGroup = [f.section, f.group].filter(Boolean).join(', ');
+  const semester = f.semester === '1' ? 'I' : f.semester === '2' ? 'II' : f.semester;
+  const levelSem = [f.level ? `Level: ${f.level}` : '', semester ? `Semester: ${semester}` : ''].filter(Boolean).join('  ');
+  const secGroup = [f.section ? `Section: ${f.section}` : '', f.group ? `Group: ${f.group}` : ''].filter(Boolean).join('  ');
 
   const downloadDocx = async () => {
     setIsDownloading(true);
@@ -179,10 +180,10 @@ export default function SAUCoverPageGenerator() {
               cell(
                 [
                   left('Submitted by:', { size: 32 }),
-                  left(f.name),
-                  left(`Reg. No: ${f.regNo}`),
-                  left(levelSem),
-                  left(secGroup),
+                  left(`Name: ${f.name}`),
+                  left(`Registration No: ${f.regNo}`),
+                  ...(levelSem ? [left(levelSem)] : []),
+                  ...(secGroup ? [left(secGroup)] : []),
                   left(f.faculty),
                 ],
                 4796
@@ -321,8 +322,8 @@ export default function SAUCoverPageGenerator() {
                 <input id="regNo" className={halfInputCls} placeholder="Reg. No" value={f.regNo} onChange={set('regNo')} />
                 <input id="level" className={halfInputCls} placeholder="Level (Level-2)" value={f.level} onChange={set('level')} />
                 <input id="semester" className={halfInputCls} placeholder="Semester (Semester-I)" value={f.semester} onChange={set('semester')} />
-                <input id="section" className={halfInputCls} placeholder="Section (Section-2)" value={f.section} onChange={set('section')} />
-                <input id="group" className={halfInputCls} placeholder="Group (Group-F)" value={f.group} onChange={set('group')} />
+                <input id="section" className={halfInputCls} placeholder="Section" value={f.section} onChange={set('section')} />
+                <input id="group" className={halfInputCls} placeholder="Group" value={f.group} onChange={set('group')} />
               </div>
 
               <div>
@@ -398,8 +399,8 @@ export default function SAUCoverPageGenerator() {
                     </div>
                     <div style={{ width: '48.3%', borderLeft: '1px solid #000', padding: '0.84cqw 1.18cqw 2.1cqw 2.52cqw' }}>
                       <p style={{ fontSize: '2.69cqw' }}>Submitted by:</p>
-                      <p style={{ fontSize: '2.35cqw' }}>{f.name || <span data-ph style={{ color: '#999' }}>তোমার নাম</span>}</p>
-                      <p style={{ fontSize: '2.35cqw' }}>{f.regNo ? `Reg. No: ${f.regNo}` : <span data-ph style={{ color: '#999' }}>Reg. No</span>}</p>
+                      <p style={{ fontSize: '2.35cqw' }}>{f.name ? `Name: ${f.name}` : <span data-ph style={{ color: '#999' }}>Name</span>}</p>
+                      <p style={{ fontSize: '2.35cqw' }}>{f.regNo ? `Registration No: ${f.regNo}` : <span data-ph style={{ color: '#999' }}>Registration No</span>}</p>
                       {levelSem && <p style={{ fontSize: '2.35cqw' }}>{levelSem}</p>}
                       {secGroup && <p style={{ fontSize: '2.35cqw' }}>{secGroup}</p>}
                       {f.faculty && <p style={{ fontSize: '2.35cqw' }}>{f.faculty}</p>}
