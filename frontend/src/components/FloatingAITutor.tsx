@@ -20,9 +20,9 @@ const VALID_FACULTIES = Object.keys(courseData);
 // Typing indicator dots
 const TypingIndicator = () => (
     <div className="flex items-center gap-1 px-4 py-3">
-        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" />
+        <span className="w-2 h-2 bg-brand-primary rounded-full" />
+        <span className="w-2 h-2 bg-brand-primary rounded-full" />
+        <span className="w-2 h-2 bg-brand-primary rounded-full" />
     </div>
 );
 
@@ -146,9 +146,8 @@ const FloatingAITutor = () => {
                 text: data.reply,
             };
             setMessages((prev) => [...prev, aiMessage]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (err: any) {
-            const detail = err?.message || 'Unknown error';
+        } catch (err: unknown) {
+            const detail = err instanceof Error ? err.message : 'Unknown error';
             const isNetworkError = detail === 'Failed to fetch'; // Actual network failure vs API rejection
             const errorMessage: Message = {
                 id: messageIdRef.current++,
@@ -181,14 +180,14 @@ const FloatingAITutor = () => {
                     }
                     w-[calc(100vw-2rem)] sm:w-[380px] max-w-md
                     h-[70vh] sm:h-[520px] max-h-[600px]
-                    bg-white dark:bg-[#111827]
-                    rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/60
-                    border border-gray-200 dark:border-gray-700/60
+                    bg-surface-card
+                    rounded-lg shadow-sm
+                    border border-border-subtle
                     overflow-hidden
                 `}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex-shrink-0">
+                <div className="flex items-center justify-between px-4 py-3 bg-brand-primary text-white flex-shrink-0">
                     <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                             <SparkleIcon />
@@ -199,7 +198,7 @@ const FloatingAITutor = () => {
                     </div>
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"
+                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                         aria-label="Close AI Tutor"
                         id="ai-tutor-close-btn"
                     >
@@ -215,14 +214,14 @@ const FloatingAITutor = () => {
                             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                             {msg.role === 'model' && (
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold mr-2 flex-shrink-0 mt-0.5">
+                                <div className="w-7 h-7 rounded-full bg-brand-primary flex items-center justify-center text-white text-xs font-semibold mr-2 flex-shrink-0 mt-0.5">
                                     AI
                                 </div>
                             )}
                             <div
-                                className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap
+                            className={`max-w-[80%] px-3.5 py-2.5 rounded-lg text-sm leading-relaxed whitespace-pre-wrap
                                     ${msg.role === 'user'
-                                        ? 'bg-emerald-600 text-white rounded-tr-sm'
+                                        ? 'bg-brand-primary text-white rounded-tr-md'
                                         : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-sm border border-gray-200 dark:border-gray-700/50'
                                     }
                                 `}
@@ -234,10 +233,10 @@ const FloatingAITutor = () => {
 
                     {isLoading && (
                         <div className="flex justify-start">
-                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold mr-2 flex-shrink-0 mt-0.5">
+                            <div className="w-7 h-7 rounded-full bg-brand-primary flex items-center justify-center text-white text-xs font-semibold mr-2 flex-shrink-0 mt-0.5">
                                 AI
                             </div>
-                            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm border border-gray-200 dark:border-gray-700/50">
+                            <div className="bg-surface-canvas rounded-lg border border-border-subtle">
                                 <TypingIndicator />
                             </div>
                         </div>
@@ -246,8 +245,8 @@ const FloatingAITutor = () => {
                 </div>
 
                 {/* Input area */}
-                <div className="px-3 py-3 border-t border-gray-200 dark:border-gray-700/60 bg-white dark:bg-[#111827] flex-shrink-0">
-                    <div className="flex items-end gap-2 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2">
+                <div className="px-3 py-3 border-t border-border-subtle bg-surface-card flex-shrink-0">
+                    <div className="flex items-end gap-2 bg-surface-canvas border border-border-subtle rounded-md px-3 py-2">
                         <textarea
                             ref={inputRef}
                             id="ai-tutor-input"
@@ -268,7 +267,7 @@ const FloatingAITutor = () => {
                             onClick={handleSend}
                             disabled={!input.trim() || isLoading}
                             id="ai-tutor-send-btn"
-                            className="flex-shrink-0 w-8 h-8 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-lg flex items-center justify-center transition-colors disabled:cursor-not-allowed"
+                            className="flex-shrink-0 min-h-11 min-w-11 bg-brand-primary hover:opacity-90 disabled:bg-text-muted text-white rounded-md flex items-center justify-center transition-colors disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             aria-label="Send message"
                         >
                             <SendIcon />
@@ -285,11 +284,9 @@ const FloatingAITutor = () => {
                 onClick={() => setIsOpen((prev) => !prev)}
                 id="ai-tutor-toggle-btn"
                 aria-label={isOpen ? 'Close AI Tutor' : 'Open AI Tutor'}
-                className={`fixed bottom-16 sm:bottom-16 right-4 sm:right-6 z-50 w-14 h-14 rounded-full shadow-lg shadow-emerald-500/30
-                    bg-gradient-to-br from-emerald-500 to-teal-600
+                className={`fixed bottom-16 sm:bottom-16 right-4 sm:right-6 z-50 w-14 h-14 rounded-full border border-brand-primary bg-brand-primary
                     text-white flex items-center justify-center
-                    hover:scale-110 active:scale-95
-                    transition-all duration-200
+                    transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2
                     ${isOpen ? 'rotate-0' : 'rotate-0'}
                 `}
             >
@@ -297,10 +294,6 @@ const FloatingAITutor = () => {
                     <CloseIcon />
                 ) : (
                     <SparkleIcon />
-                )}
-                {/* Pulse ring when closed */}
-                {!isOpen && (
-                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-20 pointer-events-none" />
                 )}
             </button>
         </>

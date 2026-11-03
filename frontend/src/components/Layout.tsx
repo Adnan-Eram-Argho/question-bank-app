@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import FloatingAITutor from './FloatingAITutor';
-import DeveloperBadge from './DeveloperBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFaculty } from '../context/FacultyContext';
 import { courseData } from '../data';
@@ -42,22 +41,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100 font-sans selection:bg-primary-200 dark:selection:bg-primary-900/50 selection:text-primary-900 dark:selection:text-primary-100 pb-16 sm:pb-14">
+        <div className="min-h-screen flex flex-col bg-surface-canvas text-text-primary font-sans pb-16 sm:pb-14">
             <motion.header
-                className="sticky top-0 z-50 bg-white/70 dark:bg-[#0A0F1E]/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] transition-colors duration-300"
+                className="sticky top-0 z-50 bg-surface-card border-b border-border-subtle shadow-sm transition-colors duration-300"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center relative">
-                    <Link to="/" onClick={closeMobileMenu} className="text-xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity whitespace-nowrap">
+                    <Link to="/" onClick={closeMobileMenu} className="inline-flex items-center gap-2 text-xl font-semibold text-brand-primary hover:opacity-80 transition-opacity whitespace-nowrap">
+                        <img src="/sau-logo.png" alt="SAU crest" className="h-7 w-7 object-contain" />
                         SAU Q-Bank
                     </Link>
 
                     <div className="flex items-center space-x-2 sm:hidden">
                         <button
                             onClick={toggleTheme}
-                            className="p-2 rounded-full text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-gray-800 transition-all focus:outline-none"
+                            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-text-muted hover:text-brand-primary hover:bg-surface-canvas transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             aria-label="Toggle Dark Mode"
                         >
                             {theme === 'light' ? <MoonIcon /> : <SunIcon />}
@@ -65,7 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 rounded-lg text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-gray-800 transition-colors focus:outline-none"
+                            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-text-muted hover:text-brand-primary hover:bg-surface-canvas transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             aria-label="Toggle Navigation Menu"
                         >
                             {isMobileMenuOpen ? <XIcon /> : <HamburgerIcon />}
@@ -77,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <div className="relative">
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex items-center space-x-1 text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm backdrop-blur-sm"
+                                className="flex min-h-11 items-center space-x-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors bg-surface-card px-3 py-1.5 rounded-md border border-border-subtle shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             >
                                 <span>{activeFaculty}</span>
                                 <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -98,7 +98,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                             transition={{ duration: 0.2 }}
                                             onBlur={() => setIsDropdownOpen(false)}
                                             tabIndex={-1}
-                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl py-2 z-50 focus:outline-none"
+                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-surface-card border border-border-subtle rounded-lg shadow-sm py-2 z-50 focus:outline-none"
                                         >
                                             {faculties.map((faculty) => (
                                                 <button
@@ -121,61 +121,61 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </AnimatePresence>
                         </div>
 
-                        <Link to="/" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
+                        <Link to="/" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Home
-                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
 
-                        <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
+                        <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Blogs
-                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </a>
-                        <Link to="/study-materials?type=book" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
+                        <Link to="/study-materials?type=book" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Books
-                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
-                        <Link to="/study-materials?type=note" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
+                        <Link to="/study-materials?type=note" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Notes
-                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
-                        <Link to="/study-materials?type=pdf" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
+                        <Link to="/study-materials?type=pdf" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             PDF
-                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
-                        <Link to="/sau-assignment-cover-page" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors whitespace-nowrap">
+                        <Link to="/sau-assignment-cover-page" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Cover Page
-                            <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                            <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
 
                         {user ? (
                             <>
                                 {(role === 'admin' || role === 'collector') && (
-                                    <Link to="/upload" className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5">
+                                    <Link to="/upload" className="inline-flex min-h-11 items-center bg-brand-primary hover:opacity-90 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                         + Upload
                                     </Link>
                                 )}
 
                                 {role === 'admin' && (
-                                    <Link to="/admin" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
+                                    <Link to="/admin" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                         Admin
-                                        <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                                        <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                                     </Link>
                                 )}
 
-                                <Link to="/profile" className="relative group text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-black dark:hover:text-white transition-colors">
+                                <Link to="/profile" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                     Profile
-                                    <motion.span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+                                    <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                                 </Link>
 
                                 <button
                                     onClick={handleSignOut}
-                                    className="text-sm font-medium text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400 px-2 py-1 transition-colors"
+                                    className="inline-flex min-h-11 items-center text-sm font-medium text-text-muted hover:text-brand-primary px-2 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                                 >
                                     Logout
                                 </button>
                             </>
                         ) : (
-                            <Link to="/login" className="bg-gradient-to-r from-green-400 to-amber-500 text-white hover:from-green-500 hover:to-amber-600 px-5 py-2 rounded-xl text-sm font-bold shadow-md shadow-[rgba(74,222,128,0.2)] hover:shadow-lg transition-all duration-300">
+                            <Link to="/login" className="inline-flex min-h-11 items-center bg-brand-primary text-white hover:opacity-90 px-5 py-2 rounded-md text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                 Login
                             </Link>
                         )}
@@ -184,7 +184,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                         <button
                             onClick={toggleTheme}
-                            className="p-2 rounded-full text-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-gray-800 transition-all focus:outline-none"
+                            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-text-muted hover:text-brand-primary hover:bg-surface-canvas transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             aria-label="Toggle Dark Mode"
                         >
                             <motion.div
@@ -199,10 +199,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
 
                 {isMobileMenuOpen && (
-                    <div className="sm:hidden border-t border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-xl absolute top-full left-0 w-full shadow-lg shadow-black/5 dark:shadow-black/20 animate-fade-in z-40">
+                    <div className="sm:hidden border-t border-border-subtle bg-surface-card absolute top-full left-0 w-full shadow-sm animate-fade-in z-40">
                         <nav className="flex flex-col px-4 pt-2 pb-6 space-y-2">
                             {/* Faculty Select Mobile */}
-                            <div className="mb-2 bg-gray-50/50 dark:bg-gray-800/30 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                            <div className="mb-2 bg-surface-canvas p-3 rounded-lg border border-border-subtle">
                                 <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                                     Select Faculty
                                 </label>
@@ -214,7 +214,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                                 setActiveFaculty(faculty);
                                                 closeMobileMenu();
                                             }}
-                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeFaculty === faculty
+                            className={`w-full min-h-11 text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeFaculty === faculty
                                                 ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 shadow-sm'
                                                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                                                 }`}
@@ -226,54 +226,54 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </div>
                             <div className="h-px w-full bg-gray-200/50 dark:bg-gray-800/50 my-1" />
 
-                            <Link to="/" onClick={closeMobileMenu} className="block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/" onClick={closeMobileMenu} className="flex min-h-11 items-center px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 Home
                             </Link>
 
-                            <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" onClick={closeMobileMenu} className="flex min-h-11 items-center text-left w-full px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 Blogs
                             </a>
-                            <Link to="/study-materials?type=book" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/study-materials?type=book" onClick={closeMobileMenu} className="flex min-h-11 items-center text-left w-full px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 Books
                             </Link>
-                            <Link to="/study-materials?type=note" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/study-materials?type=note" onClick={closeMobileMenu} className="flex min-h-11 items-center text-left w-full px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 Notes
                             </Link>
-                            <Link to="/study-materials?type=pdf" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/study-materials?type=pdf" onClick={closeMobileMenu} className="flex min-h-11 items-center text-left w-full px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 PDF
                             </Link>
-                            <Link to="/sau-assignment-cover-page" onClick={closeMobileMenu} className="text-left w-full block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                            <Link to="/sau-assignment-cover-page" onClick={closeMobileMenu} className="flex min-h-11 items-center text-left w-full px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 Cover Page
                             </Link>
 
                             {user ? (
                                 <>
-                                    <Link to="/profile" onClick={closeMobileMenu} className="block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                                    <Link to="/profile" onClick={closeMobileMenu} className="flex min-h-11 items-center px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                         Profile
                                     </Link>
 
                                     {role === 'admin' && (
-                                        <Link to="/admin" onClick={closeMobileMenu} className="block px-3 py-3 rounded-lg text-base font-medium text-gray-800 dark:text-gray-200 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-gray-800 dark:hover:text-primary-400 transition-colors">
+                                        <Link to="/admin" onClick={closeMobileMenu} className="flex min-h-11 items-center px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                             Admin Dashboard
                                         </Link>
                                     )}
 
                                     {(role === 'admin' || role === 'collector') && (
-                                        <Link to="/upload" onClick={closeMobileMenu} className="block px-3 py-3 rounded-lg text-base font-medium text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
+                                        <Link to="/upload" onClick={closeMobileMenu} className="flex min-h-11 items-center px-3 py-3 rounded-md text-base font-medium text-brand-primary bg-surface-canvas hover:opacity-90 transition-colors">
                                             + Upload Question
                                         </Link>
                                     )}
 
                                     <button
                                         onClick={handleSignOut}
-                                        className="w-full text-left px-3 py-3 rounded-lg text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mt-2"
+                                        className="w-full min-h-11 text-left px-3 py-3 rounded-md text-base font-medium text-brand-primary hover:bg-surface-canvas transition-colors mt-2"
                                     >
                                         Logout
                                     </button>
                                 </>
                             ) : (
                                 <div className="pt-2">
-                                    <Link to="/login" onClick={closeMobileMenu} className="block w-full text-center bg-primary-600 text-white px-5 py-3 rounded-lg text-base font-semibold shadow-sm hover:bg-primary-700 transition-colors">
+                                    <Link to="/login" onClick={closeMobileMenu} className="flex min-h-11 w-full items-center justify-center text-center bg-brand-primary text-white px-5 py-3 rounded-md text-base font-semibold hover:opacity-90 transition-colors">
                                         Login
                                     </Link>
                                 </div>
@@ -287,13 +287,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {children}
             </main>
 
-            <footer className="w-full bg-white dark:bg-[#0B1120] border-t border-gray-200 dark:border-gray-800/60 mt-auto transition-colors duration-300">
+            <footer className="w-full bg-surface-card border-t border-border-subtle mt-auto transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     {/* Footer Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
                         {/* Brand Column */}
                         <div className="col-span-2 md:col-span-1">
-                            <Link to="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity inline-block mb-4">
+                            <Link to="/" className="text-xl font-semibold text-brand-primary hover:opacity-80 transition-opacity inline-block mb-4">
                                 SAU Q-Bank
                             </Link>
                             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -406,7 +406,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
                 </div>
             </footer>
-            <DeveloperBadge />
             <FloatingAITutor />
         </div>
     );
