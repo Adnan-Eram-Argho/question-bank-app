@@ -49,7 +49,7 @@ const FAQ: React.FC<FAQProps> = ({ items, title = "Frequently Asked Questions" }
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5 }}
-                            className="text-3xl lg:text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white"
+                            className="text-3xl lg:text-4xl font-semibold text-center mb-8 text-text-primary"
                         >
                             {title}
                         </motion.h2>
@@ -69,7 +69,7 @@ const FAQ: React.FC<FAQProps> = ({ items, title = "Frequently Asked Questions" }
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.4, delay: index * 0.05 }}
-                                    className="bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                                    className="bg-surface-card rounded-md border border-border-subtle overflow-hidden transition-colors duration-200"
                                 >
                                     {/* Question Button */}
                                     <button
@@ -77,15 +77,15 @@ const FAQ: React.FC<FAQProps> = ({ items, title = "Frequently Asked Questions" }
                                         aria-expanded={isOpen}
                                         aria-controls={contentId}
                                         onClick={() => toggleAccordion(index)}
-                                        className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset"
+                                        className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-inset"
                                     >
-                                        <span className="text-lg font-semibold text-gray-900 dark:text-white pr-4">
+                                        <span className="text-lg font-semibold text-text-primary pr-4">
                                             {item.question}
                                         </span>
                                         <motion.svg
                                             animate={{ rotate: isOpen ? 180 : 0 }}
                                             transition={{ duration: 0.2 }}
-                                            className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0"
+                                            className="w-5 h-5 text-text-muted dark:text-text-muted flex-shrink-0"
                                             fill="none"
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"
@@ -113,7 +113,7 @@ const FAQ: React.FC<FAQProps> = ({ items, title = "Frequently Asked Questions" }
                                                 className="overflow-hidden"
                                             >
                                                 <div className="px-6 pb-5 pt-2">
-                                                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                    <p className="text-text-muted dark:text-text-muted leading-relaxed">
                                                         {item.answer}
                                                     </p>
                                                 </div>
@@ -133,12 +133,12 @@ const FAQ: React.FC<FAQProps> = ({ items, title = "Frequently Asked Questions" }
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="mt-12 text-center"
                     >
-                        <p className="text-gray-600 dark:text-gray-400 mb-4 text-lg">
+                        <p className="text-text-muted dark:text-text-muted mb-4 text-lg">
                             Still have questions? Ask our AI Tutor instantly.
                         </p>
                         <Link
                             to="/?ai-tutor=open"
-                            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-amber-500 hover:from-green-600 hover:to-amber-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                            className="inline-flex min-h-11 items-center gap-2 px-8 py-3 bg-brand-primary hover:opacity-90 text-white font-semibold rounded-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                         >
                             <svg
                                 className="w-5 h-5"

@@ -92,10 +92,10 @@ const DEV = {
 };
 
 const CARD =
-  'bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)]';
+  'bg-surface-card/80  rounded-lg  border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)]';
 
 const SECTION_TITLE =
-  'text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5';
+  'text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-5';
 
 const ITEM_VARIANTS = {
   hidden: { opacity: 0, y: 20 },
@@ -195,11 +195,11 @@ const Developer = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
         >
-          <div className="h-32 bg-gradient-to-r from-green-500 via-emerald-400 to-amber-500" />
+          <div className="h-32 bg-brand-primary" />
 
           <div className="px-6 sm:px-8 pb-8">
             <div className="-mt-16 mb-4 flex items-end justify-between">
-              <div className="w-28 h-28 rounded-full ring-4 ring-white dark:ring-[#111827] overflow-hidden bg-white dark:bg-[#0A0F1E] flex items-center justify-center text-slate-800 dark:text-slate-200 text-3xl font-bold shadow-lg">
+              <div className="w-28 h-28 rounded-full ring-4 ring-white dark:ring-surface-card overflow-hidden bg-surface-card bg-surface-canvas flex items-center justify-center text-slate-800 dark:text-slate-200 text-3xl font-semibold ">
                 {DEV.avatarUrl
                   ? <img src={DEV.avatarUrl} alt={DEV.name} className="w-full h-full object-cover" />
                   : DEV.avatarInitials}
@@ -208,28 +208,28 @@ const Developer = () => {
               <div className="flex gap-2 mt-2">
                 {DEV.github && (
                   <a href={DEV.github} target="_blank" rel="noreferrer"
-                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors"
+                    className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors"
                     title="GitHub" aria-label="GitHub">
                     <IconGitHub />
                   </a>
                 )}
                 {DEV.linkedin && (
                   <a href={DEV.linkedin} target="_blank" rel="noreferrer"
-                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                    className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
                     title="LinkedIn" aria-label="LinkedIn">
                     <IconLinkedIn />
                   </a>
                 )}
                 {DEV.email && (
                   <a href={`mailto:${DEV.email}`}
-                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
+                    className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors"
                     title="Email" aria-label="Email">
                     <IconMail />
                   </a>
                 )}
                 {DEV.portfolio && (
                   <a href={DEV.portfolio} target="_blank" rel="noreferrer"
-                    className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors"
+                    className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-colors"
                     title="Portfolio" aria-label="Portfolio">
                     <IconGlobe />
                   </a>
@@ -237,7 +237,7 @@ const Developer = () => {
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-[#F1F5F9]">{DEV.name}</h1>
+            <h1 className="text-3xl font-semibold text-slate-900 text-text-primary">{DEV.name}</h1>
             <p className="text-green-600 dark:text-green-400 font-semibold text-lg mt-1">{DEV.title}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{DEV.subtitle}</p>
 
@@ -248,7 +248,7 @@ const Developer = () => {
             </div>
 
             <a href={DEV.portfolio} target="_blank" rel="noreferrer"
-              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold shadow-md shadow-green-500/20 hover:shadow-lg hover:shadow-green-500/30 hover:-translate-y-0.5 transition-all">
+              className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-primary text-white text-sm font-semibold  shadow-green-500/20  hover:shadow-green-500/30  transition-all">
               View my full portfolio
               <IconExternal />
             </a>
@@ -265,7 +265,7 @@ const Developer = () => {
         >
           {DEV.stats.map((s) => (
             <motion.div key={s.label} className={`${CARD} px-3 py-4 text-center`} variants={ITEM_VARIANTS}>
-              <p className="text-2xl font-bold bg-gradient-to-r from-green-500 to-amber-500 bg-clip-text text-transparent">
+              <p className="text-2xl font-semibold text-brand-primary ">
                 {s.value}
               </p>
               <p className="text-[11px] leading-tight text-slate-500 dark:text-slate-400 mt-1">{s.label}</p>
@@ -280,7 +280,7 @@ const Developer = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {DEV.projects.map((p) => (
                 <a key={p.name} href={p.href} target="_blank" rel="noreferrer"
-                  className="group flex flex-col rounded-xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] bg-slate-50/60 dark:bg-[#0A0F1E]/60 p-4 hover:border-green-400/50 hover:bg-green-50/50 dark:hover:bg-green-500/5 hover:-translate-y-0.5 transition-all">
+                  className="group flex flex-col rounded-lg border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] bg-slate-50/60 bg-surface-canvas/60 p-4 hover:border-green-400/50 hover:bg-green-50/50 dark:hover:bg-green-500/5  transition-all">
                   <span className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
                       {p.name}
@@ -331,7 +331,7 @@ const Developer = () => {
                   <div className="flex flex-wrap gap-1.5">
                     {group.skills.map((skill) => (
                       <span key={skill}
-                        className="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 dark:bg-[#0A0F1E] text-slate-700 dark:text-slate-300 border border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] shadow-sm">
+                        className="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 bg-surface-canvas text-slate-700 dark:text-slate-300 border border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)] ">
                         {skill}
                       </span>
                     ))}
@@ -361,15 +361,15 @@ const Developer = () => {
 
         {/* Feedback */}
         <ScrollReveal direction="up" delay={0.2}>
-          <div className="rounded-2xl border border-green-200/60 dark:border-green-500/20 bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-500/5 dark:to-amber-500/5 p-6 text-center">
-            <h2 className="text-base font-bold text-slate-900 dark:text-[#F1F5F9]">
+          <div className="rounded-lg border border-green-200/60 dark:border-green-500/20 bg-surface-canvas p-6 text-center">
+            <h2 className="text-base font-semibold text-slate-900 text-text-primary">
               Found a missing question or a bug?
             </h2>
             <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
               This Question Bank grows with your help. Tell me what's missing and I'll fix it.
             </p>
             <a href={`mailto:${DEV.email}?subject=SAU Question Bank Feedback`}
-              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-[#111827] border border-green-300/60 dark:border-green-500/30 text-sm font-semibold text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors">
+              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-surface-card border border-green-300/60 dark:border-green-500/30 text-sm font-semibold text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors">
               <IconMail />
               Send feedback
             </a>

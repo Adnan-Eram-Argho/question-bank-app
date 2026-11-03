@@ -14,12 +14,12 @@ interface Contributor {
 }
 
 const SkeletonCard = () => (
-  <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-8 text-center animate-pulse">
-    <div className="w-24 h-24 bg-gray-200 dark:bg-gray-800 rounded-full mx-auto mb-5" />
-    <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded w-3/4 mx-auto mb-3" />
-    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2 mx-auto mb-5" />
-    <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-full mb-2" />
-    <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-5/6 mx-auto" />
+  <div className="bg-surface-card/80  rounded-lg  border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-8 text-center ">
+    <div className="w-24 h-24 bg-gray-200 bg-surface-card rounded-full mx-auto mb-5" />
+    <div className="h-5 bg-gray-200 bg-surface-card rounded w-3/4 mx-auto mb-3" />
+    <div className="h-4 bg-gray-200 bg-surface-card rounded w-1/2 mx-auto mb-5" />
+    <div className="h-3 bg-gray-200 bg-surface-card rounded w-full mb-2" />
+    <div className="h-3 bg-gray-200 bg-surface-card rounded w-5/6 mx-auto" />
   </div>
 );
 
@@ -59,7 +59,7 @@ const Contributors = () => {
       <div className="max-w-5xl mx-auto space-y-10">
         <div className="text-center">
           <motion.h1
-            className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4"
+            className="text-4xl sm:text-5xl font-semibold tracking-tight text-text-primary  mb-4"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
@@ -86,8 +86,8 @@ const Contributors = () => {
           </ScrollReveal>
         ) : contributors.length === 0 ? (
           <ScrollReveal direction="up">
-            <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
-              <p className="text-gray-500 dark:text-gray-400">No contributors found yet.</p>
+            <div className="bg-surface-card rounded-lg border border-border-subtle p-12 text-center ">
+              <p className="text-text-muted dark:text-text-muted">No contributors found yet.</p>
             </div>
           </ScrollReveal>
         ) : (
@@ -104,10 +104,10 @@ const Contributors = () => {
                 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } } }}
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 whileTap={{ scale: 0.98 }}
-                className="group bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-8 text-center hover:shadow-xl transition-all duration-300"
+                className="group bg-surface-card/80  rounded-lg  border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] p-8 text-center  transition-all duration-300"
               >
-                <div className="w-24 h-24 rounded-full mx-auto mb-5 p-[3px] bg-gradient-to-tr from-green-400 to-amber-500 shadow-md">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-[#0A0F1E] flex items-center justify-center text-slate-800 dark:text-slate-200 text-3xl font-bold">
+                <div className="w-24 h-24 rounded-full mx-auto mb-5 p-[3px] bg-brand-primary ">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-surface-card bg-surface-canvas flex items-center justify-center text-slate-800 dark:text-slate-200 text-3xl font-semibold">
                     {c.avatar_url ? (
                       <img src={c.avatar_url} alt={c.full_name || c.email} className="w-full h-full object-cover" />
                     ) : (
@@ -115,7 +115,7 @@ const Contributors = () => {
                     )}
                   </div>
                 </div>
-                <h3 className="font-bold text-xl text-slate-900 dark:text-[#F1F5F9]">
+                <h3 className="font-semibold text-xl text-slate-900 text-text-primary">
                   {c.full_name || 'Anonymous Contributor'}
                 </h3>
                 <p className="text-sm text-slate-400 dark:text-slate-500 mb-4">{c.email}</p>

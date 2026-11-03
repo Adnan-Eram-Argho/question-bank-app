@@ -35,7 +35,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
             </Helmet>
 
             <nav aria-label="Breadcrumb" className="mb-6">
-                <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <ol className="flex items-center space-x-2 text-sm text-text-muted dark:text-text-muted">
                     {items.map((item, index) => {
                         const isLast = index === items.length - 1;
 
@@ -44,7 +44,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
                                 {/* Separator (except for first item) */}
                                 {index > 0 && (
                                     <svg
-                                        className="w-4 h-4 mx-2 text-gray-400 dark:text-gray-600"
+                                        className="w-4 h-4 mx-2 text-text-muted dark:text-text-muted"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -60,7 +60,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
 
                                 {/* Breadcrumb Item */}
                                 {isLast ? (
-                                    <span className="text-gray-900 dark:text-white font-medium" aria-current="page">
+                                    <span className="text-text-primary font-medium" aria-current="page">
                                         {item.label}
                                     </span>
                                 ) : (

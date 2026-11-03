@@ -181,7 +181,7 @@ const FloatingAITutor = () => {
                     w-[calc(100vw-2rem)] sm:w-[380px] max-w-md
                     h-[70vh] sm:h-[520px] max-h-[600px]
                     bg-surface-card
-                    rounded-lg shadow-sm
+                    rounded-lg
                     border border-border-subtle
                     overflow-hidden
                 `}
@@ -189,7 +189,7 @@ const FloatingAITutor = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 bg-brand-primary text-white flex-shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-surface-card/20 rounded-full flex items-center justify-center">
                             <SparkleIcon />
                         </div>
                         <div>
@@ -198,7 +198,7 @@ const FloatingAITutor = () => {
                     </div>
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-surface-card/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                         aria-label="Close AI Tutor"
                         id="ai-tutor-close-btn"
                     >
@@ -222,7 +222,7 @@ const FloatingAITutor = () => {
                             className={`max-w-[80%] px-3.5 py-2.5 rounded-lg text-sm leading-relaxed whitespace-pre-wrap
                                     ${msg.role === 'user'
                                         ? 'bg-brand-primary text-white rounded-tr-md'
-                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-sm border border-gray-200 dark:border-gray-700/50'
+                                        : 'bg-surface-canvas bg-surface-card text-text-primary rounded-tl-sm border border-border-subtle/50'
                                     }
                                 `}
                             >
@@ -260,7 +260,7 @@ const FloatingAITutor = () => {
                             onKeyDown={handleKeyDown}
                             placeholder="Ask about your courses..."
                             disabled={isLoading}
-                            className="flex-1 bg-transparent text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 resize-none focus:outline-none max-h-28 overflow-y-auto disabled:opacity-50"
+                            className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-muted dark:placeholder:text-text-muted resize-none focus:outline-none max-h-28 overflow-y-auto disabled:opacity-50"
                             style={{ minHeight: '24px' }}
                         />
                         <button
@@ -273,7 +273,7 @@ const FloatingAITutor = () => {
                             <SendIcon />
                         </button>
                     </div>
-                    <p className="text-center text-[10px] text-gray-400 dark:text-gray-600 mt-1.5">
+                    <p className="text-center text-[10px] text-text-muted dark:text-text-muted mt-1.5">
                         Faculty-specific answers · History clears on refresh
                     </p>
                 </div>

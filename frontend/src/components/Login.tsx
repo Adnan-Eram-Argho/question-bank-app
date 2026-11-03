@@ -52,15 +52,15 @@ const Login = () => {
 
     return (
         <div className="flex items-center justify-center min-h-[70vh] animate-fade-in">
-            <div className="w-full max-w-md bg-white dark:bg-[#1E293B] p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 backdrop-blur-sm">
+            <div className="w-full max-w-md bg-surface-card p-8 sm:p-10 rounded-lg  border border-border-subtle ">
                 
                 <div className="mb-8 text-center">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent mb-2">Welcome Back</h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Sign in to manage the question repository</p>
+                    <h2 className="text-3xl font-semibold text-brand-primary  mb-2">Welcome Back</h2>
+                    <p className="text-text-muted dark:text-text-muted text-sm">Sign in to manage the question repository</p>
                 </div>
 
                 {error && (
-                    <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3">
+                    <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                         </svg>
@@ -69,7 +69,7 @@ const Login = () => {
                 )}
 
                 {message && (
-                    <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl flex items-center gap-3">
+                    <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg flex items-center gap-3">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
@@ -79,20 +79,20 @@ const Login = () => {
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 ml-1">Email Address</label>
+                        <label className="block text-sm font-medium text-text-muted dark:text-text-muted mb-1.5 ml-1">Email Address</label>
                         <input
                             type="email"
                             required
                             placeholder="you@domain.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                            className="w-full px-4 py-3 bg-surface-canvas border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all placeholder:text-text-muted dark:placeholder:text-text-muted"
                         />
                     </div>
 
                     <div>
                         <div className="flex justify-between items-center mb-1.5 ml-1">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                            <label className="block text-sm font-medium text-text-muted dark:text-text-muted">Password</label>
                             <button 
                                 type="button" 
                                 onClick={handleForgotPassword} 
@@ -107,14 +107,14 @@ const Login = () => {
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                            className="w-full px-4 py-3 bg-surface-canvas border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all placeholder:text-text-muted dark:placeholder:text-text-muted"
                         />
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 px-4 flex justify-center items-center text-white bg-primary-600 hover:bg-primary-700 rounded-xl font-medium shadow-md shadow-primary-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                        className="w-full min-h-11 py-3 px-4 flex justify-center items-center text-white bg-brand-primary hover:opacity-90 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {loading ? (
                             <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

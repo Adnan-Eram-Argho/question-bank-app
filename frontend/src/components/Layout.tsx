@@ -43,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <div className="min-h-screen flex flex-col bg-surface-canvas text-text-primary font-sans pb-16 sm:pb-14">
             <motion.header
-                className="sticky top-0 z-50 bg-surface-card border-b border-border-subtle shadow-sm transition-colors duration-300"
+                className="sticky top-0 z-50 bg-surface-card border-b border-border-subtle  transition-colors duration-300"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
@@ -77,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <div className="relative">
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex min-h-11 items-center space-x-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors bg-surface-card px-3 py-1.5 rounded-md border border-border-subtle shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+                                className="flex min-h-11 items-center space-x-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors bg-surface-card px-3 py-1.5 rounded-md border border-border-subtle  focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             >
                                 <span>{activeFaculty}</span>
                                 <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -98,7 +98,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                             transition={{ duration: 0.2 }}
                                             onBlur={() => setIsDropdownOpen(false)}
                                             tabIndex={-1}
-                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-surface-card border border-border-subtle rounded-lg shadow-sm py-2 z-50 focus:outline-none"
+                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-surface-card border border-border-subtle rounded-lg  py-2 z-50 focus:outline-none"
                                         >
                                             {faculties.map((faculty) => (
                                                 <button
@@ -109,7 +109,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                                     }}
                                                     className={`w-full text-left px-4 py-2 text-sm transition-colors ${activeFaculty === faculty
                                                         ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 font-medium'
-                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/80'
+                                                        : 'text-text-muted dark:text-text-muted hover:bg-surface-canvas dark:hover:bg-gray-800/80'
                                                         }`}
                                                 >
                                                     {faculty}
@@ -199,11 +199,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
 
                 {isMobileMenuOpen && (
-                    <div className="sm:hidden border-t border-border-subtle bg-surface-card absolute top-full left-0 w-full shadow-sm animate-fade-in z-40">
+                    <div className="sm:hidden border-t border-border-subtle bg-surface-card absolute top-full left-0 w-full  animate-fade-in z-40">
                         <nav className="flex flex-col px-4 pt-2 pb-6 space-y-2">
                             {/* Faculty Select Mobile */}
                             <div className="mb-2 bg-surface-canvas p-3 rounded-lg border border-border-subtle">
-                                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-2">
                                     Select Faculty
                                 </label>
                                 <div className="space-y-1">
@@ -215,8 +215,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                                 closeMobileMenu();
                                             }}
                             className={`w-full min-h-11 text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeFaculty === faculty
-                                                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 shadow-sm'
-                                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 '
+                                                : 'text-text-muted dark:text-text-muted hover:bg-surface-canvas dark:hover:bg-gray-800'
                                                 }`}
                                         >
                                             {faculty} {activeFaculty === faculty && '✓'}
@@ -224,7 +224,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     ))}
                                 </div>
                             </div>
-                            <div className="h-px w-full bg-gray-200/50 dark:bg-gray-800/50 my-1" />
+                            <div className="h-px w-full bg-gray-200/50 bg-surface-canvas/50 my-1" />
 
                             <Link to="/" onClick={closeMobileMenu} className="flex min-h-11 items-center px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 Home
@@ -296,24 +296,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <Link to="/" className="text-xl font-semibold text-brand-primary hover:opacity-80 transition-opacity inline-block mb-4">
                                 SAU Q-Bank
                             </Link>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                            <p className="text-sm text-text-muted dark:text-text-muted leading-relaxed">
                                 Built by SAU students, for SAU students. Access previous year questions, study materials, and AI-powered tutoring.
                             </p>
                         </div>
 
                         {/* Tools Column */}
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                            <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-4">
                                 Tools
                             </h3>
                             <ul className="space-y-3">
                                 <li>
-                                    <Link to="/questions" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/questions" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Browse Questions
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/study-materials" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/study-materials" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Study Materials
                                     </Link>
                                 </li>
@@ -330,22 +330,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                         {/* Faculties Column */}
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                            <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-4">
                                 Faculties
                             </h3>
                             <ul className="space-y-3">
                                 <li>
-                                    <Link to="/sau-economics-question" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-economics-question" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Agricultural Economics
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-agriculture-question" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-agriculture-question" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Agriculture
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-asvm-question" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-asvm-question" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Animal Science & Vet Med
                                     </Link>
                                 </li>
@@ -354,27 +354,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                         {/* Resources Column */}
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                            <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-4">
                                 Resources
                             </h3>
                             <ul className="space-y-3">
                                 <li>
-                                    <Link to="/sau-question-bank-pdf" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-question-bank-pdf" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Question Bank PDF
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-notes" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-notes" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Lecture Notes
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-admission-preparation" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-admission-preparation" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Admission Prep
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-assignment-cover-page" className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-assignment-cover-page" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
                                         Cover Page Generator
                                     </Link>
                                 </li>
@@ -383,24 +383,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
 
                     {/* Bottom Bar */}
-                    <div className="pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+                    <div className="pt-8 border-t border-border-subtle flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-text-muted dark:text-text-muted">
                             <p>
                                 Developed by{' '}
-                                <Link to="/developer" className="text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                                <Link to="/developer" className="text-text-muted dark:text-text-muted font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                                     Argho
                                 </Link>
                             </p>
-                            <span className="hidden sm:inline text-gray-300 dark:text-gray-700">&bull;</span>
+                            <span className="hidden sm:inline text-gray-300 dark:text-text-muted">&bull;</span>
                             <p>
                                 Questions by{' '}
-                                <Link to="/contributors" className="text-gray-700 dark:text-gray-300 font-medium hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors">
+                                <Link to="/contributors" className="text-text-muted dark:text-text-muted font-medium hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors">
                                     Contributors
                                 </Link>
                             </p>
                         </div>
 
-                        <p className="text-xs text-gray-400 dark:text-gray-600">
+                        <p className="text-xs text-text-muted dark:text-text-muted">
                             © {new Date().getFullYear()} SAU Question Bank. All rights reserved.
                         </p>
                     </div>

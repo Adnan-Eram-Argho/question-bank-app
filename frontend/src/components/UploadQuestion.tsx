@@ -221,18 +221,18 @@ const UploadQuestion = () => {
 
     return (
         <div className="max-w-3xl mx-auto p-2 sm:p-4 md:p-8 animate-fade-in">
-            <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-4 sm:p-6 md:p-10 transition-all">
+            <div className="bg-surface-card rounded-lg  border border-border-subtle p-4 sm:p-6 md:p-10 transition-all">
 
                 {/* Page header */}
-                <div className="mb-6 sm:mb-8 text-center sm:text-left border-b border-gray-100 dark:border-gray-800 pb-4 sm:pb-6">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent mb-2">
+                <div className="mb-6 sm:mb-8 text-center sm:text-left border-b border-border-subtle pb-4 sm:pb-6">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-brand-primary  mb-2">
                         Upload Resource
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Contribute questions, books, or notes to the repository.</p>
+                    <p className="text-text-muted dark:text-text-muted text-xs sm:text-sm">Contribute questions, books, or notes to the repository.</p>
                 </div>
 
                 {/* ── Tab Toggle ── */}
-                <div className="grid grid-cols-2 md:flex sm:flex-wrap gap-2 p-1.5 bg-gray-100 dark:bg-gray-900/60 rounded-xl mb-6 sm:mb-8" role="tablist">
+                <div className="grid grid-cols-2 md:flex sm:flex-wrap gap-2 p-1.5 bg-surface-canvas/60 rounded-lg mb-6 sm:mb-8" role="tablist">
                     {TAB_CONFIG.map(tab => (
                         <button
                             key={tab.id}
@@ -240,8 +240,8 @@ const UploadQuestion = () => {
                             aria-selected={activeTab === tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 focus:outline-none ${activeTab === tab.id
-                                    ? 'bg-white dark:bg-[#1E293B] text-primary-600 dark:text-primary-400 shadow-sm border border-gray-200/80 dark:border-gray-700'
-                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                                    ? 'bg-surface-card text-primary-600 dark:text-primary-400  border border-border-subtle/80 dark:border-border-subtle'
+                                    : 'text-text-muted dark:text-text-muted hover:text-text-muted dark:hover:text-gray-200'
                                 }`}
                         >
                             <span className="text-base sm:text-sm">{tab.emoji}</span>
@@ -256,7 +256,7 @@ const UploadQuestion = () => {
                     {/* ══ QUESTION TAB: image upload ══ */}
                     {activeTab === 'question' && (
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                            <label className="block text-sm font-semibold text-text-muted dark:text-text-muted mb-2 ml-1">
                                 Question Image (JPG/PNG)
                             </label>
                             <div
@@ -264,9 +264,9 @@ const UploadQuestion = () => {
                                 onDragLeave={handleDragLeave}
                                 onDragOver={handleDragOver}
                                 onDrop={handleDrop}
-                                className={`mt-1 flex justify-center px-4 sm:px-6 pt-5 pb-5 sm:pt-6 sm:pb-6 border-2 border-dashed rounded-xl transition-all duration-200 ${isDragging
+                                className={`mt-1 flex justify-center px-4 sm:px-6 pt-5 pb-5 sm:pt-6 sm:pb-6 border-2 border-dashed rounded-lg transition-all duration-200 ${isDragging
                                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-400/30'
-                                        : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500'
+                                        : 'border-gray-300 dark:border-border-subtle hover:bg-surface-canvas dark:hover:bg-gray-800/50 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500'
                                     }`}
                             >
                                 <div className="space-y-2 text-center flex flex-col items-center w-full">
@@ -275,31 +275,31 @@ const UploadQuestion = () => {
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                     ) : (
-                                        <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-2" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <svg className="mx-auto h-12 w-12 text-text-muted dark:text-text-muted mb-2" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                     )}
-                                    <div className="flex flex-wrap text-sm text-gray-600 dark:text-gray-400 justify-center text-center px-2">
+                                    <div className="flex flex-wrap text-sm text-text-muted dark:text-text-muted justify-center text-center px-2">
                                         <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1 focus-within:ring-primary-500 dark:focus-within:ring-offset-gray-900">
                                             <span>Click to browse</span>
                                             <input id="file-upload" name="file-upload" type="file" multiple accept=".jpg,.jpeg,.png,.webp" onChange={handleFileChange} className="sr-only" />
                                         </label>
                                         <p className="pl-1 ">, drag &amp; drop,</p>
                                         <p className="w-full sm:w-auto mt-1 sm:mt-0 sm:pl-1">
-                                            or <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-mono mx-0.5">Ctrl+V</kbd> to paste
+                                            or <kbd className="px-1.5 py-0.5 text-xs bg-surface-canvas dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-mono mx-0.5">Ctrl+V</kbd> to paste
                                         </p>
                                     </div>
-                                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                                    <p className="text-xs text-text-muted dark:text-text-muted">
                                         {isDragging ? 'Release to drop your images here' : 'PNG, JPG, WebP up to 5MB — max 2 files'}
                                     </p>
                                     {files.length > 0 && (
-                                        <div className="flex gap-3 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 w-full justify-center">
+                                        <div className="flex gap-3 mt-3 pt-3 border-t border-border-subtle w-full justify-center">
                                             {files.map((file, index) => {
                                                 const url = URL.createObjectURL(file);
                                                 return (
                                                     <div key={index} className="relative group/thumb flex-shrink-0">
-                                                        <img src={url} alt={`Preview ${index + 1}`} className="h-20 w-20 object-cover rounded-lg border-2 border-primary-400 dark:border-primary-600 shadow-md" onLoad={() => URL.revokeObjectURL(url)} />
-                                                        <button type="button" onClick={() => removeFile(index)} className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full h-5 w-5 flex items-center justify-center shadow-md opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-200 z-10" title="Remove image">
+                                                        <img src={url} alt={`Preview ${index + 1}`} className="h-20 w-20 object-cover rounded-lg border-2 border-primary-400 dark:border-primary-600 " onLoad={() => URL.revokeObjectURL(url)} />
+                                                        <button type="button" onClick={() => removeFile(index)} className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full h-5 w-5 flex items-center justify-center  opacity-0 group-hover/thumb:opacity-100 transition-opacity duration-200 z-10" title="Remove image">
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                                                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                                                             </svg>
@@ -309,7 +309,7 @@ const UploadQuestion = () => {
                                                 );
                                             })}
                                             {files.length < 2 && (
-                                                <label htmlFor="file-upload" className="h-20 w-20 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-400 hover:border-primary-400 hover:text-primary-500 cursor-pointer transition-colors flex-shrink-0" title="Add another image">
+                                                <label htmlFor="file-upload" className="h-20 w-20 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 text-text-muted hover:border-primary-400 hover:text-primary-500 cursor-pointer transition-colors flex-shrink-0" title="Add another image">
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                                 </label>
                                             )}
@@ -324,20 +324,20 @@ const UploadQuestion = () => {
                     {(activeTab === 'book' || activeTab === 'note' || activeTab === 'pdf') && (
                         <div className="space-y-5">
                             {/* Warning banner */}
-                            <div className="flex gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl">
+                            <div className="flex gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg">
                                 <span className="text-xl flex-shrink-0">⚠️</span>
                                 <div>
                                     <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Before you submit</p>
                                     <p className="text-sm text-amber-700 dark:text-amber-400 mt-0.5">
                                         Please make sure your Google Drive or Google Docs link is set to{' '}
-                                        <span className="font-bold">"Anyone with the link"</span> before submitting, otherwise students won't be able to open it.
+                                        <span className="font-semibold">"Anyone with the link"</span> before submitting, otherwise students won't be able to open it.
                                     </p>
                                 </div>
                             </div>
 
                             {/* Title */}
                             <div>
-                                <label htmlFor="material-title" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                                <label htmlFor="material-title" className="block text-sm font-semibold text-text-muted dark:text-text-muted mb-2 ml-1">
                                     {activeTab === 'book' ? '📘 Book Title' : activeTab === 'note' ? '📝 Note Title' : '📄 PDF Title'}
                                 </label>
                                 <input
@@ -347,18 +347,18 @@ const UploadQuestion = () => {
                                     onChange={(e) => setMaterialTitle(e.target.value)}
                                     placeholder={activeTab === 'book' ? 'e.g. Agricultural Economics by Halcrow' : 'e.g. Microeconomics Chapter 4 Notes'}
                                     required
-                                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-gray-400 dark:placeholder-gray-600"
+                                    className="w-full px-4 py-3 bg-surface-canvas border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all placeholder:text-text-muted dark:placeholder:text-text-muted"
                                 />
                             </div>
 
                             {/* Drive / Docs link */}
                             <div>
-                                <label htmlFor="drive-link" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                                <label htmlFor="drive-link" className="block text-sm font-semibold text-text-muted dark:text-text-muted mb-2 ml-1">
                                     Google Drive / Docs Link
                                 </label>
                                 <div className="relative">
                                     <span className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                         </svg>
                                     </span>
@@ -369,7 +369,7 @@ const UploadQuestion = () => {
                                         onChange={(e) => setDriveLink(e.target.value)}
                                         placeholder="https://drive.google.com/... or https://docs.google.com/..."
                                         required
-                                        className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder-gray-400 dark:placeholder-gray-600"
+                                        className="w-full pl-12 pr-4 py-3 bg-surface-canvas border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all placeholder:text-text-muted dark:placeholder:text-text-muted"
                                     />
                                 </div>
                             </div>
@@ -379,17 +379,17 @@ const UploadQuestion = () => {
                     {/* ══ SHARED: Level + Semester ══ */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">Level</label>
+                            <label className="block text-sm font-semibold text-text-muted dark:text-text-muted mb-2 ml-1">Level</label>
                             <select value={level} onChange={(e) => setLevel(e.target.value)} required
-                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                                className="w-full px-4 py-3 bg-surface-canvas border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all">
                                 <option value="" disabled>Select Level...</option>
                                 {Object.keys(facultyData).map((lvl) => <option key={lvl} value={lvl}>{lvl}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">Semester</label>
+                            <label className="block text-sm font-semibold text-text-muted dark:text-text-muted mb-2 ml-1">Semester</label>
                             <select value={semester} onChange={(e) => setSemester(e.target.value)} disabled={!level} required
-                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                className="w-full px-4 py-3 bg-surface-canvas border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                 <option value="" disabled>Select Semester...</option>
                                 {semesters.map((sem) => <option key={sem} value={sem}>{sem}</option>)}
                             </select>
@@ -399,9 +399,9 @@ const UploadQuestion = () => {
                     {/* ══ SHARED: Course ══ */}
                     {activeTab !== 'pdf' && (
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">Course</label>
+                            <label className="block text-sm font-semibold text-text-muted dark:text-text-muted mb-2 ml-1">Course</label>
                             <select value={courseName} onChange={(e) => setCourseName(e.target.value)} disabled={!semester} required
-                                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                className="w-full px-4 py-3 bg-surface-canvas border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                 <option value="" disabled>Select Course...</option>
                                 {courses.map((course) => <option key={course} value={course}>{course}</option>)}
                             </select>
@@ -410,14 +410,14 @@ const UploadQuestion = () => {
 
                     {/* ══ QUESTION TAB: Question Type ══ */}
                     {activeTab === 'question' && (
-                        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-800">
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 ml-1">Question Type</label>
+                        <div className="bg-surface-canvas/50 p-4 rounded-lg border border-border-subtle">
+                            <label className="block text-sm font-semibold text-text-muted dark:text-text-muted mb-3 ml-1">Question Type</label>
                             <div className="flex flex-col sm:flex-row gap-4">
                                 {['Theory', 'Practical'].map((qt) => (
-                                    <label key={qt} className="flex items-center p-3 sm:p-0 bg-white sm:bg-transparent dark:bg-gray-900 sm:dark:bg-transparent border sm:border-transparent border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 sm:hover:bg-transparent transition-colors">
+                                    <label key={qt} className="flex items-center p-3 sm:p-0 bg-surface-card sm:bg-transparent bg-surface-canvas sm:dark:bg-transparent border sm:border-transparent border-border-subtle rounded-lg cursor-pointer hover:bg-surface-canvas sm:hover:bg-transparent transition-colors">
                                         <input type="radio" value={qt} checked={questionType === qt} onChange={(e) => setQuestionType(e.target.value)}
-                                            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700" />
-                                        <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            className="h-4 w-4 text-primary-600 focus-visible:ring-brand-primary border-gray-300 dark:border-gray-600 bg-surface-card dark:bg-gray-700" />
+                                        <span className="ml-3 text-sm font-medium text-text-muted dark:text-text-muted">
                                             {qt === 'Theory' ? 'Theory Question' : 'Practical Assessment'}
                                         </span>
                                     </label>
@@ -428,7 +428,7 @@ const UploadQuestion = () => {
 
                     {/* ══ Feedback Message ══ */}
                     {message && (
-                        <div className={`p-3 sm:p-4 rounded-xl flex items-start sm:items-center gap-3 ${message.toLowerCase().includes('success')
+                        <div className={`p-3 sm:p-4 rounded-lg flex items-start sm:items-center gap-3 ${message.toLowerCase().includes('success')
                                 ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50'
                                 : 'bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50'
                             }`}>
@@ -453,7 +453,7 @@ const UploadQuestion = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3.5 px-4 flex justify-center items-center text-white bg-primary-600 hover:bg-primary-700 rounded-xl font-medium shadow-md shadow-primary-500/30 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                            className="w-full min-h-11 py-3.5 px-4 flex justify-center items-center text-white bg-brand-primary hover:opacity-90 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <>
