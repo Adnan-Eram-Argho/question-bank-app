@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useFaculty } from '../context/FacultyContext';
 import { courseData } from '../data';
 import { MoonIcon, SunIcon, HamburgerIcon, XIcon, ChevronDownIcon } from './icons';
+import DeveloperBadge from './DeveloperBadge';
 
 interface LayoutProps {
     children: ReactNode;
@@ -406,6 +407,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </div>
                 </div>
             </footer>
+            <DeveloperBadge />
             <FloatingAITutor />
         </div>
     );
