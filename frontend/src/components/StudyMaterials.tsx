@@ -6,7 +6,7 @@ import { courseData } from '../data';
 import { motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 import { useFaculty } from '../context/FacultyContext';
-import { UserIcon, ExternalLinkIcon } from './icons';
+import { BookOpenIcon, DocumentTextIcon, UserIcon, ExternalLinkIcon } from './icons';
 
 interface StudyMaterial {
     id: string;
@@ -24,38 +24,17 @@ interface StudyMaterial {
 const TYPE_CONFIG = {
     book: {
         label: 'Book',
-        emoji: '📘',
-        badgeBg: 'bg-indigo-50 dark:bg-indigo-900/30',
-        badgeText: 'text-indigo-700 dark:text-indigo-300',
-        badgeBorder: 'border-indigo-100 dark:border-indigo-800/50',
-        btnBg: 'bg-indigo-600 hover:bg-indigo-700',
-        btnShadow: 'shadow-indigo-500/30',
-        iconBg: 'bg-indigo-100 dark:bg-indigo-900/40',
-        iconText: 'text-indigo-600 dark:text-indigo-400',
+        Icon: BookOpenIcon,
     },
     note: {
         label: 'Note',
-        emoji: '📝',
-        badgeBg: 'bg-amber-50 dark:bg-amber-900/30',
-        badgeText: 'text-amber-700 dark:text-amber-300',
-        badgeBorder: 'border-amber-100 dark:border-amber-800/50',
-        btnBg: 'bg-amber-500 hover:bg-amber-600',
-        btnShadow: 'shadow-amber-500/30',
-        iconBg: 'bg-amber-100 dark:bg-amber-900/40',
-        iconText: 'text-amber-600 dark:text-amber-400',
+        Icon: DocumentTextIcon,
     },
     pdf: {
         label: 'Gen. PDF',
-        emoji: '📄',
-        badgeBg: 'bg-rose-50 dark:bg-rose-900/30',
-        badgeText: 'text-rose-700 dark:text-rose-300',
-        badgeBorder: 'border-rose-100 dark:border-rose-800/50',
-        btnBg: 'bg-rose-600 hover:bg-rose-700',
-        btnShadow: 'shadow-rose-500/30',
-        iconBg: 'bg-rose-100 dark:bg-rose-900/40',
-        iconText: 'text-rose-600 dark:text-rose-400',
+        Icon: DocumentTextIcon,
     },
-};
+} satisfies Record<StudyMaterial['type'], { label: string; Icon: typeof DocumentTextIcon }>;
 
 const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -66,6 +45,7 @@ const cardVariants = {
 
 const MaterialCard = ({ m }: { m: StudyMaterial }) => {
     const cfg = TYPE_CONFIG[m.type];
+    const TypeIcon = cfg.Icon;
 
     return (
         <motion.div
@@ -73,50 +53,46 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            whileTap={{ scale: 0.98 }}
-            className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] flex flex-col h-full relative"
+            className="group bg-surface-card rounded-lg border border-border-subtle hover:border-brand-primary/50 transition-colors duration-150 overflow-hidden flex flex-col h-full"
         >
-            <div className={`h-1.5 w-full ${m.type === 'book' ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : m.type === 'note' ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-gradient-to-r from-rose-400 to-red-500'}`} />
-
             <div className="p-6 flex flex-col flex-grow gap-4">
                 <div className="flex items-start gap-4">
-                    <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${cfg.iconBg}`}>
-                        {cfg.emoji}
+                    <div className="flex-shrink-0 w-12 h-12 rounded-md border border-border-subtle bg-surface-canvas flex items-center justify-center text-brand-primary">
+                        <TypeIcon className="h-6 w-6" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F5F9] leading-snug line-clamp-2">
+                        <h3 className="font-semibold text-base text-text-primary leading-snug line-clamp-2">
                             {m.title}
                         </h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="text-xs text-text-muted mt-1">
                             {new Date(m.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
                     </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${cfg.badgeBg} ${cfg.badgeText} ${cfg.badgeBorder}`}>
-                        {cfg.emoji} {cfg.label}
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border border-border-subtle text-text-muted">
+                        <TypeIcon className="h-4 w-4 text-brand-primary" /> {cfg.label}
                     </span>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200/50 dark:border-green-500/20">
+                    <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold bg-surface-canvas text-text-primary border border-border-subtle">
                         {m.level}
                     </span>
                     {m.semester && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200/50 dark:border-amber-500/20">
+                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold bg-surface-canvas text-text-primary border border-border-subtle">
                             {m.semester}
                         </span>
                     )}
                 </div>
 
                 {m.course_name && (
-                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2 flex-grow">
+                    <p className="text-sm text-text-muted leading-relaxed line-clamp-2 flex-grow">
                         {m.course_name}
                     </p>
                 )}
                 {!m.course_name && <div className="flex-grow"></div>}
 
-                <div className="flex items-center gap-2 pt-2 mt-auto text-xs text-gray-500 dark:text-gray-400 pb-2">
-                    <UserIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                <div className="flex items-center gap-2 pt-2 mt-auto text-xs text-text-muted pb-2">
+                    <UserIcon className="h-4 w-4" />
                     <span className="truncate font-medium">{m.users?.full_name || m.users?.email || 'Unknown'}</span>
                 </div>
 
@@ -124,7 +100,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
                     href={m.drive_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-white text-sm font-semibold shadow-md ${cfg.btnBg} ${cfg.btnShadow} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300`}
+                    className="w-full min-h-11 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md bg-brand-primary hover:opacity-90 text-white text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                 >
                     <ExternalLinkIcon />
                     View / Download
@@ -398,38 +374,38 @@ const StudyMaterials = () => {
                 transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
             >
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent leading-tight">
+                    <h1 className="text-2xl sm:text-3xl font-semibold text-text-primary leading-tight">
                         {activeFaculty} Study Materials
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-2">
+                    <p className="text-text-muted mt-2">
                         Curated books and notes for SAU {activeFaculty}
                     </p>
                 </div>
 
                 {!loading && (
                     <div className="flex gap-3 flex-shrink-0">
-                        <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-xl text-sm font-semibold border border-indigo-100 dark:border-indigo-800/50">
-                            📘 {bookCount} Book{bookCount !== 1 ? 's' : ''}
+                        <div className="flex items-center gap-2 px-4 py-2 bg-surface-card text-text-primary rounded-md text-sm font-semibold border border-border-subtle">
+                            <BookOpenIcon className="h-4 w-4 text-brand-primary" /> {bookCount} Book{bookCount !== 1 ? 's' : ''}
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-xl text-sm font-semibold border border-amber-100 dark:border-amber-800/50">
-                            📝 {noteCount} Note{noteCount !== 1 ? 's' : ''}
+                        <div className="flex items-center gap-2 px-4 py-2 bg-surface-card text-text-primary rounded-md text-sm font-semibold border border-border-subtle">
+                            <DocumentTextIcon className="h-4 w-4 text-brand-primary" /> {noteCount} Note{noteCount !== 1 ? 's' : ''}
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 rounded-xl text-sm font-semibold border border-rose-100 dark:border-rose-800/50">
-                            📄 {pdfCount} PDF{pdfCount !== 1 ? 's' : ''}
+                        <div className="flex items-center gap-2 px-4 py-2 bg-surface-card text-text-primary rounded-md text-sm font-semibold border border-border-subtle">
+                            <DocumentTextIcon className="h-4 w-4 text-brand-primary" /> {pdfCount} PDF{pdfCount !== 1 ? 's' : ''}
                         </div>
                     </div>
                 )}
             </motion.div>
 
             <ScrollReveal direction="up" delay={0.2}>
-                <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all">
+                <div className="bg-surface-card p-6 rounded-lg border border-border-subtle">
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 items-end">
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
                             <select
                                 value={filterLevel}
                                 onChange={(e) => setFilterLevel(e.target.value)}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                                className="w-full px-4 py-3 bg-surface-card bg-surface-canvas border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-md focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
                                 <option value="">All Levels</option>
@@ -440,12 +416,12 @@ const StudyMaterials = () => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Semester</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Semester</label>
                             <select
                                 value={filterSemester}
                                 onChange={(e) => setFilterSemester(e.target.value)}
                                 disabled={!filterLevel}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                                className="w-full px-4 py-3 bg-surface-card bg-surface-canvas border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-md focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
                                 <option value="">All Semesters</option>
@@ -456,12 +432,12 @@ const StudyMaterials = () => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Course</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Course</label>
                             <select
                                 value={filterCourse}
                                 onChange={(e) => setFilterCourse(e.target.value)}
                                 disabled={!filterSemester}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                                className="w-full px-4 py-3 bg-surface-card bg-surface-canvas border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-md focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
                                 <option value="">All Courses</option>
@@ -472,7 +448,7 @@ const StudyMaterials = () => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
                             <select
                                 value={filterType}
                                 onChange={(e) => {
@@ -484,13 +460,13 @@ const StudyMaterials = () => {
                                         setSearchParams({});
                                     }
                                 }}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                                className="w-full px-4 py-3 bg-surface-card bg-surface-canvas border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-md focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
                                 <option value="">All Types</option>
-                                <option value="book">📘 Books</option>
-                                <option value="note">📝 Notes</option>
-                                <option value="pdf">📄 Gen. PDFs</option>
+                                <option value="book">Books</option>
+                                <option value="note">Notes</option>
+                                <option value="pdf">Gen. PDFs</option>
                             </select>
                         </div>
 
@@ -498,7 +474,7 @@ const StudyMaterials = () => {
                             <motion.button
                                 onClick={clearFilters}
                                 whileTap={{ scale: 0.97 }}
-                                className="group w-full h-[46px] bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-xl transition-colors outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-700 flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)]"
+                                className="group w-full h-[46px] bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-md transition-colors outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-700 flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)]"
                             >
                                 <motion.svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -518,10 +494,10 @@ const StudyMaterials = () => {
 
             <div className="space-y-4">
                 {!loading && (
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <p className="text-sm font-medium text-text-muted dark:text-text-muted">
                         {isFiltered
-                            ? <><span className="text-gray-900 dark:text-white font-bold">{materials.length}</span> material{materials.length !== 1 ? 's' : ''} found</>
-                            : <>Showing <span className="text-gray-900 dark:text-white font-bold">{materials.length}</span> material{materials.length !== 1 ? 's' : ''}</>
+                            ? <><span className="text-gray-900 dark:text-white font-semibold">{materials.length}</span> material{materials.length !== 1 ? 's' : ''} found</>
+                            : <>Showing <span className="text-gray-900 dark:text-white font-semibold">{materials.length}</span> material{materials.length !== 1 ? 's' : ''}</>
                         }
                     </p>
                 )}
@@ -532,12 +508,12 @@ const StudyMaterials = () => {
                     </div>
                 ) : materials.length === 0 ? (
                     <ScrollReveal direction="up">
-                        <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
-                            <div className="bg-gray-50 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                                📚
+                        <div className="bg-surface-card rounded-lg border border-border-subtle p-12 text-center">
+                            <div className="bg-surface-canvas border border-border-subtle w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 text-brand-primary">
+                                <BookOpenIcon className="h-8 w-8" />
                             </div>
                             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No materials found</h3>
-                            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                            <p className="text-text-muted dark:text-text-muted max-w-sm mx-auto">
                                 No books or notes match your current filters. Try adjusting or resetting them.
                             </p>
                             {isFiltered && (
@@ -573,7 +549,7 @@ const StudyMaterials = () => {
                         )}
 
                         {!hasMore && materials.length > 0 && (
-                            <p className="text-center text-sm text-gray-400 dark:text-gray-500 pt-4">
+                            <p className="text-center text-sm text-text-muted dark:text-text-muted pt-4">
                                 You've reached the end of the list.
                             </p>
                         )}

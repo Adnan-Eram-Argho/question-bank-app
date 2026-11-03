@@ -2,38 +2,18 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { courseData } from '../data';
-import { motion, animate } from 'framer-motion';
-import HeroParticles from './HeroParticles';
+import { motion } from 'framer-motion';
 import ScrollReveal from './ScrollReveal';
 import { useFaculty } from '../context/FacultyContext';
-import { ExpandIcon, UserIcon, EmptyStateIcon } from './icons';
+import { AcademicCapIcon, ExpandIcon, UserIcon, EmptyStateIcon } from './icons';
 import SEO from './SEO';
 
-const StatCounter = ({ to, label }: { to: number, label: string }) => {
-    const nodeRef = useRef<HTMLSpanElement>(null);
-    useEffect(() => {
-        const node = nodeRef.current;
-        if (node) {
-            const controls = animate(0, to, {
-                duration: 2,
-                ease: "easeOut",
-                onUpdate(value) {
-                    node.textContent = Math.round(value).toString() + "+";
-                }
-            });
-            return () => controls.stop();
-        }
-    }, [to]);
-
-    return (
-        <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
-            <span ref={nodeRef} className="text-3xl font-bold bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">
-                0+
-            </span>
-            <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mt-1">{label}</span>
-        </div>
-    );
-};
+const StatCard = ({ value, label, loading }: { value: number; label: string; loading: boolean }) => (
+    <div className="flex flex-col items-center justify-center p-4 bg-surface-card rounded-lg border border-border-subtle w-full">
+        <span className="text-3xl font-semibold text-brand-primary">{loading ? 'Loading' : `${value}+`}</span>
+        <span className="text-xs text-text-muted font-medium mt-1">{label}</span>
+    </div>
+);
 
 interface Question {
     id: number;
@@ -64,13 +44,10 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
                 delay: index * 0.1,
                 ease: [0.21, 0.47, 0.32, 0.98]
             }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
             whileTap={{ scale: 0.98 }}
-            className="group bg-white dark:bg-[#111827] rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-300 flex flex-col h-full relative"
+            className="group bg-surface-card rounded-lg border border-border-subtle hover:border-brand-primary/50 overflow-hidden transition-colors duration-150 flex flex-col h-full relative"
         >
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-green-400 to-amber-400 z-20"></div>
-
-            <div className="relative h-56 w-full bg-gray-100 dark:bg-[#0A0F1E] overflow-hidden border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.05)] flex">
+            <div className="relative h-56 w-full bg-surface-canvas overflow-hidden border-b border-border-subtle flex">
                 {images.length === 1 && (
                     <a href={images[0]} target="_blank" rel="noreferrer" className="w-full h-full block relative group/full">
                         <img
@@ -80,8 +57,8 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
                             loading={shouldLoadEagerly ? "eager" : "lazy"}
                             fetchPriority={shouldLoadEagerly ? "high" : "auto"}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/full:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                        <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/full:opacity-100 translate-y-2 group-hover/full:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Full Image">
+                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/full:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        <div className="absolute bottom-4 right-4 bg-surface-card border border-border-subtle p-2 rounded-md text-text-primary opacity-0 group-hover/full:opacity-100 shadow-sm transition-opacity duration-150 z-10" title="View Full Image">
                             <ExpandIcon />
                         </div>
                     </a>
@@ -96,8 +73,8 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
                                 loading={shouldLoadEagerly ? "eager" : "lazy"}
                                 fetchPriority={shouldLoadEagerly ? "high" : "auto"}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                            <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/half:opacity-100 translate-y-2 group-hover/half:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Page 1">
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="absolute bottom-4 right-4 bg-surface-card border border-border-subtle p-2 rounded-md text-text-primary opacity-0 group-hover/half:opacity-100 shadow-sm transition-opacity duration-150 z-10" title="View Page 1">
                                 <ExpandIcon />
                             </div>
                         </a>
@@ -109,8 +86,8 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
                                 loading={shouldLoadEagerly ? "eager" : "lazy"}
                                 fetchPriority={shouldLoadEagerly ? "high" : "auto"}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                            <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-full text-gray-900 dark:text-white opacity-0 group-hover/half:opacity-100 translate-y-2 group-hover/half:translate-y-0 shadow-lg transition-all duration-300 hover:bg-primary-500 hover:text-white dark:hover:bg-primary-500 z-10" title="View Page 2">
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/half:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                            <div className="absolute bottom-4 right-4 bg-surface-card border border-border-subtle p-2 rounded-md text-text-primary opacity-0 group-hover/half:opacity-100 shadow-sm transition-opacity duration-150 z-10" title="View Page 2">
                                 <ExpandIcon />
                             </div>
                             {images.length > 2 && (
@@ -118,7 +95,7 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
                                     href={images[2]}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="absolute top-4 left-4 bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full hover:bg-black/90 transition-colors z-10"
+                                    className="absolute top-4 left-4 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full hover:bg-black/90 transition-colors z-10"
                                     title={`View remaining ${images.length - 2} pages`}
                                 >
                                     +{images.length - 2} more
@@ -130,7 +107,7 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
             </div>
 
             <div className="p-6 flex flex-col flex-grow">
-                <h3 className="font-bold text-lg text-slate-900 dark:text-[#F1F5F9] mb-2 line-clamp-2 leading-tight">
+                <h3 className="font-semibold text-lg text-text-primary mb-2 line-clamp-2 leading-tight">
                     {q.course_name}
                 </h3>
 
@@ -149,12 +126,12 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
                     </span>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.06)]">
-                    <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-between pt-3 border-t border-border-subtle">
+                    <div className="flex items-center gap-2 text-[11px] text-text-muted">
                         <UserIcon />
                         <span className="truncate max-w-[120px]">{uploaderName}</span>
                     </div>
-                    <div className="text-[11px] text-gray-400 dark:text-gray-500">
+                    <div className="text-[11px] text-text-muted">
                         {new Date(q.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                     </div>
                 </div>
@@ -588,29 +565,28 @@ const QuestionList = () => {
                 canonicalPath="/questions"
             />
 
-            <div className="relative overflow-hidden flex flex-col items-center text-center max-w-4xl mx-auto py-8 lg:py-12 px-4 rounded-3xl">
-                <HeroParticles />
+            <div className="relative flex flex-col items-center text-center max-w-4xl mx-auto py-8 lg:py-12 px-4 rounded-lg">
                 <div className="relative z-10 w-full flex flex-col items-center">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, ease: 'easeOut' }}
-                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 dark:bg-[#111827]/50 backdrop-blur-md border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] text-sm font-semibold text-slate-800 dark:text-slate-200 mb-6 shadow-sm"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-surface-card border border-border-subtle text-sm font-semibold text-text-primary mb-6"
                     >
-                        <span className="animate-pulse">🌾</span> {activeFaculty} · SAU
+                        <AcademicCapIcon className="h-4 w-4 text-brand-primary" /> {activeFaculty} · SAU
                     </motion.div>
 
                     <motion.h1
-                        className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent leading-tight mb-6"
+                        className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-text-primary leading-tight mb-6"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.15, ease: 'easeOut' }}
                     >
-                        Sher-e-Bangla Agricultural University <br className="hidden sm:block" /><span className="bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">{activeFaculty} Question Bank</span>
+                        Sher-e-Bangla Agricultural University <br className="hidden sm:block" /><span className="text-brand-primary">{activeFaculty} Question Bank</span>
                     </motion.h1>
 
                     <motion.p
-                        className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed"
+                        className="text-lg sm:text-xl text-text-muted max-w-2xl leading-relaxed"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.3, ease: 'easeOut' }}
@@ -624,41 +600,22 @@ const QuestionList = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.45, ease: 'easeOut' }}
                     >
-                        {statsLoading ? (
-                            <>
-                                <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500 mb-2"></div>
-                                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">Loading...</span>
-                                </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500 mb-2"></div>
-                                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">Loading...</span>
-                                </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-md rounded-2xl border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] w-full">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500 mb-2"></div>
-                                    <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">Loading...</span>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <StatCounter to={stats.questions} label="Questions" />
-                                <StatCounter to={stats.courses} label="Courses" />
-                                <StatCounter to={stats.contributors} label="Contributors" />
-                            </>
-                        )}
+                        <StatCard value={stats.questions} label="Questions" loading={statsLoading} />
+                        <StatCard value={stats.courses} label="Courses" loading={statsLoading} />
+                        <StatCard value={stats.contributors} label="Contributors" loading={statsLoading} />
                     </motion.div>
                 </div>
             </div>
 
             <ScrollReveal direction="up" delay={0.2}>
-                <div className="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.07)] transition-all">
+                <div className="bg-surface-card p-6 rounded-lg border border-border-subtle">
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 items-end">
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
                             <select
                                 value={filterLevel}
                                 onChange={(e) => setFilterLevel(e.target.value)}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                                className="w-full min-h-11 px-4 py-3 bg-surface-card border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-colors appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
                                 <option value="">All Levels</option>
@@ -669,11 +626,11 @@ const QuestionList = () => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Semester</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Semester</label>
                             <select
                                 value={filterSemester}
                                 onChange={(e) => setFilterSemester(e.target.value)}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                                className="w-full min-h-11 px-4 py-3 bg-surface-card border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-colors disabled:opacity-50 appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                                 disabled={!filterLevel}
                             >
@@ -685,11 +642,11 @@ const QuestionList = () => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Course</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Course</label>
                             <select
                                 value={filterCourse}
                                 onChange={(e) => setFilterCourse(e.target.value)}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-[#0A0F1E]/50 appearance-none"
+                                className="w-full min-h-11 px-4 py-3 bg-surface-card border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-colors disabled:opacity-50 appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                                 disabled={!filterSemester}
                             >
@@ -701,11 +658,11 @@ const QuestionList = () => {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
+                            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Type</label>
                             <select
                                 value={filterType}
                                 onChange={(e) => setFilterType(e.target.value)}
-                                className="w-full px-4 py-3 bg-white dark:bg-[#0A0F1E] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.08)] text-slate-800 dark:text-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all outline-none appearance-none"
+                                className="w-full min-h-11 px-4 py-3 bg-surface-card border border-border-subtle text-text-primary rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-colors appearance-none"
                                 style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                             >
                                 <option value="">All Types</option>
@@ -723,7 +680,7 @@ const QuestionList = () => {
                                     setFilterType('');
                                 }}
                                 whileTap={{ scale: 0.97 }}
-                                className="group w-full h-[46px] bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-xl transition-colors outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-700 flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)]"
+                                className="group w-full min-h-11 bg-surface-card hover:bg-surface-canvas text-text-primary font-semibold rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 flex items-center justify-center gap-2 border border-border-subtle"
                             >
                                 <motion.svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -744,43 +701,43 @@ const QuestionList = () => {
             <div className="space-y-4">
                 <ScrollReveal direction="up">
                     <div className="flex justify-between items-center">
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <p className="text-sm font-medium text-text-muted dark:text-text-muted">
                             {isFiltered ? (
-                                <>Found <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
+                                <>Found <span className="text-gray-900 dark:text-white font-semibold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
                             ) : (
-                                <>Showing <span className="text-gray-900 dark:text-white font-bold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
+                                <>Showing <span className="text-gray-900 dark:text-white font-semibold">{questions.length}</span> question{questions.length !== 1 && 's'}</>
                             )}
                         </p>
                     </div>
                 </ScrollReveal>
 
                 {questions.length === 0 ? (
-                    <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center shadow-sm">
-                        <div className="bg-gray-50 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="bg-surface-card rounded-lg border border-border-subtle p-12 text-center">
+                        <div className="bg-surface-canvas w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4">
                             {!filterLevel && !filterSemester && !filterCourse ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             ) : (
-                                <EmptyStateIcon className="h-8 w-8 text-gray-400" />
+                                <EmptyStateIcon className="h-8 w-8 text-text-muted" />
                             )}
                         </div>
                         {!filterLevel && !filterSemester && !filterCourse ? (
                             <>
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Search for Questions</h3>
-                                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                                <p className="text-text-muted dark:text-text-muted max-w-md mx-auto">
                                     Use the filters above to find specific question papers. You must select a <span className="font-semibold text-primary-600 dark:text-primary-400">Level</span>, <span className="font-semibold text-primary-600 dark:text-primary-400">Semester</span>, and <span className="font-semibold text-primary-600 dark:text-primary-400">Course</span> to load results.
                                 </p>
                             </>
                         ) : !filterLevel || !filterSemester || !filterCourse ? (
                             <>
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Complete Your Selection</h3>
-                                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                                <p className="text-text-muted dark:text-text-muted max-w-md mx-auto">
                                     Please select a <span className="font-semibold text-primary-600 dark:text-primary-400">Level</span>,{' '}
                                     <span className="font-semibold text-primary-600 dark:text-primary-400">Semester</span>, and{' '}
                                     <span className="font-semibold text-primary-600 dark:text-primary-400">Course</span> to view related question papers.
                                 </p>
-                                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-500">
+                                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-text-muted dark:text-text-muted">
                                     <span className={`px-3 py-1 rounded-full ${filterLevel ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800'}`}>
                                         {filterLevel ? '✓ Level' : '1. Level'}
                                     </span>
@@ -797,7 +754,7 @@ const QuestionList = () => {
                         ) : (
                             <>
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No questions found</h3>
-                                <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                                <p className="text-text-muted dark:text-text-muted max-w-sm mx-auto">
                                     Try adjusting your filters or check back later for new uploads.
                                 </p>
                                 {isFiltered && (
@@ -840,7 +797,7 @@ const QuestionList = () => {
                         )}
 
                         {!hasMore && questions.length > 0 && (
-                            <p className="text-center text-sm text-gray-400 dark:text-gray-500 pt-4">
+                            <p className="text-center text-sm text-text-muted dark:text-text-muted pt-4">
                                 You've reached the end of the list.
                             </p>
                         )}
