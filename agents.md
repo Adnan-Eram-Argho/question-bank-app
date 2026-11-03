@@ -49,3 +49,21 @@ Accessibility
     Mobile touch targets ≥ 44×44px. Icon-only buttons need aria-label.
     Replace hardcoded "→" with ArrowRightIcon (add to icons.tsx).
     Muted text = text-muted token only (replace text-gray-400/500).
+
+## Regression Prevention (added 2026-11-04 — read before any change)
+
+1. **Contributor lookups:** question/material records store the uploader's
+   EMAIL. `/api/contributors` profiles carry BOTH `id` (UUID) and `email`.
+   Always match **email → email**. Comparing email to UUID yields "Unknown"
+   everywhere (bug fixed in 233b745 after a refactor broke it).
+2. **Local debugging first step:** check `http://localhost:5000` responds
+   "API is operational." AND `frontend/.env` has
+   `VITE_API_URL=http://localhost:5000` BEFORE debugging "missing uploads"
+   or "Unknown" — the UI fails silently when the backend is down.
+3. **DeveloperBadge.tsx is intentional branding.** In `Layout.tsx` it renders
+   ABOVE the Alumni Beta banner. Never remove it during UI cleanup (it
+   happened once and had to be restored).
+4. **Render free tier cold-starts the backend after idle:** the first API
+   call can take up to ~60s. Not a bug. Retry once before investigating.
+5. **README.md — "Notes for AI Coding Agents"** is the long version of these
+   rules with root causes. Read it for full context.

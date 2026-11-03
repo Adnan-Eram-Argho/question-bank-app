@@ -23,6 +23,7 @@
 - [Tech Stack](#tech-stack)
 - [Key Features](#key-features)
 - [SEO Landing Pages](#seo-landing-pages) ✨
+- [Notes for AI Coding Agents (Regression Prevention)](#-notes-for-ai-coding-agents-regression-prevention)
 - [Recent Updates](#recent-updates)
 - [Folder Structure](#folder-structure)
 - [Getting Started](#getting-started)
@@ -31,6 +32,7 @@
   - [Environment Variables](#environment-variables)
 - [Usage](#usage)
 - [API Reference](#api-reference)
+- [Deployment & Publishing](#deployment--publishing)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -77,6 +79,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 | Layer | Technology | Version/Details |
 |---|---|---|
 | **Frontend** | React, TypeScript, Vite, TailwindCSS, Framer Motion | React 19.2.4, Vite 8.0.1, TailwindCSS 3.4.19 |
+| Fonts | Inter + Noto Sans Bengali | 400/500/600 via `<link>` + preconnect; Bangla body line-height ≥ 1.6 |
 | **Routing** | React Router | v7.13.2 |
 | **Backend** | Node.js, Express, TypeScript | Express 5.2.1, Node v18+ |
 | **Database & Auth** | Supabase (PostgreSQL + Auth) | supabase-js 2.100.1 |
@@ -100,6 +103,7 @@ The platform supports **3 faculties** with comprehensive course mappings across 
 - **📚 Study Materials Library** — A unified resource hub for Books, Notes, and General PDFs. Supports URL-synced type filters (`?type=book`), infinite scroll pagination (batches of 9), real-time type counts, and asynchronous contributor profile resolution with intelligent in-memory caching (~60% API call reduction).
 - **🤖 Context-Aware AI Tutor** — Domain-locked Groq-powered chat assistant (Llama 3.3 70B: llama-3.3-70b-versatile) that dynamically generates faculty-specific system prompts at request time, with image analysis (up to 5 image URLs per message, max 2000 chars), robust error handling, strict domain guardrails, and prompt injection protection via whitelist validation.
 - **✨ Premium UI & Animations** — High-performance unified scroll reveals, custom canvas-based Framer Motion hero particles, interactive floating badges, smooth page transitions, and micro-interaction hover effects throughout.
+- 🎨 **Unified Design System** — 7 design tokens as CSS variables (light + dark) mapped in `tailwind.config.js`; flat bordered surfaces (borders-over-shadows), 2 border radii, Inter + Noto Sans Bengali typography, typed SVG icons (`icons.tsx`) instead of emoji, focus-visible rings, 44px touch targets, and `useReducedMotion()`-aware animations.
 - **🔐 Role-Based Access Control** — Supabase Auth with `admin` and `collector` roles. Optimized auth flow with race condition prevention using `useRef` to track latest user ID, redundant DB queries removed for instant logins, and secure profile updates with atomic operations.
 - **🛠️ Admin Dashboard** — Full moderation panel with skeleton loading states: create users with rollback on failure, delete questions/materials/users with cascading storage cleanup (Supabase Storage), manage study materials, master admin protection via environment variable, and professional toast notifications for all operations.
 - **📊 Dynamic Home Stats** — Real-time counters for questions (from Supabase), courses (calculated from data.ts), and contributors (from API) with smooth loading animations and automatic updates.
@@ -147,7 +151,59 @@ The platform now includes **7 optimized landing pages** with structured data, br
 
 ---
 
+## 🤖 Notes for AI Coding Agents (Regression Prevention)
+
+> This repository is frequently edited with AI coding agents (Codex, Copilot, Cursor, etc.). Every rule below exists because a **real regression actually happened**. Read this section completely before changing anything. Also read `AGENTS.md` (repo conventions + authoritative design tokens) and `docs/ui-audit.md` (full UI design system) before any UI work.
+
+### 1. Contributor name enrichment — match the identifier the data actually carries
+
+- **What broke (Nov 2026):** every question/study-material card showed **"Unknown"** instead of the uploader's name.
+- **Root cause:** the enrichment lookup compared the uploader identifier stored on each record (an **email address**) against the contributor profile's **`id` (UUID)**. An email never equals a UUID, so no profile ever matched and the UI silently fell back to "Unknown".
+- **Fix:** commit **`233b745`** — the lookup now matches **email → email** against the profiles returned by `GET /api/contributors` (`{ id, full_name, email, avatar_url, role, ... }`).
+- **Rule:** before touching any contributor/author/owner lookup, inspect **one real row** from `questions` / `study_materials` and **one real `/api/contributors` response**, and match on the field that actually aligns (currently: **email**). Never "simplify" or "normalize" this matching to use `id` — the records carry emails.
+- **Caching gotcha:** the frontend caches contributor profiles for 5 minutes (in-memory Map + `Cache-Control: public, max-age=300`). A stale cache is NOT a lookup bug — hard-refresh (Ctrl+Shift+R) before concluding anything.
+
+### 2. Local debugging — check the backend is actually running FIRST
+
+- **What happened (Nov 2026):** "uploads not showing" and "names not showing" in local dev were caused by the Express backend simply **not running** on `http://localhost:5000` (connection refused), while the frontend silently degraded to "Unknown"/empty states instead of showing errors. Hours were spent debugging frontend code that was fine.
+- **Rule:** before diagnosing ANY data bug locally:
+  1. Confirm the backend responds: open `http://localhost:5000` — should say **"API is operational."**
+  2. Confirm `frontend/.env` contains `VITE_API_URL=http://localhost:5000`
+  3. Check DevTools — Network tab for the failing request **before** rewriting frontend logic.
+
+### 3. The developer badge is intentional — do NOT remove it
+
+- `frontend/src/components/DeveloperBadge.tsx` renders a floating **"Made by Md. Adnan Eram Argho"** badge. In `Layout.tsx` it must stay rendered **above the Alumni Beta notification banner** (earlier in the DOM / higher stacking order).
+- A UI-cleanup pass once removed it as "visual clutter" (Nov 2026) and it had to be manually restored. **UI work must not delete product branding.** Credit also lives in the footer.
+- If `Layout.tsx` is ever refactored, the order must remain: `<DeveloperBadge />` → then the Alumni Beta notification banner.
+
+### 4. UI design tokens (`AGENTS.md` + `docs/ui-audit.md` are authoritative)
+
+- Exactly **2 border radii** (`rounded-md`, `rounded-lg`) — no `rounded-2xl`/`rounded-3xl`.
+- **Borders-over-shadows**: flat bordered surfaces; no gradients, no `bg-clip-text`, no glassmorphism (`backdrop-blur`).
+- **Static Tailwind classes only** — never `bg-${color}-100` string interpolation (Tailwind purges it at build time).
+- **SVG icons from `icons.tsx`** instead of emoji in UI chrome.
+- Accessibility: focus-visible rings, touch targets ≥ 44×44px, `ScrollReveal` honors `useReducedMotion()` and is disabled below `sm`.
+
+### 5. Build gate & workflow
+
+- `cd frontend && npm run build` must pass with **zero TypeScript errors** before every commit. Fix what you broke before starting the next task.
+- One logical change per commit (`ui(batch-N): ...`, `fix: ...`, `docs: ...`).
+- The maintainer applies **whole-file replacements, not diffs** — when providing changes, output the complete final file.
+- Never commit `.env` files; never print secrets, keys, or tokens.
+
+---
+
 ## ✨ Recent Updates
+
+### 🆕 Cover Page Fields, Contributor Fix, Developer Badge & UI Redesign (2026-11-04)
+
+- **Cover page generator:** added **Section** and **Group** fields (rendered below Level/Semester) to the form, the live A4 preview, and the DOCX export — so group members can be identified on assignment covers.
+- **Contributor names fixed ("Unknown" bug):** the enrichment lookup compared the uploader's **email** against the contributor profile **UUID**; commit `233b745` restored email → email matching. Full root cause + prevention rules: see [Notes for AI Coding Agents](#-notes-for-ai-coding-agents-regression-prevention) and [Troubleshooting](#study-materials--questions-showing-unknown-contributors).
+- **Local-dev gotcha documented:** "uploads not showing / names missing" locally was caused by the backend **not running** on `localhost:5000` (connection refused). The UI degrades silently — check the backend and the Network tab before changing code.
+- **Developer badge restored:** floating "Made by" badge re-added in `Layout.tsx`, positioned **above the Alumni Beta notification banner** (a UI cleanup pass had removed it).
+- **UI redesign (6 batches, per `docs/ui-audit.md` + `AGENTS.md`):** Inter + Noto Sans Bengali typography via `<link>` + preconnect; 7 design tokens as CSS variables (light/dark) mapped in `tailwind.config.js` with `<alpha-value>`; flat bordered surfaces replacing gradients/glassmorphism/shadows; 2 radii; emoji labels → typed SVG icons from `icons.tsx`; SAU crest in navbar brand; `animate-ping` and hero particles removed; focus-visible rings + 44px touch targets; `ScrollReveal` honors `useReducedMotion()` and is disabled below `sm`.
+- **Performance audit findings (production, measured):** first API request after backend idle can take **up to ~1 minute** (Render free-tier cold start — measured ~52 s; **not a bug, retry once**); main JS bundle — **884 KB**; some legacy hero/brand images oversized; duplicate data fetches and third-party ad script (AdSense) weight add to first load. Recommended follow-ups: route-based code splitting (`React.lazy` for page components), explicit `width`/`height` + responsive sizing for hero assets, deferring the ad script until first interaction.
 
 ### 🆕 SAU Assignment Cover Page Generator (2026-10-16)
 - **New tool page** at `/sau-assignment-cover-page`: free, browser-only generator for SAU assignment, note book, and lab report cover pages with live A4 preview (always white/black, print-safe), DOCX export via `docx` 9.11.0 + `file-saver`, and PDF via browser print. No data leaves the browser.
@@ -289,6 +345,9 @@ question-bank-app/
 │   └── tsconfig.json
 │
 ├── frontend/                       # React (Vite) SPA
+│   ├── AGENTS.md                   # AI agent conventions + authoritative design tokens
+│   ├── docs/
+│   │   └── ui-audit.md              # Full UI audit: findings, design system, 6-batch plan
 │   ├── public/                     # Static assets served at root
 │   ├── src/
 │   │   ├── assets/                 # Images and static media
@@ -298,7 +357,7 @@ question-bank-app/
 │   │   │   ├── Breadcrumb.tsx      # Accessible breadcrumb navigation with JSON-LD schema
 │   │   │   ├── Contributors.tsx    # Public contributors showcase page
 │   │   │   ├── Developer.tsx       # Developer profile page
-│   │   │   ├── DeveloperBadge.tsx  # Interactive "Developed By" floating badge
+│   │   │   ├── DeveloperBadge.tsx  # Floating "Made by" badge — DO NOT REMOVE (see AI notes)
 │   │   │   ├── FAQ.tsx             # Homepage FAQ component with JSON-LD FAQPage schema
 │   │   │   ├── FloatingAITutor.tsx # Groq-powered AI chat widget (image-aware)
 │   │   │   ├── HeroParticles.tsx   # Canvas-based Framer Motion hero animation
@@ -408,7 +467,7 @@ cp frontend/.env.example frontend/.env
 | `SUPABASE_URL` | Your Supabase project URL | ✅ Yes |
 | `SUPABASE_SERVICE_KEY` | Supabase **service role** key (bypasses RLS) | ✅ Yes |
 | `GROQ_API_KEY` | Groq API key for the AI Tutor | ✅ Yes |
-| `CORS_ORIGIN` | Comma-separated list of allowed origins (e.g., `https://your-app.vercel.app`) | ✅ Yes (Production) |
+| `CORS_ORIGIN` | Comma-separated list of allowed origins (e.g., `https://sau-eco-qstns.vercel.app`) | ✅ Yes (Production) |
 | `MASTER_ADMIN_ID` | UUID of the master admin account (protected from deletion) | Recommended |
 
 > ⚠️ **Security Notes:**
@@ -451,7 +510,7 @@ npm run dev
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
-> 💡 **Tip:** When running locally, set `VITE_API_URL=http://localhost:5000` in `frontend/.env` so the frontend communicates with your local backend instead of the hosted Render API.
+> 💡 **Tip (read this — it caused a false "bug" before):** When running locally, set `VITE_API_URL=http://localhost:5000` in `frontend/.env` so the frontend communicates with your local backend instead of the hosted Render API. If the backend is **not running** on port 5000, every API call fails **silently** — uploads won't show and contributor names fall back to "Unknown". Always verify `http://localhost:5000` says "API is operational." before debugging frontend code. See [Troubleshooting](#study-materials--questions-showing-unknown-contributors).
 
 ---
 
@@ -593,6 +652,58 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 
 ---
 
+## 🚀 Deployment & Publishing
+
+**Frontend — Vercel** (auto-deploy from Git)  **Backend — Render** (auto-deploy from Git)  **Production URL:** https://sau-eco-qstns.vercel.app/
+
+Pushing to `main` is the publish button. Both platforms pick commits up automatically — no manual deploy needed.
+
+### Standard Publish Workflow
+
+1. **Build gate** — must pass with zero TypeScript errors:
+
+   ```bash
+   cd frontend
+   npm run build
+   ```
+
+2. **Local smoke test** — run the backend (`cd backend && npm run dev`) and frontend (`cd frontend && npm run dev`) with `VITE_API_URL=http://localhost:5000`, then verify:
+   - Login works
+   - Study Materials / Question cards show **real contributor names** (not "Unknown")
+   - The floating developer badge appears **above** the Alumni Beta banner
+   - One test upload shows up after refresh
+   - AI Tutor replies
+
+3. **Commit + push:**
+
+   ```bash
+   git add .
+   git status        # confirm no .env files are staged
+   git commit -m "fix: contributor email lookup, restore developer badge, UI redesign"
+   git push origin main
+   ```
+
+4. **Watch the deploy:**
+   - Vercel dashboard → Deployments → wait for **Ready** (Production) — usually 2–3 min
+   - Render dashboard → Events/Logs — only redeploys when `backend/` files changed (~5–10 min)
+
+5. **Post-deploy smoke test** on https://sau-eco-qstns.vercel.app/ — hard refresh (Ctrl+Shift+R) and repeat the checks from step 2. **Note:** the first API request after the backend has been idle can take up to ~1 minute (Render free-tier cold start). This is normal — retry once before investigating.
+
+6. **Rollback if something breaks:**
+   - Instant: Vercel → Deployments → previous good deployment → **Promote to Production**
+   - Code-level: `git revert <sha>` then `git push origin main`
+
+### Environment Variables (set once in the dashboards, never in the repo)
+
+| Platform | Variables |
+|---|---|
+| **Vercel** (frontend) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_URL` = the **Render backend URL** (must NOT be `http://localhost:5000` in production) |
+| **Render** (backend) | `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `GROQ_API_KEY`, `CORS_ORIGIN` (must include `https://sau-eco-qstns.vercel.app`), `MASTER_ADMIN_ID` |
+
+Local `.env` files are gitignored — local values never reach production.
+
+---
+
 ## 🗺️ Roadmap
 
 ### Planned Features
@@ -606,6 +717,8 @@ All endpoints are served from the Express backend. Base URL: `http://localhost:5
 - [ ] **Comment System** — Allow students to ask questions about specific resources
 
 ### Completed Milestones
+- [x] **UI Redesign (2026-11-04)** — 6-batch implementation of the design system in `docs/ui-audit.md`: Inter + Noto Sans Bengali typography, 7 CSS-variable design tokens (light/dark), flat bordered surfaces, 2 radii, SVG icon system, accessibility pass (focus rings, 44px targets, reduced-motion)
+- [x] **Contributor "Unknown" Fix (2026-11-04)** — Email → email matching restored (commit `233b745`); regression-prevention rules documented for AI agents
 - [x] **SAU Assignment Cover Page Generator** — Free browser-only tool at `/sau-assignment-cover-page` with live A4 preview (always white/black), DOCX export (`docx` 9.11.0), and PDF via print; SEO-optimized with JSON-LD, breadcrumbs, sitemap entry, and contextual links from 5 landing pages
 - [x] **Vercel Analytics** — First-party, privacy-friendly page-view tracking via `@vercel/analytics`
 - [x] **Infinite Scroll Pagination** — Question Bank and Study Materials pages load content in batches of 9 using `IntersectionObserver` with request deduplication via `useRef`
@@ -763,13 +876,23 @@ This project follows industry best practices for security, performance, and data
 - **Check 5**: Verify message length is under 2000 characters
 - **Check 6**: Ensure image URLs (if any) are from Supabase Storage or Cloudinary (for backward compatibility)
 
-#### Study Materials Showing "Unknown" Contributors
-**Symptoms**: All materials show "Unknown" instead of uploader names
-- **Cause 1**: `/api/contributors` endpoint failing
-- **Fix 1**: Check backend logs for errors, verify Supabase connection
-- **Cause 2**: Users table missing entries for uploaders
-- **Fix 2**: Ensure user records exist in Supabase `users` table with matching IDs
-- **Debug**: Open browser DevTools → Network tab → filter "contributors" → check response
+#### Study Materials / Questions Showing "Unknown" Contributors
+
+**Symptoms:** Cards show "Unknown" instead of uploader names; the "Contributors" stat may also look wrong.
+
+**Root cause 1 — identifier mismatch (code bug, FIXED in `233b745`):**
+- The enrichment lookup compared the uploader identifier stored on each question/material record (an **email address**) against the contributor profile's **`id` (UUID)**. An email never equals a UUID, so no profile ever matched and every card fell back to "Unknown".
+- Fix: the lookup now matches **email → email** against the profiles from `GET /api/contributors`.
+- Prevention: see [Notes for AI Coding Agents — rule 1](#1-contributor-name-enrichment--match-the-identifier-the-data-actually-carries).
+
+**Root cause 2 — backend not running (local dev only):**
+- `http://localhost:5000` refused connections (backend not started with `npm run dev`), or `frontend/.env` was missing `VITE_API_URL=http://localhost:5000` so the frontend was pointing at production while testing local code. All API calls fail and the UI **silently** shows "Unknown"/empty — by design (graceful degradation), which makes it look like a data bug.
+
+**Diagnosis order (2 minutes):**
+1. DevTools → Network tab → filter `contributors` — is the request returning **200 with profiles**?
+2. If the request fails locally: open `http://localhost:5000` — it should say "API is operational." If not, start the backend and set `VITE_API_URL=http://localhost:5000`.
+3. If it returns 200 but names still show "Unknown": hard refresh (Ctrl+Shift+R) to bust the 5-minute contributor cache, then verify the record's uploader field value actually appears among the returned profile emails.
+4. In production, the first request after the backend has been idle can take up to ~1 minute (Render free-tier cold start) — retry once before investigating.
 
 #### Profile Avatar Not Updating
 **Symptoms**: Upload succeeds but old avatar persists
@@ -799,6 +922,7 @@ This project follows industry best practices for security, performance, and data
 - **Check 1**: Browser DevTools → Network tab → identify slow requests
 - **Check 2**: Verify Supabase project region is close to your users
 - **Check 3**: Enable React DevTools Profiler to identify slow component renders
+- **Check 4**: **Is it the first request after a while?** Render (free tier) spins the backend down when idle; the first API call can take up to ~1 minute to cold-start. Retry once — if the second load is fast, it was cold start, not a bug.
 - **Optimization**: Study Materials uses contributor caching; clear cache only if data is stale
 
 #### High Memory Usage on Backend
