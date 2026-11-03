@@ -67,6 +67,36 @@ export const EmptyStateIcon = ({ className = 'h-8 w-8', ...props }: IconProps) =
     </svg>
 );
 
+export const AcademicCapIcon = ({ className = 'h-5 w-5', ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 9l9-5 9 5-9 5-9-5zm4 2.2V16c3.2 2.4 6.8 2.4 10 0v-4.8M21 9v6" />
+    </svg>
+);
+
+export const BookOpenIcon = ({ className = 'h-5 w-5', ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 6.25C10.8 5.48 9.25 5 7.5 5 5.75 5 4.17 5.48 3 6.25v13C4.17 18.48 5.75 18 7.5 18c1.75 0 3.3.48 4.5 1.25m0-13C13.2 5.48 14.75 5 16.5 5c1.75 0 3.33.48 4.5 1.25v13c-1.17-.77-2.75-1.25-4.5-1.25-1.75 0-3.3.48-4.5 1.25m0-13v13" />
+    </svg>
+);
+
+export const DocumentTextIcon = ({ className = 'h-5 w-5', ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.59a2 2 0 011.41.59l5.41 5.41A2 2 0 0120 10.41V19a2 2 0 01-2 2zM14 3v6h6" />
+    </svg>
+);
+
+export const UsersIcon = ({ className = 'h-5 w-5', ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 20h5v-2a3 3 0 00-5.36-1.86M17 20H7m10 0v-2c0-.66-.13-1.28-.36-1.86M7 20H2v-2a3 3 0 015.36-1.86M7 20v-2c0-.66.13-1.28.36-1.86m0 0a5 5 0 019.28 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+);
+
+export const RefreshIcon = ({ className = 'h-5 w-5', ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 4v5h.58m15.36 2A8 8 0 004.58 9m0 0H9m11 11v-5h-.58m0 0a8 8 0 01-15.36-2m15.36 2H15" />
+    </svg>
+);
+
 // AI tutor icons use solid fill (HeroIcons solid) while the rest use outline strokes.
 /** Heart shape — floating AI tutor trigger button */
 export const SparkleIcon = ({ className = 'w-7 h-7', ...props }: IconProps) => (
