@@ -55,7 +55,7 @@ const MaterialCard = ({ m }: { m: StudyMaterial }) => {
             viewport={{ once: true, margin: '-40px' }}
             className="group bg-surface-card rounded-lg border border-border-subtle hover:border-brand-primary/50 transition-colors duration-150 overflow-hidden flex flex-col h-full"
         >
-            <div className="p-6 flex flex-col flex-grow gap-4">
+            <div className="flex flex-grow flex-col gap-4 p-4 sm:p-6">
                 <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-12 h-12 rounded-md border border-border-subtle bg-surface-canvas flex items-center justify-center text-brand-primary">
                         <TypeIcon className="h-6 w-6" />
@@ -259,6 +259,7 @@ const StudyMaterials = () => {
             setLoadingMore(true);
         }
 
+        let requestTimeout: number | undefined;
         try {
             let query = supabase
                 .from('study_materials')
@@ -275,7 +276,11 @@ const StudyMaterials = () => {
             const to = from + BATCH_SIZE - 1;
             query = query.range(from, to);
 
-            const { data, error } = await query;
+            const controller = new AbortController();
+            requestTimeout = window.setTimeout(() => controller.abort(), 15000);
+            const { data, error } = await query.abortSignal(controller.signal);
+            window.clearTimeout(requestTimeout);
+            requestTimeout = undefined;
             if (error) throw error;
 
             const fetchedMaterials = data || [];
@@ -285,29 +290,27 @@ const StudyMaterials = () => {
                 return;
             }
 
-            // Enrich with contributor data before updating state
-            const enrichedMaterials = await enrichWithContributors(fetchedMaterials);
-
-            // Check again after async operation
-            if (currentRequestId !== requestIdRef.current) {
-                return;
-            }
-
-            // Single state update with enriched data
             if (isReset) {
-                setMaterials(enrichedMaterials);
+                setMaterials(fetchedMaterials);
             } else {
-                setMaterials(prev => [...prev, ...enrichedMaterials]);
+                setMaterials(prev => [...prev, ...fetchedMaterials]);
             }
 
             if (fetchedMaterials.length < BATCH_SIZE) {
                 setHasMore(false);
             }
+
+            // Render materials first; uploader details arrive from a separate API.
+            void enrichWithContributors(fetchedMaterials).then(enrichedMaterials => {
+                const enrichedById = new Map(enrichedMaterials.map(material => [material.id, material]));
+                setMaterials(current => current.map(material => enrichedById.get(material.id) || material));
+            });
         } catch (err) {
             if (currentRequestId === requestIdRef.current) {
                 console.error('[StudyMaterials] Fetch error:', err);
             }
         } finally {
+            if (requestTimeout !== undefined) window.clearTimeout(requestTimeout);
             if (currentRequestId === requestIdRef.current) {
                 setLoading(false);
                 setLoadingMore(false);
@@ -383,7 +386,7 @@ const StudyMaterials = () => {
                 </div>
 
                 {!loading && (
-                    <div className="flex gap-3 flex-shrink-0">
+                    <div className="flex flex-wrap gap-2 sm:gap-3">
                         <div className="flex items-center gap-2 px-4 py-2 bg-surface-card text-text-primary rounded-md text-sm font-semibold border border-border-subtle">
                             <BookOpenIcon className="h-4 w-4 text-brand-primary" /> {bookCount} Book{bookCount !== 1 ? 's' : ''}
                         </div>
@@ -398,7 +401,7 @@ const StudyMaterials = () => {
             </motion.div>
 
             <ScrollReveal direction="up" delay={0.2}>
-                <div className="bg-surface-card p-6 rounded-lg border border-border-subtle">
+                <div className="rounded-lg border border-border-subtle bg-surface-card p-4 sm:p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 items-end">
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
@@ -508,7 +511,7 @@ const StudyMaterials = () => {
                     </div>
                 ) : materials.length === 0 ? (
                     <ScrollReveal direction="up">
-                        <div className="bg-surface-card rounded-lg border border-border-subtle p-12 text-center">
+                        <div className="rounded-lg border border-border-subtle bg-surface-card p-6 text-center sm:p-12">
                             <div className="bg-surface-canvas border border-border-subtle w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 text-brand-primary">
                                 <BookOpenIcon className="h-8 w-8" />
                             </div>
@@ -528,7 +531,7 @@ const StudyMaterials = () => {
                     </ScrollReveal>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
                             {materials.map((m, index) => {
                                 if (materials.length === index + 1) {
                                     return (

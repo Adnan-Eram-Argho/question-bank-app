@@ -297,7 +297,7 @@ export default function SAUCoverPageGenerator() {
           <div className="grid lg:grid-cols-2 gap-8 items-start">
 
             {/* Form panel */}
-            <div className="space-y-3 bg-surface-card rounded-lg border border-border-subtle dark:border-border-subtle p-6 ">
+            <div className="space-y-3 rounded-lg border border-border-subtle bg-surface-card p-4 sm:p-6">
               <div>
                 <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-1">Title</label>
                 <input id="title" className={inputCls} placeholder="যেমন A Note Book on Farm Mechanization" value={f.title} onChange={set('title')} />
@@ -318,7 +318,7 @@ export default function SAUCoverPageGenerator() {
               <p className="text-sm font-semibold text-gray-700 dark:text-text-muted pt-2 border-t border-gray-100 dark:border-border-subtle">
                 তোমার তথ্য (Submitted by)
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <input id="studentName" className={halfInputCls} placeholder="Name" value={f.name} onChange={set('name')} />
                 <input id="regNo" className={halfInputCls} placeholder="Reg. No" value={f.regNo} onChange={set('regNo')} />
                 <input id="level" className={halfInputCls} placeholder="Level (Level-2)" value={f.level} onChange={set('level')} />

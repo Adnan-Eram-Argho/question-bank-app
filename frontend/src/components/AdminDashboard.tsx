@@ -488,7 +488,7 @@ const AdminDashboard: React.FC = () => {
                     {questionsLoading ? (
                         <LoadingSkeleton />
                     ) : questions.length > 0 ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                             {questions.map(q => (
                                 <div key={q.id} className="bg-surface-card rounded-lg border border-border-subtle  overflow-hidden relative group  transition-all duration-300 flex flex-col">
                                     <div className="relative h-40 bg-surface-canvas">

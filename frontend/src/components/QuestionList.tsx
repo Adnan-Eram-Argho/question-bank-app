@@ -9,9 +9,9 @@ import { AcademicCapIcon, ExpandIcon, UserIcon, EmptyStateIcon } from './icons';
 import SEO from './SEO';
 
 const StatCard = ({ value, label, loading }: { value: number; label: string; loading: boolean }) => (
-    <div className="flex flex-col items-center justify-center p-4 bg-surface-card rounded-lg border border-border-subtle w-full">
-        <span className="text-3xl font-semibold text-brand-primary">{loading ? 'Loading' : `${value}+`}</span>
-        <span className="text-xs text-text-muted font-medium mt-1">{label}</span>
+    <div className="flex w-full min-w-0 flex-col items-center justify-center rounded-lg border border-border-subtle bg-surface-card p-2 sm:p-4">
+        <span className="text-2xl font-semibold text-brand-primary sm:text-3xl">{loading ? 'Loading' : `${value}+`}</span>
+        <span className="mt-1 text-center text-[10px] font-medium text-text-muted sm:text-xs">{label}</span>
     </div>
 );
 
@@ -106,7 +106,7 @@ const QuestionCard = ({ q, index, isFirstBatch }: { q: Question; index: number; 
                 )}
             </div>
 
-            <div className="p-6 flex flex-col flex-grow">
+            <div className="flex flex-grow flex-col p-4 sm:p-6">
                 <h3 className="font-semibold text-lg text-text-primary mb-2 line-clamp-2 leading-tight">
                     {q.course_name}
                 </h3>
@@ -148,6 +148,7 @@ const QuestionList = () => {
     const BATCH_SIZE = 9;
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -423,6 +424,7 @@ const QuestionList = () => {
     }, []); // No dependencies - uses refs which don't trigger re-renders
 
     const fetchQuestions = useCallback(async (pageNum: number, isReset = false) => {
+        const currentRequestId = ++requestIdRef.current;
         // ✅ Require complete filter selection (level, semester, course) to load any questions
         const hasAllRequiredFilters = filterLevel && filterSemester && filterCourse;
         
@@ -431,19 +433,20 @@ const QuestionList = () => {
             setLoading(false);
             setLoadingMore(false);
             setHasMore(false);
+            setLoadError(false);
             return;
         }
-
-        const currentRequestId = ++requestIdRef.current;
 
         if (isReset) {
             setLoading(true);
             setQuestions([]);
             setHasMore(true);
+            setLoadError(false);
         } else {
             setLoadingMore(true);
         }
 
+        let requestTimeout: number | undefined;
         try {
             let query = supabase.from('questions').select('*').order('created_at', { ascending: false });
 
@@ -457,7 +460,11 @@ const QuestionList = () => {
             const to = from + BATCH_SIZE - 1;
             query = query.range(from, to);
 
-            const { data, error } = await query;
+            const controller = new AbortController();
+            requestTimeout = window.setTimeout(() => controller.abort(), 15000);
+            const { data, error } = await query.abortSignal(controller.signal);
+            window.clearTimeout(requestTimeout);
+            requestTimeout = undefined;
             if (error) throw error;
 
             // 🛡️ Check if this is still the latest request before updating state
@@ -466,27 +473,30 @@ const QuestionList = () => {
             }
 
             const rawQuestions = data || [];
-            const newQuestions = await enrichWithContributors(rawQuestions);
-
-            if (currentRequestId !== requestIdRef.current) {
-                return;
-            }
-
             if (isReset) {
-                setQuestions(newQuestions);
+                setQuestions(rawQuestions);
             } else {
-                setQuestions(prev => [...prev, ...newQuestions]);
+                setQuestions(prev => [...prev, ...rawQuestions]);
             }
 
             if (rawQuestions.length < BATCH_SIZE) {
                 setHasMore(false);
             }
+
+            // Contributor profiles are optional card metadata: render questions first,
+            // then fill in names when the separate API request completes.
+            void enrichWithContributors(rawQuestions).then(enrichedQuestions => {
+                const enrichedById = new Map(enrichedQuestions.map(question => [question.id, question]));
+                setQuestions(current => current.map(question => enrichedById.get(question.id) || question));
+            });
         } catch (error) {
             // Only log error if this is still the latest request
             if (currentRequestId === requestIdRef.current) {
                 console.error('[QuestionList] Error fetching questions:', error);
+                setLoadError(true);
             }
         } finally {
+            if (requestTimeout !== undefined) window.clearTimeout(requestTimeout);
             // Only update loading state if this is still the latest request
             if (currentRequestId === requestIdRef.current) {
                 setLoading(false);
@@ -603,7 +613,7 @@ const QuestionList = () => {
                     </motion.p>
 
                     <motion.div
-                        className="w-full grid grid-cols-3 gap-6 mt-12"
+                        className="mt-8 grid w-full grid-cols-3 gap-2 sm:mt-12 sm:gap-6"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.45, ease: 'easeOut' }}
@@ -616,7 +626,7 @@ const QuestionList = () => {
             </div>
 
             <ScrollReveal direction="up" delay={0.2}>
-                <div className="bg-surface-card p-6 rounded-lg border border-border-subtle">
+                <div className="rounded-lg border border-border-subtle bg-surface-card p-4 sm:p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 items-end">
                         <div className="flex flex-col gap-2">
                             <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Level</label>
@@ -719,8 +729,22 @@ const QuestionList = () => {
                     </div>
                 </ScrollReveal>
 
-                {questions.length === 0 ? (
-                    <div className="bg-surface-card rounded-lg border border-border-subtle p-12 text-center">
+                {loadError && (
+                    <div role="alert" className="rounded-lg border border-border-subtle bg-surface-card p-5 text-center sm:p-6">
+                        <h3 className="mb-2 text-lg font-semibold text-text-primary">Questions could not be loaded</h3>
+                        <p className="mb-4 text-sm text-text-muted">Check your connection and try again.</p>
+                        <button
+                            type="button"
+                            onClick={() => fetchQuestions(0, true)}
+                            className="inline-flex min-h-11 items-center justify-center rounded-md bg-brand-primary px-5 py-2 font-semibold text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+                        >
+                            Try again
+                        </button>
+                    </div>
+                )}
+
+                {questions.length === 0 && !loadError ? (
+                    <div className="rounded-lg border border-border-subtle bg-surface-card p-6 text-center sm:p-12">
                         <div className="bg-surface-canvas w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4">
                             {!filterLevel && !filterSemester && !filterCourse ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -745,7 +769,7 @@ const QuestionList = () => {
                                     <span className="font-semibold text-primary-600 dark:text-primary-400">Semester</span>, and{' '}
                                     <span className="font-semibold text-primary-600 dark:text-primary-400">Course</span> to view related question papers.
                                 </p>
-                                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-text-muted dark:text-text-muted">
+                                <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-text-muted dark:text-text-muted">
                                     <span className={`px-3 py-1 rounded-full ${filterLevel ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800'}`}>
                                         {filterLevel ? '✓ Level' : '1. Level'}
                                     </span>
@@ -781,9 +805,9 @@ const QuestionList = () => {
                             </>
                         )}
                     </div>
-                ) : (
+                ) : questions.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
                             {questions.map((q, index) => {
                                 const isFirstBatch = page === 0;
                                 if (questions.length === index + 1) {
@@ -810,7 +834,7 @@ const QuestionList = () => {
                             </p>
                         )}
                     </>
-                )}
+                ) : null}
             </div>
         </div>
     );

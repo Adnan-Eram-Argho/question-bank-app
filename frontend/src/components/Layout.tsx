@@ -17,7 +17,7 @@ interface LayoutProps {
 /**
  * Primary application layout wrapper providing responsive navigation,
  * theme toggling, and authentication-aware routing links.
- * 
+ *
  * @param props.children - Main page content to be rendered within the layout.
  */
 const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -40,22 +40,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         setIsMobileMenuOpen(false);
     };
 
-
     return (
-        <div className="min-h-screen flex flex-col bg-surface-canvas text-text-primary font-sans pb-16 sm:pb-14">
+        <div className="min-h-screen flex flex-col bg-surface-canvas text-text-primary font-sans pb-32 sm:pb-14">
             <motion.header
-                className="sticky top-0 z-50 bg-surface-card border-b border-border-subtle  transition-colors duration-300"
+                className="sticky top-0 z-50 bg-surface-card border-b border-border-subtle transition-colors duration-300"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center relative">
-                    <Link to="/" onClick={closeMobileMenu} className="inline-flex items-center gap-2 text-xl font-semibold text-brand-primary hover:opacity-80 transition-opacity whitespace-nowrap">
+                    <Link to="/" onClick={closeMobileMenu} className="inline-flex items-center gap-2 text-xl font-semibold text-brand-primary hover:opacity-80 transition-opacity whitespace-nowrap shrink-0">
                         <img src="/sau-logo.png" alt="SAU crest" className="h-7 w-7 object-contain" />
                         SAU Q-Bank
                     </Link>
 
-                    <div className="flex items-center space-x-2 sm:hidden">
+                    <div className="flex items-center space-x-2 xl:hidden">
                         <button
                             onClick={toggleTheme}
                             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-text-muted hover:text-brand-primary hover:bg-surface-canvas transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
@@ -73,14 +72,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         </button>
                     </div>
 
-                    <nav className="hidden sm:flex items-center space-x-6">
+                    <nav className="hidden xl:flex items-center space-x-4">
                         {/* Faculty Dropdown Desktop */}
                         <div className="relative">
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex min-h-11 items-center space-x-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors bg-surface-card px-3 py-1.5 rounded-md border border-border-subtle  focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+                                className="flex min-h-11 items-center space-x-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors bg-surface-card px-3 py-1.5 rounded-md border border-border-subtle shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             >
-                                <span>{activeFaculty}</span>
+                                <span className="max-w-[9rem] truncate">{activeFaculty}</span>
                                 <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
                             <AnimatePresence>
@@ -99,7 +98,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                             transition={{ duration: 0.2 }}
                                             onBlur={() => setIsDropdownOpen(false)}
                                             tabIndex={-1}
-                                            className="absolute top-full right-0 lg:left-0 lg:right-auto mt-2 w-56 bg-surface-card border border-border-subtle rounded-lg  py-2 z-50 focus:outline-none"
+                                            className="absolute top-full left-0 mt-2 w-56 bg-surface-card border border-border-subtle rounded-lg py-2 z-50 focus:outline-none"
                                         >
                                             {faculties.map((faculty) => (
                                                 <button
@@ -109,8 +108,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                                         setIsDropdownOpen(false);
                                                     }}
                                                     className={`w-full text-left px-4 py-2 text-sm transition-colors ${activeFaculty === faculty
-                                                        ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 font-medium'
-                                                        : 'text-text-muted dark:text-text-muted hover:bg-surface-canvas dark:hover:bg-gray-800/80'
+                                                        ? 'bg-brand-primary/10 text-brand-primary font-medium'
+                                                        : 'text-text-muted hover:bg-surface-canvas'
                                                         }`}
                                                 >
                                                     {faculty}
@@ -122,24 +121,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </AnimatePresence>
                         </div>
 
-                        <Link to="/" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                        <Link to="/" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Home
                             <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
 
-                        <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                        <a href="https://sau-blogs.vercel.app/" target="_blank" rel="noopener noreferrer" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Blogs
                             <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </a>
-                        <Link to="/study-materials?type=book" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                        <Link to="/study-materials?type=book" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Books
                             <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
-                        <Link to="/study-materials?type=note" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                        <Link to="/study-materials?type=note" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             Notes
                             <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
-                        <Link to="/study-materials?type=pdf" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                        <Link to="/study-materials?type=pdf" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                             PDF
                             <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                         </Link>
@@ -151,37 +150,37 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         {user ? (
                             <>
                                 {(role === 'admin' || role === 'collector') && (
-                                    <Link to="/upload" className="inline-flex min-h-11 items-center bg-brand-primary hover:opacity-90 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                                    <Link to="/upload" className="inline-flex min-h-11 items-center bg-brand-primary hover:opacity-90 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                         + Upload
                                     </Link>
                                 )}
 
                                 {role === 'admin' && (
-                                    <Link to="/admin" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                                    <Link to="/admin" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                         Admin
                                         <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                                     </Link>
                                 )}
 
-                                <Link to="/profile" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                                <Link to="/profile" className="relative group inline-flex min-h-11 items-center px-1 text-sm font-semibold text-text-primary hover:text-brand-primary transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                     Profile
                                     <motion.span className="absolute -bottom-1 left-0 w-full h-px bg-brand-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
                                 </Link>
 
                                 <button
                                     onClick={handleSignOut}
-                                    className="inline-flex min-h-11 items-center text-sm font-medium text-text-muted hover:text-brand-primary px-2 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
+                                    className="inline-flex min-h-11 items-center text-sm font-medium text-text-muted hover:text-brand-primary px-2 py-1 transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                                 >
                                     Logout
                                 </button>
                             </>
                         ) : (
-                            <Link to="/login" className="inline-flex min-h-11 items-center bg-brand-primary text-white hover:opacity-90 px-5 py-2 rounded-md text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
+                            <Link to="/login" className="inline-flex min-h-11 items-center bg-brand-primary text-white hover:opacity-90 px-5 py-2 rounded-md text-sm font-semibold transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2">
                                 Login
                             </Link>
                         )}
 
-                        <div className="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-2" />
+                        <div className="h-6 w-px bg-border-subtle mx-2" />
 
                         <button
                             onClick={toggleTheme}
@@ -200,11 +199,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
 
                 {isMobileMenuOpen && (
-                    <div className="sm:hidden border-t border-border-subtle bg-surface-card absolute top-full left-0 w-full  animate-fade-in z-40">
+                    <div className="xl:hidden max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border-subtle bg-surface-card absolute top-full left-0 w-full animate-fade-in z-40">
                         <nav className="flex flex-col px-4 pt-2 pb-6 space-y-2">
                             {/* Faculty Select Mobile */}
                             <div className="mb-2 bg-surface-canvas p-3 rounded-lg border border-border-subtle">
-                                <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
                                     Select Faculty
                                 </label>
                                 <div className="space-y-1">
@@ -215,9 +214,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                                 setActiveFaculty(faculty);
                                                 closeMobileMenu();
                                             }}
-                            className={`w-full min-h-11 text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeFaculty === faculty
-                                                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300 '
-                                                : 'text-text-muted dark:text-text-muted hover:bg-surface-canvas dark:hover:bg-gray-800'
+                                            className={`w-full min-h-11 text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${activeFaculty === faculty
+                                                ? 'bg-brand-primary/15 text-brand-primary'
+                                                : 'text-text-muted hover:bg-surface-canvas'
                                                 }`}
                                         >
                                             {faculty} {activeFaculty === faculty && '✓'}
@@ -225,7 +224,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                     ))}
                                 </div>
                             </div>
-                            <div className="h-px w-full bg-gray-200/50 bg-surface-canvas/50 my-1" />
+                            <div className="h-px w-full bg-border-subtle my-1" />
 
                             <Link to="/" onClick={closeMobileMenu} className="flex min-h-11 items-center px-3 py-3 rounded-md text-base font-medium text-text-primary hover:bg-surface-canvas hover:text-brand-primary transition-colors">
                                 Home
@@ -297,7 +296,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <Link to="/" className="text-xl font-semibold text-brand-primary hover:opacity-80 transition-opacity inline-block mb-4">
                                 SAU Q-Bank
                             </Link>
-                            <p className="text-sm text-text-muted dark:text-text-muted leading-relaxed">
+                            <p className="text-sm text-text-muted leading-relaxed">
                                 Built by SAU students, for SAU students. Access previous year questions, study materials, and AI-powered tutoring.
                             </p>
                         </div>
@@ -309,17 +308,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </h3>
                             <ul className="space-y-3">
                                 <li>
-                                    <Link to="/questions" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/questions" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Browse Questions
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/study-materials" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/study-materials" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Study Materials
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/?ai-tutor=open" className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors">
+                                    <Link to="/?ai-tutor=open" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-primary hover:opacity-80 transition-opacity">
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                         </svg>
@@ -336,17 +335,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </h3>
                             <ul className="space-y-3">
                                 <li>
-                                    <Link to="/sau-economics-question" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-economics-question" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Agricultural Economics
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-agriculture-question" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-agriculture-question" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Agriculture
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-asvm-question" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-asvm-question" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Animal Science & Vet Med
                                     </Link>
                                 </li>
@@ -360,22 +359,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             </h3>
                             <ul className="space-y-3">
                                 <li>
-                                    <Link to="/sau-question-bank-pdf" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-question-bank-pdf" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Question Bank PDF
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-notes" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-notes" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Lecture Notes
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-admission-preparation" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-admission-preparation" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Admission Prep
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/sau-assignment-cover-page" className="text-sm text-text-muted dark:text-text-muted hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                                    <Link to="/sau-assignment-cover-page" className="text-sm text-text-muted hover:text-brand-primary transition-colors">
                                         Cover Page Generator
                                     </Link>
                                 </li>
@@ -385,23 +384,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                     {/* Bottom Bar */}
                     <div className="pt-8 border-t border-border-subtle flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-text-muted dark:text-text-muted">
+                        <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-text-muted">
                             <p>
                                 Developed by{' '}
-                                <Link to="/developer" className="text-text-muted dark:text-text-muted font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                                <Link to="/developer" className="text-text-muted font-medium hover:text-brand-primary transition-colors">
                                     Argho
                                 </Link>
                             </p>
-                            <span className="hidden sm:inline text-gray-300 dark:text-text-muted">&bull;</span>
+                            <span className="hidden sm:inline text-text-muted">&bull;</span>
                             <p>
                                 Questions by{' '}
-                                <Link to="/contributors" className="text-text-muted dark:text-text-muted font-medium hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors">
+                                <Link to="/contributors" className="text-text-muted font-medium hover:text-brand-secondary transition-colors">
                                     Contributors
                                 </Link>
                             </p>
                         </div>
 
-                        <p className="text-xs text-text-muted dark:text-text-muted">
+                        <p className="text-xs text-text-muted">
                             © {new Date().getFullYear()} SAU Question Bank. All rights reserved.
                         </p>
                     </div>

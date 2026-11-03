@@ -173,13 +173,13 @@ const FloatingAITutor = () => {
         <>
             {/* ── Chat Panel ── */}
             <div
-                className={`fixed bottom-24 right-4 sm:right-6 z-50 flex flex-col transition-all duration-300 ease-out origin-bottom-right
+                className={`fixed bottom-36 right-4 sm:bottom-24 sm:right-6 z-50 flex flex-col transition-all duration-300 ease-out origin-bottom-right
                     ${isOpen
                         ? 'opacity-100 scale-100 pointer-events-auto'
                         : 'opacity-0 scale-90 pointer-events-none'
                     }
                     w-[calc(100vw-2rem)] sm:w-[380px] max-w-md
-                    h-[70vh] sm:h-[520px] max-h-[600px]
+                    h-[70vh] max-h-[calc(100dvh-11rem)] sm:h-[520px] sm:max-h-[600px]
                     bg-surface-card
                     rounded-lg
                     border border-border-subtle
@@ -284,7 +284,7 @@ const FloatingAITutor = () => {
                 onClick={() => setIsOpen((prev) => !prev)}
                 id="ai-tutor-toggle-btn"
                 aria-label={isOpen ? 'Close AI Tutor' : 'Open AI Tutor'}
-                className={`fixed bottom-16 sm:bottom-16 right-4 sm:right-6 z-50 w-14 h-14 rounded-full border border-brand-primary bg-brand-primary
+                className={`fixed bottom-36 sm:bottom-16 right-4 sm:right-6 z-50 w-14 h-14 rounded-full border border-brand-primary bg-brand-primary
                     text-white flex items-center justify-center
                     transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2
                     ${isOpen ? 'rotate-0' : 'rotate-0'}
