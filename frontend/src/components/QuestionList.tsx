@@ -252,6 +252,9 @@ const QuestionList = () => {
                 if (user.id) {
                     contributorsCache.current.set(user.id, user);
                 }
+                if (user.email) {
+                    contributorsCache.current.set(user.email.toLowerCase(), user);
+                }
             });
             
             return data;
@@ -359,23 +362,23 @@ const QuestionList = () => {
     const isFiltered = !!(filterLevel || filterSemester || filterCourse || filterType);
 
     const enrichWithContributors = useCallback(async (fetchedQuestions: Question[]) => {
-        const uploaderIds = Array.from(new Set(
+        const uploaderKeys = Array.from(new Set(
             fetchedQuestions
                 .map(q => q.uploaded_by)
-                .filter((id): id is string => !!id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
+                .filter((uploader): uploader is string => !!uploader)
         ));
 
-        if (uploaderIds.length === 0) {
+        if (uploaderKeys.length === 0) {
             return fetchedQuestions;
         }
 
         try {
             // ✅ Use cached contributors (already preloaded on mount)
             const cachedContributors = new Map(contributorsCache.current);
-            const uncachedIds = uploaderIds.filter(id => !cachedContributors.has(id));
+            const uncachedKeys = uploaderKeys.filter(key => !cachedContributors.has(key) && !cachedContributors.has(key.toLowerCase()));
 
             // ✅ Only fetch if there are truly uncached IDs (should be rare after initial preload)
-            if (uncachedIds.length > 0) {
+            if (uncachedKeys.length > 0) {
                 const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://question-bank-app.onrender.com'}/api/contributors`);
                 if (!response.ok) throw new Error('Network response not ok');
                 
@@ -385,30 +388,35 @@ const QuestionList = () => {
                         acc[user.id] = user;
                         contributorsCache.current.set(user.id, user);
                     }
+                    if (user.email) {
+                        acc[user.email.toLowerCase()] = user;
+                        contributorsCache.current.set(user.email.toLowerCase(), user);
+                    }
                     return acc;
                 }, {});
 
-                uncachedIds.forEach(id => {
-                    if (userMap[id]) {
-                        cachedContributors.set(id, userMap[id]);
+                uncachedKeys.forEach(key => {
+                    const contributor = userMap[key] || userMap[key.toLowerCase()];
+                    if (contributor) {
+                        cachedContributors.set(key, contributor);
                     }
                 });
             }
 
             return fetchedQuestions.map(q => {
-                const isId = q.uploaded_by && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q.uploaded_by);
+                const uploaderKey = q.uploaded_by;
                 return {
                     ...q,
-                    users: isId ? cachedContributors.get(q.uploaded_by) || null : null
+                    users: uploaderKey ? cachedContributors.get(uploaderKey) || cachedContributors.get(uploaderKey.toLowerCase()) || null : null
                 };
             });
         } catch (err) {
             console.error('[QuestionList] Failed to fetch contributors:', err);
             return fetchedQuestions.map(q => {
-                const isId = q.uploaded_by && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q.uploaded_by);
+                const uploaderKey = q.uploaded_by;
                 return {
                     ...q,
-                    users: isId ? contributorsCache.current.get(q.uploaded_by) || null : null
+                    users: uploaderKey ? contributorsCache.current.get(uploaderKey) || contributorsCache.current.get(uploaderKey.toLowerCase()) || null : null
                 };
             });
         }
