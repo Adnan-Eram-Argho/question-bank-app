@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -7,6 +7,7 @@ import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
 import RelatedPages from '../components/RelatedPages';
 import ScrollReveal from '../components/ScrollReveal';
+import { ArrowRightIcon } from '../components/icons';
 
 // Types
 interface FormData {
@@ -93,10 +94,10 @@ const JSON_LD_FAQ = {
 };
 
 const inputCls =
-  'w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-colors';
+  'w-full border border-border-subtle rounded-md p-2.5 text-sm bg-surface-card text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-colors';
 
 const halfInputCls =
-  'border border-gray-200 dark:border-gray-700 rounded-lg p-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-colors';
+  'border border-border-subtle rounded-md p-2.5 text-sm bg-surface-card text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 transition-colors';
 
 export default function SAUCoverPageGenerator() {
   const [f, setF] = useState<FormData>(INITIAL_FORM);
@@ -276,7 +277,7 @@ export default function SAUCoverPageGenerator() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3"
+            className="text-3xl lg:text-4xl font-semibold text-text-primary dark:text-white mb-3"
           >
             SAU Assignment Cover Page Generator
           </motion.h1>
@@ -284,7 +285,7 @@ export default function SAUCoverPageGenerator() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+            className="text-base text-text-muted dark:text-text-muted max-w-2xl mx-auto"
           >
             তথ্য লেখো, লাইভ A4 প্রিভিউ দেখো — তারপর DOCX বা PDF ডাউনলোড করো।
           </motion.p>
@@ -296,25 +297,25 @@ export default function SAUCoverPageGenerator() {
           <div className="grid lg:grid-cols-2 gap-8 items-start">
 
             {/* Form panel */}
-            <div className="space-y-3 bg-white dark:bg-[#111827] rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+            <div className="space-y-3 bg-surface-card rounded-lg border border-border-subtle dark:border-border-subtle p-6 ">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Title</label>
+                <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-1">Title</label>
                 <input id="title" className={inputCls} placeholder="যেমন A Note Book on Farm Mechanization" value={f.title} onChange={set('title')} />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Course Code</label>
+                <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-1">Course Code</label>
                 <input id="courseCode" className={inputCls} placeholder="যেমন AGEN 226" value={f.courseCode} onChange={set('courseCode')} />
               </div>
 
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 pt-2 border-t border-gray-100 dark:border-gray-700">
+              <p className="text-sm font-semibold text-gray-700 dark:text-text-muted pt-2 border-t border-gray-100 dark:border-border-subtle">
                 শিক্ষকের তথ্য (Submitted to)
               </p>
               <input id="teacherName" className={inputCls} placeholder="শিক্ষকের নাম" value={f.teacherName} onChange={set('teacherName')} />
               <input id="teacherDesignation" className={inputCls} placeholder="পদবি (যেমন Lecturer)" value={f.teacherDesignation} onChange={set('teacherDesignation')} />
               <input id="teacherDepartment" className={inputCls} placeholder="Department (যেমন Dept. of Agricultural Engineering)" value={f.teacherDepartment} onChange={set('teacherDepartment')} />
 
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 pt-2 border-t border-gray-100 dark:border-gray-700">
+              <p className="text-sm font-semibold text-gray-700 dark:text-text-muted pt-2 border-t border-gray-100 dark:border-border-subtle">
                 তোমার তথ্য (Submitted by)
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -327,7 +328,7 @@ export default function SAUCoverPageGenerator() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Faculty</label>
+                <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-1">Faculty</label>
                 <select id="faculty" className={inputCls} value={f.faculty} onChange={set('faculty')}>
                   <option value="">Faculty বাছো</option>
                   {FACULTIES.map((x) => <option key={x}>{x}</option>)}
@@ -339,7 +340,7 @@ export default function SAUCoverPageGenerator() {
                   id="downloadDocx"
                   onClick={downloadDocx}
                   disabled={isDownloading}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                  className="flex-1 inline-flex min-h-11 items-center justify-center gap-2 px-4 py-3 bg-brand-primary hover:opacity-90 text-white font-semibold rounded-md transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                 >
                   {isDownloading ? (
                     <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>তৈরি হচ্ছে…</>
@@ -350,20 +351,20 @@ export default function SAUCoverPageGenerator() {
                 <button
                   id="downloadPdf"
                   onClick={() => window.print()}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                  className="flex-1 inline-flex min-h-11 items-center justify-center gap-2 px-4 py-3 bg-brand-secondary hover:opacity-90 text-white font-semibold rounded-md transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:ring-offset-2"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                   PDF (Print)
                 </button>
               </div>
-              <p className="text-xs text-gray-400 dark:text-gray-500 text-center pt-1">
-                🔒 সব তথ্য শুধু তোমার ব্রাউজারে — কোনো সার্ভারে পাঠানো হয় না।
+              <p className="text-xs text-text-muted dark:text-text-muted text-center pt-1">
+                সব তথ্য শুধু তোমার ব্রাউজারে — কোনো সার্ভারে পাঠানো হয় না।
               </p>
             </div>
 
             {/* Live preview — always white/black, printed as PDF */}
             <div className="lg:sticky lg:top-24">
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 text-center">লাইভ প্রিভিউ (A4)</p>
+              <p className="text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-2 text-center">লাইভ প্রিভিউ (A4)</p>
               <div
                 id="cover-preview"
                 style={{
@@ -417,9 +418,9 @@ export default function SAUCoverPageGenerator() {
       {/* Description */}
       <ScrollReveal direction="up" delay={0.1}>
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="bg-white dark:bg-[#111827] rounded-2xl border border-gray-200 dark:border-gray-700 p-8 shadow-sm">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">SAU Cover Page সম্পর্কে</h2>
-            <div className="space-y-3 text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+          <div className="bg-surface-card rounded-lg border border-border-subtle dark:border-border-subtle p-8 ">
+            <h2 className="text-2xl font-semibold text-text-primary dark:text-white mb-4">SAU Cover Page সম্পর্কে</h2>
+            <div className="space-y-3 text-gray-700 dark:text-text-muted text-sm leading-relaxed">
               <p>
                 Sher-e-Bangla Agricultural University (SAU)-এর assignment, note book বা lab report জমা
                 দেওয়ার সময় একটি সুন্দর <strong>SAU assignment cover page</strong> দরকার হয়।
@@ -443,8 +444,8 @@ export default function SAUCoverPageGenerator() {
       {/* Steps */}
       <ScrollReveal direction="up" delay={0.1}>
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">কীভাবে ব্যবহার করবে</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="text-2xl font-semibold text-text-primary dark:text-white mb-6 text-center">কীভাবে ব্যবহার করবে</h2>
+          <div className="grid gap-6 md:grid-cols-[1.15fr_1fr_0.85fr]">
             {[
               { step: '১', color: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400', title: 'তথ্য লেখো', desc: 'কোর্সের নাম, শিক্ষকের তথ্য এবং তোমার নাম, রেজিস্ট্রেশন নম্বর লেখো।' },
               { step: '২', color: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400', title: 'প্রিভিউ দেখো', desc: 'ডানদিকে লাইভ A4 প্রিভিউতে দেখো কভার পেজটি কেমন দেখাচ্ছে।' },
@@ -452,16 +453,16 @@ export default function SAUCoverPageGenerator() {
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className={`inline-flex items-center justify-center w-12 h-12 ${item.color} rounded-full mb-4`}>
-                  <span className={`text-xl font-bold ${item.text}`}>{item.step}</span>
+                  <span className={`text-xl font-semibold ${item.text}`}>{item.step}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{item.desc}</p>
+                <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-text-muted dark:text-text-muted">{item.desc}</p>
               </div>
             ))}
           </div>
           <div className="mt-6 text-center text-sm">
             <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-              কভার পেজের ফরম্যাট নিয়ে প্রশ্ন আছে? AI-কে জিজ্ঞেস করো →
+              কভার পেজের ফরম্যাট নিয়ে প্রশ্ন আছে? AI-কে জিজ্ঞেস করো {<ArrowRightIcon className="ml-1 h-4 w-4" />}
             </Link>
           </div>
         </div>
@@ -470,12 +471,12 @@ export default function SAUCoverPageGenerator() {
       {/* FAQ */}
       <ScrollReveal direction="up" delay={0.1}>
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">সচরাচর জিজ্ঞাসা (FAQ)</h2>
+          <h2 className="text-2xl font-semibold text-text-primary dark:text-white mb-6">সচরাচর জিজ্ঞাসা (FAQ)</h2>
           <div className="space-y-4">
             {FAQS.map((x) => (
-              <div key={x.q} className="bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{x.q}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{x.a}</p>
+              <div key={x.q} className="bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle p-5">
+                <h3 className="font-semibold text-text-primary dark:text-white mb-1">{x.q}</h3>
+                <p className="text-sm text-text-muted dark:text-text-muted">{x.a}</p>
               </div>
             ))}
           </div>

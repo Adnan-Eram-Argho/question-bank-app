@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface ScrollRevealProps {
     children: ReactNode;
@@ -19,6 +19,20 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
     duration = 0.6,
     amount = 0.15
 }) => {
+    const prefersReducedMotion = useReducedMotion();
+    const [isBelowSmallBreakpoint, setIsBelowSmallBreakpoint] = useState(() =>
+        typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches
+    );
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(max-width: 639px)');
+        const updateViewport = () => setIsBelowSmallBreakpoint(mediaQuery.matches);
+
+        updateViewport();
+        mediaQuery.addEventListener('change', updateViewport);
+        return () => mediaQuery.removeEventListener('change', updateViewport);
+    }, []);
+
     const getInitial = () => {
         switch (direction) {
             case 'up': return { opacity: 0, y: 40 };
@@ -29,6 +43,10 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
             default: return { opacity: 0, y: 40 };
         }
     };
+
+    if (prefersReducedMotion || isBelowSmallBreakpoint) {
+        return <div className={className}>{children}</div>;
+    }
 
     return (
         <motion.div

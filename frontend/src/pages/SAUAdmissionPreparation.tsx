@@ -6,6 +6,7 @@ import FAQ from '../components/FAQ';
 import RelatedPages from '../components/RelatedPages';
 import Breadcrumb from '../components/Breadcrumb';
 import type { FAQItem } from '../lib/faqData';
+import { ArrowRightIcon } from '../components/icons';
 
 const admissionFAQs: FAQItem[] = [
     {
@@ -52,7 +53,7 @@ const SAUAdmissionPreparation = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+                        className="text-4xl lg:text-5xl font-semibold text-text-primary dark:text-white mb-4"
                     >
                         SAU Admission Test Preparation (2026)
                     </motion.h1>
@@ -61,7 +62,7 @@ const SAUAdmissionPreparation = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
-                        className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-8 leading-relaxed"
+                        className="text-lg text-gray-700 dark:text-text-muted max-w-2xl mx-auto mb-8 leading-relaxed"
                     >
                         Prepare effectively for Sher-e-Bangla Agricultural University admission tests with sample questions, timed mock exams, and targeted study guides. Boost your confidence and maximize your score.
                     </motion.p>
@@ -75,7 +76,7 @@ const SAUAdmissionPreparation = () => {
                     >
                         <Link
                             to="/questions"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-amber-500 hover:from-green-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-primary hover:opacity-90 text-white font-semibold rounded-md  transition-all duration-200"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -89,7 +90,7 @@ const SAUAdmissionPreparation = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
-                        className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400"
+                        className="flex flex-wrap justify-center gap-6 text-sm text-text-muted dark:text-text-muted"
                     >
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +120,7 @@ const SAUAdmissionPreparation = () => {
                         className="mt-6 text-sm"
                     >
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Stuck on a concept? Ask AI →
+                            Stuck on a concept? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </motion.div>
                 </div>
@@ -128,7 +129,7 @@ const SAUAdmissionPreparation = () => {
             {/* Program Categories Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Choose Your Program Level
                     </h2>
 
@@ -154,20 +155,20 @@ const SAUAdmissionPreparation = () => {
                             <Link
                                 key={index}
                                 to="/questions"
-                                className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                                className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                             >
                                 <div className={`p-3 ${item.iconBg} rounded-lg mb-4 inline-block`}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${item.iconText}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                     {item.level}
                                 </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <p className="text-sm text-text-muted dark:text-text-muted mb-1">
                                     <strong>Subjects:</strong> {item.subjects}
                                 </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-text-muted dark:text-text-muted">
                                     <strong>Duration:</strong> {item.duration}
                                 </p>
                             </Link>
@@ -177,7 +178,7 @@ const SAUAdmissionPreparation = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Need help choosing your program? Ask AI →
+                            Need help choosing your program? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -186,20 +187,20 @@ const SAUAdmissionPreparation = () => {
             {/* How to Prepare Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         How to Prepare Effectively
                     </h2>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid gap-6 md:grid-cols-3 [&>*:first-child]:md:col-span-2">
                         {/* Step 1 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-green-600 dark:text-green-400">1</span>
+                                <span className="text-xl font-semibold text-green-600 dark:text-green-400">1</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Review the Syllabus
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Understand which topics carry the most weight and plan your study schedule accordingly.
                             </p>
                         </div>
@@ -207,12 +208,12 @@ const SAUAdmissionPreparation = () => {
                         {/* Step 2 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-amber-600 dark:text-amber-400">2</span>
+                                <span className="text-xl font-semibold text-amber-600 dark:text-amber-400">2</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Practice Daily
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Solve 20-30 sample questions every day. Focus on weak areas identified through mock tests.
                             </p>
                         </div>
@@ -220,12 +221,12 @@ const SAUAdmissionPreparation = () => {
                         {/* Step 3 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">3</span>
+                                <span className="text-xl font-semibold text-blue-600 dark:text-blue-400">3</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Take Mock Tests
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Simulate exam conditions weekly. Build speed, accuracy, and time management skills.
                             </p>
                         </div>
@@ -234,7 +235,7 @@ const SAUAdmissionPreparation = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Want a personalized study plan? Ask AI →
+                            Want a personalized study plan? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -243,19 +244,19 @@ const SAUAdmissionPreparation = () => {
             {/* Why Use This Resource */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Why Students Use This Resource
                     </h2>
 
-                    <div className="bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+                    <div className="bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle p-8">
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Realistic exam simulation:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Timed mock tests mirror the actual admission exam format, helping you build confidence and manage time effectively.</span>
+                                    <strong className="text-text-primary dark:text-white">Realistic exam simulation:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Timed mock tests mirror the actual admission exam format, helping you build confidence and manage time effectively.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -263,8 +264,8 @@ const SAUAdmissionPreparation = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Targeted practice:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Focus on high-weightage subjects like Biology and Chemistry. Identify and strengthen weak areas before exam day.</span>
+                                    <strong className="text-text-primary dark:text-white">Targeted practice:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Focus on high-weightage subjects like Biology and Chemistry. Identify and strengthen weak areas before exam day.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -272,8 +273,8 @@ const SAUAdmissionPreparation = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Instant doubt clearing:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Stuck on a chemistry equation or biology concept? Ask the AI tutor for instant explanations instead of waiting for teachers.</span>
+                                    <strong className="text-text-primary dark:text-white">Instant doubt clearing:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Stuck on a chemistry equation or biology concept? Ask the AI tutor for instant explanations instead of waiting for teachers.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -281,8 +282,8 @@ const SAUAdmissionPreparation = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Track your progress:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Monitor your mock test scores over time. See improvement trends and adjust your study strategy accordingly.</span>
+                                    <strong className="text-text-primary dark:text-white">Track your progress:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Monitor your mock test scores over time. See improvement trends and adjust your study strategy accordingly.</span>
                                 </div>
                             </li>
                         </ul>
@@ -291,7 +292,7 @@ const SAUAdmissionPreparation = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Need motivation or study tips? Ask AI →
+                            Need motivation or study tips? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>

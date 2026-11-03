@@ -6,6 +6,7 @@ import FAQ from '../components/FAQ';
 import RelatedPages from '../components/RelatedPages';
 import Breadcrumb from '../components/Breadcrumb';
 import type { FAQItem } from '../lib/faqData';
+import { ArrowRightIcon } from '../components/icons';
 
 const notesFAQs: FAQItem[] = [
     {
@@ -52,7 +53,7 @@ const SAUNotes = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+                        className="text-4xl lg:text-5xl font-semibold text-text-primary dark:text-white mb-4"
                     >
                         SAU Lecture Notes & Study Materials (2026)
                     </motion.h1>
@@ -61,7 +62,7 @@ const SAUNotes = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
-                        className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-8 leading-relaxed"
+                        className="text-lg text-gray-700 dark:text-text-muted max-w-2xl mx-auto mb-8 leading-relaxed"
                     >
                         Access comprehensive lecture notes, textbook summaries, and reference materials for all SAU faculties. Download PDFs, browse by course, and supplement your exam preparation with quality study resources.
                     </motion.p>
@@ -75,7 +76,7 @@ const SAUNotes = () => {
                     >
                         <Link
                             to="/study-materials"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-amber-500 hover:from-green-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-primary hover:opacity-90 text-white font-semibold rounded-md  transition-all duration-200"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -89,7 +90,7 @@ const SAUNotes = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
-                        className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400"
+                        className="flex flex-wrap justify-center gap-6 text-sm text-text-muted dark:text-text-muted"
                     >
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +120,7 @@ const SAUNotes = () => {
                         className="mt-6 text-sm"
                     >
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Need help understanding a topic? Ask AI →
+                            Need help understanding a topic? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </motion.div>
                 </div>
@@ -128,11 +129,11 @@ const SAUNotes = () => {
             {/* Material Categories Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Types of Study Materials
                     </h2>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
                         {[
                             {
                                 title: 'Lecture Notes',
@@ -162,17 +163,17 @@ const SAUNotes = () => {
                             <Link
                                 key={index}
                                 to={`/study-materials?type=${item.type}`}
-                                className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                                className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                             >
                                 <div className={`p-3 ${item.iconBg} rounded-lg mb-4 inline-block`}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${item.iconText}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                     {item.title}
                                 </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-text-muted dark:text-text-muted">
                                     {item.description}
                                 </p>
                             </Link>
@@ -182,7 +183,7 @@ const SAUNotes = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Confused about which material to use? Ask AI →
+                            Confused about which material to use? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -191,20 +192,20 @@ const SAUNotes = () => {
             {/* How to Use Study Materials Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         How to Use These Materials Effectively
                     </h2>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid gap-8 md:grid-cols-3">
                         {/* Step 1 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-green-600 dark:text-green-400">1</span>
+                                <span className="text-xl font-semibold text-green-600 dark:text-green-400">1</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Match with Your Course
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Filter by faculty, level, and course code to find relevant materials.
                             </p>
                         </div>
@@ -212,12 +213,12 @@ const SAUNotes = () => {
                         {/* Step 2 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-amber-600 dark:text-amber-400">2</span>
+                                <span className="text-xl font-semibold text-amber-600 dark:text-amber-400">2</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Cross-Reference with Questions
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Use notes alongside past papers to understand recurring topics better.
                             </p>
                         </div>
@@ -225,12 +226,12 @@ const SAUNotes = () => {
                         {/* Step 3 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">3</span>
+                                <span className="text-xl font-semibold text-blue-600 dark:text-blue-400">3</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Clarify Doubts with AI
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Stuck on a concept? Ask the AI tutor for instant explanations.
                             </p>
                         </div>
@@ -239,7 +240,7 @@ const SAUNotes = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Want study strategy tips? Ask AI →
+                            Want study strategy tips? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -248,19 +249,19 @@ const SAUNotes = () => {
             {/* Why Students Use This Resource */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Why SAU Students Use This Resource
                     </h2>
 
-                    <div className="bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+                    <div className="bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle p-8">
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">All materials in one place:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">No more searching through WhatsApp groups or asking seniors — everything organized by course.</span>
+                                    <strong className="text-text-primary dark:text-white">All materials in one place:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">No more searching through WhatsApp groups or asking seniors — everything organized by course.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -268,8 +269,8 @@ const SAUNotes = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Downloadable PDFs:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Study offline during commutes or when internet is slow. Print what you need.</span>
+                                    <strong className="text-text-primary dark:text-white">Downloadable PDFs:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Study offline during commutes or when internet is slow. Print what you need.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -277,8 +278,8 @@ const SAUNotes = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Recent and relevant:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Materials from the last 2-3 years aligned with current syllabus and exam patterns.</span>
+                                    <strong className="text-text-primary dark:text-white">Recent and relevant:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Materials from the last 2-3 years aligned with current syllabus and exam patterns.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -286,8 +287,8 @@ const SAUNotes = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Contribute and earn recognition:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Share your notes, get credited publicly, and help juniors succeed.</span>
+                                    <strong className="text-text-primary dark:text-white">Contribute and earn recognition:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Share your notes, get credited publicly, and help juniors succeed.</span>
                                 </div>
                             </li>
                         </ul>
@@ -296,7 +297,7 @@ const SAUNotes = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Need help organizing your study plan? Ask AI →
+                            Need help organizing your study plan? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -306,10 +307,10 @@ const SAUNotes = () => {
             <FAQ items={notesFAQs} title="Common Questions About Study Materials" />
 
             {/* Contextual link to cover page tool */}
-            <div className="max-w-4xl mx-auto px-4 py-2 pb-4 text-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="max-w-4xl mx-auto px-4 py-2 pb-4 text-center text-sm text-text-muted dark:text-text-muted">
                 Need a cover page for your assignment?{' '}
                 <Link to="/sau-assignment-cover-page" className="text-green-600 dark:text-green-400 hover:underline font-medium">
-                    Use our free SAU cover page generator →
+                    Use our free SAU cover page generator {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                 </Link>
             </div>
 

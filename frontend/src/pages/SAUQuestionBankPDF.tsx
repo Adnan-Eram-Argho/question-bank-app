@@ -4,6 +4,7 @@ import SEO from '../components/SEO';
 import ScrollReveal from '../components/ScrollReveal';
 import FAQ from '../components/FAQ';
 import type { FAQItem } from '../lib/faqData';
+import { ArrowRightIcon } from '../components/icons';
 
 const pdfFAQs: FAQItem[] = [
     {
@@ -41,7 +42,7 @@ const SAUQuestionBankPDF = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+                        className="text-4xl lg:text-5xl font-semibold text-text-primary dark:text-white mb-4"
                     >
                         SAU Question Bank PDF — All Subjects (2026)
                     </motion.h1>
@@ -50,7 +51,7 @@ const SAUQuestionBankPDF = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
-                        className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-8 leading-relaxed"
+                        className="text-lg text-gray-700 dark:text-text-muted max-w-2xl mx-auto mb-8 leading-relaxed"
                     >
                         Access previous year exam papers for all SAU faculties. Browse by course, filter by semester, and save as PDF for offline study. No registration required.
                     </motion.p>
@@ -64,7 +65,7 @@ const SAUQuestionBankPDF = () => {
                     >
                         <Link
                             to="/questions"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-amber-500 hover:from-green-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-primary hover:opacity-90 text-white font-semibold rounded-md  transition-all duration-200"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -78,7 +79,7 @@ const SAUQuestionBankPDF = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
-                        className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400"
+                        className="flex flex-wrap justify-center gap-6 text-sm text-text-muted dark:text-text-muted"
                     >
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,7 +109,7 @@ const SAUQuestionBankPDF = () => {
                         className="mt-6 text-sm"
                     >
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Stuck on a topic? Ask AI →
+                            Stuck on a topic? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </motion.div>
                 </div>
@@ -117,15 +118,15 @@ const SAUQuestionBankPDF = () => {
             {/* Available Faculties Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Available Faculties
                     </h2>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         {/* Agricultural Economics */}
                         <Link
                             to="/questions?faculty=AEC"
-                            className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                            className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
@@ -133,14 +134,14 @@ const SAUQuestionBankPDF = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-green-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text-muted group-hover:text-green-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Agricultural Economics
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-text-muted dark:text-text-muted">
                                 50+ courses covering microeconomics, macroeconomics, agricultural marketing, and farm management.
                             </p>
                         </Link>
@@ -148,7 +149,7 @@ const SAUQuestionBankPDF = () => {
                         {/* Agriculture */}
                         <Link
                             to="/questions?faculty=Agriculture"
-                            className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                            className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
@@ -156,14 +157,14 @@ const SAUQuestionBankPDF = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text-muted group-hover:text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Agriculture
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-text-muted dark:text-text-muted">
                                 60+ courses including crop science, soil management, agronomy, and agricultural extension.
                             </p>
                         </Link>
@@ -171,7 +172,7 @@ const SAUQuestionBankPDF = () => {
                         {/* ASVM */}
                         <Link
                             to="/questions?faculty=ASVM"
-                            className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                            className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -179,14 +180,14 @@ const SAUQuestionBankPDF = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                 </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text-muted group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Animal Science & Veterinary Medicine
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-text-muted dark:text-text-muted">
                                 50+ courses covering animal nutrition, veterinary pathology, livestock management, and dairy science.
                             </p>
                         </Link>
@@ -195,7 +196,7 @@ const SAUQuestionBankPDF = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Need help choosing courses? Ask AI →
+                            Need help choosing courses? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -204,20 +205,20 @@ const SAUQuestionBankPDF = () => {
             {/* How to Access Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         How to Access Question Papers
                     </h2>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid gap-8 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
                         {/* Step 1 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-green-600 dark:text-green-400">1</span>
+                                <span className="text-xl font-semibold text-green-600 dark:text-green-400">1</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Select Faculty
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Choose your faculty from the dropdown: AEC, Agriculture, or ASVM.
                             </p>
                         </div>
@@ -225,12 +226,12 @@ const SAUQuestionBankPDF = () => {
                         {/* Step 2 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-amber-600 dark:text-amber-400">2</span>
+                                <span className="text-xl font-semibold text-amber-600 dark:text-amber-400">2</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Filter by Course
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Pick your level, semester, and specific course code to narrow results.
                             </p>
                         </div>
@@ -238,12 +239,12 @@ const SAUQuestionBankPDF = () => {
                         {/* Step 3 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">3</span>
+                                <span className="text-xl font-semibold text-blue-600 dark:text-blue-400">3</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 View & Save
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Browse questions online or use Ctrl+P to save as PDF for offline study.
                             </p>
                         </div>
@@ -252,7 +253,7 @@ const SAUQuestionBankPDF = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Confused about filtering? Ask AI →
+                            Confused about filtering? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -261,19 +262,19 @@ const SAUQuestionBankPDF = () => {
             {/* Why SAU Students Use This Platform */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Why SAU Students Use This Platform
                     </h2>
 
-                    <div className="bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+                    <div className="bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle p-8">
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Exam pattern recognition:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">See which topics repeat yearly and focus your study time accordingly.</span>
+                                    <strong className="text-text-primary dark:text-white">Exam pattern recognition:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">See which topics repeat yearly and focus your study time accordingly.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -281,8 +282,8 @@ const SAUQuestionBankPDF = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">No scattered Telegram groups:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Everything organized by faculty and course in one searchable place.</span>
+                                    <strong className="text-text-primary dark:text-white">No scattered Telegram groups:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Everything organized by faculty and course in one searchable place.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -290,8 +291,8 @@ const SAUQuestionBankPDF = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Instant doubt clearing:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Stuck on a question concept? Ask the AI tutor instead of waiting for classmates.</span>
+                                    <strong className="text-text-primary dark:text-white">Instant doubt clearing:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Stuck on a question concept? Ask the AI tutor instead of waiting for classmates.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -299,8 +300,8 @@ const SAUQuestionBankPDF = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Contribution rewards:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Upload your old papers and help juniors — builds your reputation in the SAU community.</span>
+                                    <strong className="text-text-primary dark:text-white">Contribution rewards:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Upload your old papers and help juniors — builds your reputation in the SAU community.</span>
                                 </div>
                             </li>
                         </ul>
@@ -309,7 +310,7 @@ const SAUQuestionBankPDF = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Want study tips? Ask AI →
+                            Want study tips? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -321,25 +322,25 @@ const SAUQuestionBankPDF = () => {
             {/* Related Resources Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Related Resources
                     </h2>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr_0.8fr]">
                         {/* Study Materials */}
                         <Link
                             to="/study-materials"
-                            className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                            className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                         >
                             <div className="flex items-center gap-3 mb-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                 </svg>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                                <h3 className="text-lg font-semibold text-text-primary dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                                     Study Materials
                                 </h3>
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-text-muted dark:text-text-muted">
                                 Lecture notes, textbooks, and reference materials for all SAU courses.
                             </p>
                         </Link>
@@ -347,17 +348,17 @@ const SAUQuestionBankPDF = () => {
                         {/* AI Tutor */}
                         <Link
                             to="/?ai-tutor=open"
-                            className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                            className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                         >
                             <div className="flex items-center gap-3 mb-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                 </svg>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                                <h3 className="text-lg font-semibold text-text-primary dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
                                     AI Tutor
                                 </h3>
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-text-muted dark:text-text-muted">
                                 Get instant explanations for difficult concepts from past exam questions.
                             </p>
                         </Link>
@@ -365,17 +366,17 @@ const SAUQuestionBankPDF = () => {
                         {/* Economics Questions */}
                         <Link
                             to="/sau-economics-question"
-                            className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                            className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                         >
                             <div className="flex items-center gap-3 mb-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                <h3 className="text-lg font-semibold text-text-primary dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                     Economics Questions
                                 </h3>
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-text-muted dark:text-text-muted">
                                 Dedicated page for Agricultural Economics faculty exam preparation.
                             </p>
                         </Link>
@@ -384,10 +385,10 @@ const SAUQuestionBankPDF = () => {
             </ScrollReveal>
 
             {/* Contextual link to cover page tool */}
-            <div className="max-w-4xl mx-auto px-4 py-2 pb-4 text-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="max-w-4xl mx-auto px-4 py-2 pb-4 text-center text-sm text-text-muted dark:text-text-muted">
                 Need a cover page for your assignment?{' '}
                 <Link to="/sau-assignment-cover-page" className="text-green-600 dark:text-green-400 hover:underline font-medium">
-                    Use our free SAU cover page generator →
+                    Use our free SAU cover page generator {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                 </Link>
             </div>
         </>

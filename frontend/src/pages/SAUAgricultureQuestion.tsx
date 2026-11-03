@@ -6,6 +6,7 @@ import FAQ from '../components/FAQ';
 import RelatedPages from '../components/RelatedPages';
 import Breadcrumb from '../components/Breadcrumb';
 import type { FAQItem } from '../lib/faqData';
+import { ArrowRightIcon } from '../components/icons';
 
 const agricultureFAQs: FAQItem[] = [
     {
@@ -52,7 +53,7 @@ const SAUAgricultureQuestion = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+                        className="text-4xl lg:text-5xl font-semibold text-text-primary dark:text-white mb-4"
                     >
                         SAU Agriculture Questions — All Levels (2026)
                     </motion.h1>
@@ -61,7 +62,7 @@ const SAUAgricultureQuestion = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
-                        className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-8 leading-relaxed"
+                        className="text-lg text-gray-700 dark:text-text-muted max-w-2xl mx-auto mb-8 leading-relaxed"
                     >
                         Access previous year exam papers for all 60+ Agriculture courses across 4 levels and 8 semesters. Filter by course code, browse by topic, and prepare effectively for midterms and finals.
                     </motion.p>
@@ -75,7 +76,7 @@ const SAUAgricultureQuestion = () => {
                     >
                         <Link
                             to="/questions?faculty=Agriculture"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-amber-500 hover:from-green-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-primary hover:opacity-90 text-white font-semibold rounded-md  transition-all duration-200"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -89,7 +90,7 @@ const SAUAgricultureQuestion = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
-                        className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400"
+                        className="flex flex-wrap justify-center gap-6 text-sm text-text-muted dark:text-text-muted"
                     >
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +120,7 @@ const SAUAgricultureQuestion = () => {
                         className="mt-6 text-sm"
                     >
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Stuck on an agriculture concept? Ask AI →
+                            Stuck on an agriculture concept? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </motion.div>
                 </div>
@@ -128,7 +129,7 @@ const SAUAgricultureQuestion = () => {
             {/* Available Levels Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Agriculture Courses by Level
                     </h2>
 
@@ -142,7 +143,7 @@ const SAUAgricultureQuestion = () => {
                             <Link
                                 key={index}
                                 to={`/questions?faculty=Agriculture&level=${item.level}`}
-                                className="group block p-6 bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200"
+                                className="group block p-6 bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle hover:border-brand-primary/50 transition-colors duration-200"
                             >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
@@ -150,14 +151,14 @@ const SAUAgricultureQuestion = () => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                                         </svg>
                                     </div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-text-muted group-hover:text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                     {item.label}
                                 </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-text-muted dark:text-text-muted">
                                     {item.semesters} • {item.courses}
                                 </p>
                             </Link>
@@ -167,7 +168,7 @@ const SAUAgricultureQuestion = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Need help choosing your level? Ask AI →
+                            Need help choosing your level? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -176,20 +177,20 @@ const SAUAgricultureQuestion = () => {
             {/* How to Use This Page Section */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         How to Find Agriculture Questions
                     </h2>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr] [&>*:last-child]:md:col-span-2">
                         {/* Step 1 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-green-600 dark:text-green-400">1</span>
+                                <span className="text-xl font-semibold text-green-600 dark:text-green-400">1</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Select Your Level
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Choose 1st, 2nd, 3rd, or 4th year based on your current semester.
                             </p>
                         </div>
@@ -197,12 +198,12 @@ const SAUAgricultureQuestion = () => {
                         {/* Step 2 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-amber-600 dark:text-amber-400">2</span>
+                                <span className="text-xl font-semibold text-amber-600 dark:text-amber-400">2</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Pick Your Course
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Filter by course code (e.g., AGR-101, SOIL-201) or browse by topic.
                             </p>
                         </div>
@@ -210,12 +211,12 @@ const SAUAgricultureQuestion = () => {
                         {/* Step 3 */}
                         <div className="text-center">
                             <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
-                                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">3</span>
+                                <span className="text-xl font-semibold text-blue-600 dark:text-blue-400">3</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                            <h3 className="text-lg font-semibold text-text-primary dark:text-white mb-2">
                                 Practice & Prepare
                             </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            <p className="text-text-muted dark:text-text-muted text-sm">
                                 Review past papers, identify patterns, and use AI Tutor for doubts.
                             </p>
                         </div>
@@ -224,7 +225,7 @@ const SAUAgricultureQuestion = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Confused about course selection? Ask AI →
+                            Confused about course selection? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -233,19 +234,19 @@ const SAUAgricultureQuestion = () => {
             {/* Why Agriculture Students Use This Platform */}
             <ScrollReveal direction="up" delay={0.1}>
                 <div className="max-w-4xl mx-auto px-4 py-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <h2 className="text-3xl font-semibold text-text-primary dark:text-white mb-8 text-center">
                         Why Agriculture Students Use This Platform
                     </h2>
 
-                    <div className="bg-white dark:bg-[#111827] rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+                    <div className="bg-surface-card bg-surface-card rounded-md border border-border-subtle dark:border-border-subtle p-8">
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Identify high-weightage topics:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">See which crop cycles, soil types, and pest management strategies appear every year — focus your study time there.</span>
+                                    <strong className="text-text-primary dark:text-white">Identify high-weightage topics:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">See which crop cycles, soil types, and pest management strategies appear every year — focus your study time there.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -253,8 +254,8 @@ const SAUAgricultureQuestion = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">No more scattered Telegram groups:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">All Agriculture questions organized by course code in one searchable place.</span>
+                                    <strong className="text-text-primary dark:text-white">No more scattered Telegram groups:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">All Agriculture questions organized by course code in one searchable place.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -262,8 +263,8 @@ const SAUAgricultureQuestion = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Instant doubt clearing:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Stuck on photosynthesis mechanisms or fertilizer calculations? Ask the AI tutor instead of waiting for classmates.</span>
+                                    <strong className="text-text-primary dark:text-white">Instant doubt clearing:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Stuck on photosynthesis mechanisms or fertilizer calculations? Ask the AI tutor instead of waiting for classmates.</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">
@@ -271,8 +272,8 @@ const SAUAgricultureQuestion = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <strong className="text-gray-900 dark:text-white">Help juniors by contributing:</strong>
-                                    <span className="text-gray-700 dark:text-gray-300 ml-1">Upload your old Agriculture papers and build your reputation in the SAU community.</span>
+                                    <strong className="text-text-primary dark:text-white">Help juniors by contributing:</strong>
+                                    <span className="text-gray-700 dark:text-text-muted ml-1">Upload your old Agriculture papers and build your reputation in the SAU community.</span>
                                 </div>
                             </li>
                         </ul>
@@ -281,7 +282,7 @@ const SAUAgricultureQuestion = () => {
                     {/* AI Tutor Inline Prompt */}
                     <div className="mt-6 text-center text-sm">
                         <Link to="/?ai-tutor=open" className="text-green-600 dark:text-green-400 hover:underline inline-flex items-center gap-1">
-                            Want Agriculture study tips? Ask AI →
+                            Want Agriculture study tips? Ask AI {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                         </Link>
                     </div>
                 </div>
@@ -291,10 +292,10 @@ const SAUAgricultureQuestion = () => {
             <FAQ items={agricultureFAQs} title="Common Questions About Agriculture Exam Prep" />
 
             {/* Contextual link to cover page tool */}
-            <div className="max-w-4xl mx-auto px-4 py-2 pb-4 text-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="max-w-4xl mx-auto px-4 py-2 pb-4 text-center text-sm text-text-muted dark:text-text-muted">
                 Need a cover page for your Agriculture assignment?{' '}
                 <Link to="/sau-assignment-cover-page" className="text-green-600 dark:text-green-400 hover:underline font-medium">
-                    Use our free SAU cover page generator →
+                    Use our free SAU cover page generator {<ArrowRightIcon className="ml-1 h-4 w-4" />}
                 </Link>
             </div>
 

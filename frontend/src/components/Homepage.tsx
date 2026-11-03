@@ -5,7 +5,7 @@ import SEO from './SEO';
 import { seoConfig } from '../lib/seoConfig';
 import FAQ from './FAQ';
 import { homepageFAQs } from '../lib/faqData';
-import { AcademicCapIcon, BookOpenIcon, DocumentTextIcon, RefreshIcon, UsersIcon } from './icons';
+import { AcademicCapIcon, ArrowRightIcon, BookOpenIcon, DocumentTextIcon, RefreshIcon, UsersIcon } from './icons';
 
 const Homepage = () => {
     const { activeFaculty } = useFaculty();
@@ -107,7 +107,7 @@ const Homepage = () => {
                                 className="inline-flex min-h-11 items-center gap-2 px-4 py-2 rounded-md bg-surface-card border border-border-subtle text-sm font-medium text-text-primary hover:border-brand-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                             >
                                 <DocumentTextIcon className="h-4 w-4 text-brand-primary" />
-                                Free Cover Page Generator →
+                                Free Cover Page Generator <ArrowRightIcon className="ml-1 h-4 w-4" />
                             </Link>
                         </motion.div>
 

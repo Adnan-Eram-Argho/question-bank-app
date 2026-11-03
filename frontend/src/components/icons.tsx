@@ -97,6 +97,12 @@ export const RefreshIcon = ({ className = 'h-5 w-5', ...props }: IconProps) => (
     </svg>
 );
 
+export const ArrowRightIcon = ({ className = 'h-4 w-4', ...props }: IconProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 12h14m-7-7l7 7-7 7" />
+    </svg>
+);
+
 // AI tutor icons use solid fill (HeroIcons solid) while the rest use outline strokes.
 /** Heart shape — floating AI tutor trigger button */
 export const SparkleIcon = ({ className = 'w-7 h-7', ...props }: IconProps) => (
