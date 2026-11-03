@@ -8,6 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        'surface-canvas': 'rgb(var(--surface-canvas) / <alpha-value>)',
+        'surface-card': 'rgb(var(--surface-card) / <alpha-value>)',
+        'border-subtle': 'rgb(var(--border-subtle) / <alpha-value>)',
+        'brand-primary': 'rgb(var(--brand-primary) / <alpha-value>)',
+        'brand-secondary': 'rgb(var(--brand-secondary) / <alpha-value>)',
+        'text-primary': 'rgb(var(--text-primary) / <alpha-value>)',
+        'text-muted': 'rgb(var(--text-muted) / <alpha-value>)',
         // Agri Green (Premium Natural Leaf) - Primary
         primary: {
           50: '#f1f8f3',
@@ -44,7 +51,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans Bengali', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

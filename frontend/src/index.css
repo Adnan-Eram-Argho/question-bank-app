@@ -2,8 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --surface-canvas: 248 250 248;
+  --surface-card: 255 255 255;
+  --border-subtle: 226 232 227;
+  --brand-primary: 27 94 56;
+  --brand-secondary: 139 94 20;
+  --text-primary: 17 28 19;
+  --text-muted: 75 94 79;
+}
+
+.dark {
+  --surface-canvas: 13 20 15;
+  --surface-card: 20 31 23;
+  --border-subtle: 35 51 39;
+  --brand-primary: 74 222 128;
+  --brand-secondary: 251 191 36;
+  --text-primary: 240 253 244;
+  --text-muted: 155 176 160;
+}
+
 @layer base {
   body {
-    @apply bg-gray-50 dark:bg-[#0B1120] text-gray-800 dark:text-gray-200 transition-colors duration-300 font-sans antialiased selection:bg-primary-200 dark:selection:bg-primary-900/50 selection:text-primary-900 dark:selection:text-primary-100;
+    @apply bg-surface-canvas text-text-primary transition-colors duration-300 font-sans antialiased selection:bg-brand-primary/20 selection:text-text-primary;
+    line-height: 1.65;
   }
 }
