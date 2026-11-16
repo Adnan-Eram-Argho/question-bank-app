@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -13,6 +13,7 @@ import { ArrowRightIcon } from '../components/icons';
 interface FormData {
   title: string;
   courseCode: string;
+  courseTitle: string;
   teacherName: string;
   teacherDesignation: string;
   teacherDepartment: string;
@@ -28,6 +29,7 @@ interface FormData {
 const INITIAL_FORM: FormData = {
   title: '',
   courseCode: '',
+  courseTitle: '',
   teacherName: '',
   teacherDesignation: '',
   teacherDepartment: '',
@@ -103,15 +105,34 @@ export default function SAUCoverPageGenerator() {
   const [f, setF] = useState<FormData>(INITIAL_FORM);
   const [isDownloading, setIsDownloading] = useState(false);
 
+  useEffect(() => {
+    const before = () => {
+      const src = document.getElementById('cover-preview');
+      if (!src || document.getElementById('print-cover')) return;
+      const clone = src.cloneNode(true) as HTMLElement;
+      clone.id = 'print-cover';
+      document.body.appendChild(clone);
+    };
+    const after = () => document.getElementById('print-cover')?.remove();
+    window.addEventListener('beforeprint', before);
+    window.addEventListener('afterprint', after);
+    return () => {
+      window.removeEventListener('beforeprint', before);
+      window.removeEventListener('afterprint', after);
+    };
+  }, []);
+
   const set =
     (k: keyof FormData) =>
       (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setF((prev) => ({ ...prev, [k]: e.target.value }));
 
   const title = f.title.trim();
+  const courseTitle = f.courseTitle.trim();
   const semester = f.semester === '1' ? 'I' : f.semester === '2' ? 'II' : f.semester;
   const levelSem = [f.level ? `Level: ${f.level}` : '', semester ? `Semester: ${semester}` : ''].filter(Boolean).join('  ');
   const secGroup = [f.section ? `Section: ${f.section}` : '', f.group ? `Group: ${f.group}` : ''].filter(Boolean).join('  ');
+  const u = (n: number) => `calc(${n} * var(--u))`;
 
   const downloadDocx = async () => {
     setIsDownloading(true);
@@ -162,7 +183,7 @@ export default function SAUCoverPageGenerator() {
         });
 
       const infoTable = new Table({
-        indent: { size: -135, type: WidthType.DXA },
+        indent: { size: -455, type: WidthType.DXA },
         width: { size: 9936, type: WidthType.DXA },
         columnWidths: [5140, 4796],
         rows: [
@@ -213,7 +234,8 @@ export default function SAUCoverPageGenerator() {
                 ],
               }),
               center(title, 32, { bold: true }),
-              center(`Course Code: ${f.courseCode}`, 32, { after: 1176 }),
+              center(`Course Code: ${f.courseCode}`, 32, { after: courseTitle ? 200 : 1176 }),
+              ...(courseTitle ? [center(`Course Title: ${courseTitle}`, 32, { after: 1176 })] : []),
               infoTable,
             ],
           },
@@ -242,24 +264,27 @@ export default function SAUCoverPageGenerator() {
       </Helmet>
 
       <style>{`
-        #cover-preview { container-type: inline-size; }
-        #cover-preview p { margin: 0 0 1.68cqw; line-height: 1.32; }
+        #cover-preview { container-type: inline-size; --u: 1cqw; }
+        #cover-preview p, #print-cover p { margin: 0 0 calc(1.68 * var(--u)); line-height: 1.32; }
+        #print-cover { display: none; --u: 2.1mm; }
         @media print {
           @page { size: A4; margin: 0; }
-          body > * { visibility: hidden !important; }
-          header, footer, [data-floating], .Toaster { display: none !important; }
-          #cover-preview, #cover-preview * { visibility: visible !important; }
-          #cover-preview {
-            position: fixed !important;
-            inset: 0 !important;
+          html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+          body > *:not(#print-cover) { display: none !important; }
+          #print-cover {
+            display: block !important;
+            position: static !important;
             width: 210mm !important;
-            height: 297mm !important;
+            height: 296mm !important;
             max-width: none !important;
+            aspect-ratio: auto !important;
+            margin: 0 !important;
             box-shadow: none !important;
+            overflow: hidden !important;
             background: #fff !important;
             color: #000 !important;
           }
-          #cover-preview [data-ph] { visibility: hidden !important; }
+          #print-cover [data-ph] { visibility: hidden !important; }
         }
       `}</style>
 
@@ -306,6 +331,11 @@ export default function SAUCoverPageGenerator() {
               <div>
                 <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-1">Course Code</label>
                 <input id="courseCode" className={inputCls} placeholder="যেমন AGEN 226" value={f.courseCode} onChange={set('courseCode')} />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider mb-1">Course Title (ঐচ্ছিক)</label>
+                <input id="courseTitle" className={inputCls} placeholder="যেমন Farm Power and Machinery" value={f.courseTitle} onChange={set('courseTitle')} />
               </div>
 
               <p className="text-sm font-semibold text-gray-700 dark:text-text-muted pt-2 border-t border-gray-100 dark:border-border-subtle">
@@ -379,32 +409,33 @@ export default function SAUCoverPageGenerator() {
                   overflow: 'hidden',
                 }}
               >
-                <div style={{ padding: '12.1cqw 12.1cqw 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: '3.7cqw', fontWeight: 'bold' }}>Sher-e-Bangla Agricultural University</p>
-                  <p style={{ fontSize: '2.69cqw' }}>Sher-e-Bangla Nagar, Dhaka-1207</p>
-                  <img src="/sau-logo.png" alt="SAU logo" style={{ display: 'block', width: '25.2cqw', height: '27.2cqw', margin: '0 auto 3.78cqw' }} />
-                  <p style={{ fontSize: '2.69cqw', fontWeight: 'bold' }}>
+                <div style={{ padding: `${u(12.1)} ${u(12.1)} 0`, textAlign: 'center' }}>
+                  <p style={{ fontSize: u(3.7), fontWeight: 'bold' }}>Sher-e-Bangla Agricultural University</p>
+                  <p style={{ fontSize: u(2.69) }}>Sher-e-Bangla Nagar, Dhaka-1207</p>
+                  <img src="/sau-logo.png" alt="SAU logo" style={{ display: 'block', width: u(25.2), height: u(27.2), margin: `0 auto ${u(3.78)}` }} />
+                  <p style={{ fontSize: u(2.69), fontWeight: 'bold' }}>
                     {title || <span data-ph style={{ color: '#999' }}>কভার পেজের শিরোনাম</span>}
                   </p>
-                  <p style={{ fontSize: '2.69cqw', marginBottom: '9.88cqw' }}>
+                  <p style={{ fontSize: u(2.69), marginBottom: courseTitle ? undefined : u(9.88) }}>
                     {f.courseCode ? `Course Code: ${f.courseCode}` : <span data-ph style={{ color: '#999' }}>Course Code</span>}
                   </p>
+                  {courseTitle && <p style={{ fontSize: u(2.69), marginBottom: u(9.88) }}>Course Title: {courseTitle}</p>}
 
-                  <div style={{ display: 'flex', textAlign: 'left', width: '83.5cqw', marginLeft: '-1.14cqw', border: '1px solid #000' }}>
-                    <div style={{ width: '51.7%', padding: '0.84cqw 1.18cqw 2.1cqw 2.52cqw' }}>
-                      <p style={{ fontSize: '2.69cqw' }}>Submitted to:</p>
-                      <p style={{ fontSize: '2.35cqw' }}>{f.teacherName || <span data-ph style={{ color: '#999' }}>শিক্ষকের নাম</span>}</p>
-                      <p style={{ fontSize: '2.35cqw', fontStyle: 'italic' }}>{f.teacherDesignation || <span data-ph style={{ color: '#999' }}>পদবি</span>}</p>
-                      <p style={{ fontSize: '2.35cqw' }}>{f.teacherDepartment || <span data-ph style={{ color: '#999' }}>Department</span>}</p>
-                      <p style={{ fontSize: '2.35cqw' }}>Sher-e-Bangla Agricultural University, Dhaka-1207</p>
+                  <div style={{ display: 'flex', textAlign: 'left', width: u(83.5), marginLeft: u(-3.85), border: '1px solid #000' }}>
+                    <div style={{ width: '51.7%', padding: `${u(0.84)} ${u(1.18)} ${u(2.1)} ${u(2.52)}` }}>
+                      <p style={{ fontSize: u(2.69) }}>Submitted to:</p>
+                      <p style={{ fontSize: u(2.35) }}>{f.teacherName || <span data-ph style={{ color: '#999' }}>শিক্ষকের নাম</span>}</p>
+                      <p style={{ fontSize: u(2.35), fontStyle: 'italic' }}>{f.teacherDesignation || <span data-ph style={{ color: '#999' }}>পদবি</span>}</p>
+                      <p style={{ fontSize: u(2.35) }}>{f.teacherDepartment || <span data-ph style={{ color: '#999' }}>Department</span>}</p>
+                      <p style={{ fontSize: u(2.35) }}>Sher-e-Bangla Agricultural University, Dhaka-1207</p>
                     </div>
-                    <div style={{ width: '48.3%', borderLeft: '1px solid #000', padding: '0.84cqw 1.18cqw 2.1cqw 2.52cqw' }}>
-                      <p style={{ fontSize: '2.69cqw' }}>Submitted by:</p>
-                      <p style={{ fontSize: '2.35cqw' }}>{f.name ? `Name: ${f.name}` : <span data-ph style={{ color: '#999' }}>Name</span>}</p>
-                      <p style={{ fontSize: '2.35cqw' }}>{f.regNo ? `Registration No: ${f.regNo}` : <span data-ph style={{ color: '#999' }}>Registration No</span>}</p>
-                      {levelSem && <p style={{ fontSize: '2.35cqw' }}>{levelSem}</p>}
-                      {secGroup && <p style={{ fontSize: '2.35cqw' }}>{secGroup}</p>}
-                      {f.faculty && <p style={{ fontSize: '2.35cqw' }}>{f.faculty}</p>}
+                    <div style={{ width: '48.3%', borderLeft: '1px solid #000', padding: `${u(0.84)} ${u(1.18)} ${u(2.1)} ${u(2.52)}` }}>
+                      <p style={{ fontSize: u(2.69) }}>Submitted by:</p>
+                      <p style={{ fontSize: u(2.35) }}>{f.name ? `Name: ${f.name}` : <span data-ph style={{ color: '#999' }}>Name</span>}</p>
+                      <p style={{ fontSize: u(2.35) }}>{f.regNo ? `Registration No: ${f.regNo}` : <span data-ph style={{ color: '#999' }}>Registration No</span>}</p>
+                      {levelSem && <p style={{ fontSize: u(2.35) }}>{levelSem}</p>}
+                      {secGroup && <p style={{ fontSize: u(2.35) }}>{secGroup}</p>}
+                      {f.faculty && <p style={{ fontSize: u(2.35) }}>{f.faculty}</p>}
                     </div>
                   </div>
                 </div>
