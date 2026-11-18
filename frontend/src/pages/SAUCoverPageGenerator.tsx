@@ -46,6 +46,7 @@ const FACULTIES = [
   'Faculty of Agribusiness Management',
   'Faculty of Agriculture',
   'Faculty of Animal Science & Veterinary Medicine',
+  'Faculty of Fisheries and Marine Science'
 ];
 
 const FONT = 'Times New Roman';
